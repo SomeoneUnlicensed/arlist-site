@@ -210,12 +210,16 @@
             })
             .then(md => {
                 document.getElementById('doc-render').innerHTML = marked.parse(md);
-                const title = md.split('\n')[0].replace('#', '').trim();
-                document.title = title + ' | Арлист';
-                document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+                const firstLine = md.trim().split('\n')[0];
+                const title = firstLine.replace(/^#+\s*/, '').trim();
+                if (title) {
+                    document.title = title + ' | Арлист';
+                }
             })
             .catch(err => {
                 document.getElementById('doc-render').innerHTML = '<h1>404</h1><p>Документ не найден.</p>';
+            })
+            .finally(() => {
                 document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
             });
     </script>
