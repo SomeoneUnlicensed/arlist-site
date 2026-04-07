@@ -162,11 +162,29 @@
     </style>
 </head>
 <body>
+    <div class="stub-overlay" id="stub-page">
+        <div class="stub-content">
+            <h2 class="stub-title">Личный кабинет</h2>
+            <p class="stub-text">
+                Мы завершаем работу над единой системой авторизации.<br>
+                Пока что приглашаем вас в наш Git-сервис.
+            </p>
+            <a href="https://commit.arlist.tech" class="stub-link" target="_blank">Перейти в Commit</a>
+            <span class="stub-close" id="stub-close">Вернуться назад</span>
+        </div>
+    </div>
+
     <nav class="navbar">
         <a href="/" class="logo">
-            <img src="/icon.svg" alt="Arlist" class="logo-icon">
+            <img src="/icon.svg" alt="" class="logo-icon">
             Арлист
         </a>
+        <ul class="nav-links">
+            <li><a href="/research" class="nav-link">Исследования</a></li>
+            <li><a href="/gr" class="nav-link">ГР</a></li>
+            <li><a href="/forEdu" class="nav-link">Образование</a></li>
+            <li><button class="nav-link" id="login-btn" style="background: none; border: none; cursor: pointer;">Вход</button></li>
+        </ul>
     </nav>
     <div class="container">
         <main class="content reveal">
@@ -188,6 +206,22 @@
         fetch(`/legal/docs/${slug}.md`)
             .then(r => {
                 if (!r.ok) throw new Error('Document not found');
+                return r.text();
+            })
+            .then(md => {
+                document.getElementById('doc-render').innerHTML = marked.parse(md);
+                const title = md.split('\n')[0].replace('#', '').trim();
+                document.title = title + ' | Арлист';
+                document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+            })
+            .catch(err => {
+                document.getElementById('doc-render').innerHTML = '<h1>404</h1><p>Документ не найден.</p>';
+                document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+            });
+    </script>
+</body>
+</html>
+ if (!r.ok) throw new Error('Document not found');
                 return r.text();
             })
             .then(md => {

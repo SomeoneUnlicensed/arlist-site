@@ -87,6 +87,10 @@
             height: 24px;
             width: auto;
         }
+        
+        .logo img {
+            pointer-events: none;
+        }
 
         .nav-links {
             display: flex;
@@ -193,6 +197,12 @@
             overflow: hidden;
         }
 
+        .product-card:hover {
+            background: rgba(255, 255, 255, 0.02);
+            transform: scale(1.01);
+            z-index: 10;
+        }
+
         .product-card::before {
             content: '';
             position: absolute;
@@ -244,6 +254,24 @@
             font-size: 0.85rem;
             line-height: 1.8;
             max-width: 320px;
+        }
+
+        .product-arrow {
+            display: inline-flex;
+            align-items: center;
+            margin-top: 32px;
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.2em;
+            color: var(--ac-white);
+            opacity: 0;
+            transform: translateX(-10px);
+            transition: all var(--transition);
+        }
+
+        .product-card:not(.coming-soon):hover .product-arrow {
+            opacity: 1;
+            transform: translateX(0);
         }
 
         /* Footer */
@@ -366,7 +394,7 @@
 
 <nav class="navbar">
     <a href="/" class="logo">
-        <img src="/icon.svg" alt="Arlist" class="logo-icon">
+        <img src="/icon.svg" alt="" class="logo-icon">
         Арлист
     </a>
     <ul class="nav-links">
@@ -403,6 +431,7 @@
                     </span>
                     <h3 class="product-title">Commit</h3>
                     <p class="product-desc">Git-сервис для команд. Хостинг репозиториев, CI/CD и совместная работа — всё в одном месте.</p>
+                    <span class="product-arrow">Перейти →</span>
                 </a>
 
                 <!-- Arlist ID -->

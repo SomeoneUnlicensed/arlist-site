@@ -89,6 +89,10 @@
             width: auto;
         }
 
+        .logo img {
+            pointer-events: none;
+        }
+
         .nav-links {
             display: flex;
             gap: 32px;
@@ -175,6 +179,12 @@
             overflow: hidden;
         }
 
+        .research-card:hover {
+            background: rgba(255, 255, 255, 0.02);
+            transform: scale(1.01);
+            z-index: 10;
+        }
+
         .research-card::before {
             content: '';
             position: absolute;
@@ -258,7 +268,7 @@
 
 <nav class="navbar">
     <a href="/" class="logo">
-        <img src="/icon.svg" alt="Arlist" class="logo-icon">
+        <img src="/icon.svg" alt="" class="logo-icon">
         Arlist Research
     </a>
     <ul class="nav-links">
@@ -270,7 +280,7 @@
 <main>
     <section class="hero">
         <div class="container">
-            <span class="hero-label reveal">Лаборатория исследований</span>
+            <span class="hero-label reveal">Exploration Lab</span>
             <h1 class="hero-title reveal">
                 Определяем <span>будущее технологий.</span>
             </h1>
@@ -325,7 +335,7 @@
 </main>
 
 <footer>
-    <p class="footer-text">© 2026 Arlist Technologies. Сделано со смыслом.</p>
+    <p class="footer-text">© 2026 Arlist Technologies. Built with purpose.</p>
 </footer>
 
 <script>
