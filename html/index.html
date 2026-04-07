@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Арлист | Сервисы для людей</title>
+    <meta name="description" content="Честные технологии без лишней бюрократии. Создаем ПО, которое уважает пользователя.">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="/icon.svg">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+    <link rel="manifest" href="/site.webmanifest">
+    <meta name="theme-color" content="#ffffff">
+    <style>
+        :root {
+            --ac-black: #000000;
+            --ac-white: #ffffff;
+            --ac-gray-05: rgba(0,0,0,0.05);
+            --ac-gray-10: rgba(0,0,0,0.1);
+            --ac-gray-20: rgba(0,0,0,0.2);
+            --ac-gray-30: rgba(0,0,0,0.3);
+            --ac-gray-40: rgba(0,0,0,0.4);
+            --ac-gray-50: rgba(0,0,0,0.5);
+            --font-serif: 'Playfair Display', Georgia, serif;
+            --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            --transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            background-color: var(--ac-white);
+            color: var(--ac-black);
+            font-family: var(--font-sans);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+            overflow-x: hidden;
+        }
+
+        /* Заблокировать скролл когда открыта заглушка */
+        body.stub-open {
+            overflow: hidden;
+        }
+
+        ::selection { background: var(--ac-black); color: var(--ac-white); }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 48px;
+        }
+
+        /* Navigation */
+        .navbar {
+            padding: 32px 48px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .logo {
+            font-family: var(--font-serif);
+            font-size: 1.75rem;
+            font-weight: 700;
+            text-decoration: none;
+            color: var(--ac-black);
+            letter-spacing: -0.02em;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 48px;
+            list-style: none;
+            align-items: center;
+        }
+
+        .nav-link {
+            text-decoration: none;
+            color: var(--ac-gray-40);
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.2em;
+            font-weight: 600;
+            transition: color var(--transition);
+            border: none;
+            background: none;
+            cursor: pointer;
+        }
+
+        .nav-link:hover { color: var(--ac-black); }
+        .nav-link.active { color: var(--ac-black); font-weight: 700; }
+
+        .btn-login {
+            display: inline-block;
+            padding: 10px 24px;
+            background: var(--ac-black);
+            color: var(--ac-white);
+            text-decoration: none;
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.2em;
+            font-weight: 700;
+            transition: all var(--transition);
+            border-radius: 4px;
+            margin-left: 16px;
+            cursor: pointer;
+            border: none;
+        }
+
+        .btn-login:hover {
+            opacity: 0.85;
+            transform: translateY(-2px);
+        }
+
+        /* Hero */
+        .hero {
+            padding: 40px 0 120px;
+        }
+
+        .hero-inner {
+            max-width: 800px;
+        }
+
+        .hero-label {
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.3em;
+            font-weight: 700;
+            color: var(--ac-gray-30);
+            margin-bottom: 24px;
+        }
+
+        .hero-title {
+            font-family: var(--font-serif);
+            font-size: clamp(2.5rem, 6vw, 4.5rem);
+            line-height: 1.05;
+            letter-spacing: -0.03em;
+            margin-bottom: 24px;
+        }
+
+        .hero-subtitle {
+            font-size: 1.125rem;
+            color: var(--ac-gray-40);
+            max-width: 580px;
+            line-height: 1.7;
+            margin-bottom: 40px;
+        }
+
+        .btn-primary {
+            display: inline-block;
+            padding: 14px 40px;
+            background: var(--ac-black);
+            color: var(--ac-white);
+            text-decoration: none;
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.2em;
+            font-weight: 700;
+            transition: all var(--transition);
+            border-radius: 4px;
+        }
+
+        .btn-primary:hover {
+            opacity: 0.85;
+            transform: translateY(-2px);
+        }
+
+        /* Products Section */
+        .products-section {
+            padding: 100px 0;
+            border-top: 1px solid var(--ac-gray-05);
+        }
+
+        .section-header {
+            margin-bottom: 64px;
+        }
+
+        .section-label {
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.3em;
+            font-weight: 700;
+            color: var(--ac-gray-30);
+            margin-bottom: 16px;
+        }
+
+        .section-title {
+            font-family: var(--font-serif);
+            font-size: clamp(1.75rem, 3.5vw, 2.5rem);
+            letter-spacing: -0.02em;
+        }
+
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 48px;
+        }
+
+        .product-card {
+            border-top: 1px solid var(--ac-gray-10);
+            padding-top: 24px;
+            text-decoration: none;
+            color: inherit;
+            transition: all var(--transition);
+            display: block;
+            position: relative;
+        }
+
+        .product-card.coming-soon {
+            opacity: 0.6;
+            pointer-events: none;
+            cursor: not-allowed;
+        }
+
+        .product-card:hover {
+            transform: translateY(-6px);
+            border-color: var(--ac-gray-30);
+        }
+
+        .product-card.coming-soon:hover {
+            transform: none;
+        }
+
+        .product-card-label {
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.25em;
+            color: var(--ac-gray-30);
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .badge-soon {
+            background: var(--ac-gray-10);
+            color: var(--ac-gray-40);
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 9px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+
+        .badge-active {
+            background: var(--ac-black);
+            color: var(--ac-white);
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 9px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+
+        .product-card-title {
+            font-family: var(--font-serif);
+            font-size: 2rem;
+            margin-bottom: 12px;
+            font-weight: 400;
+        }
+
+        .product-card-desc {
+            color: var(--ac-gray-50);
+            font-size: 0.9375rem;
+            line-height: 1.7;
+        }
+
+        .product-card-arrow {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 20px;
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            font-weight: 600;
+            opacity: 0;
+            transform: translateX(-10px);
+            transition: all var(--transition);
+        }
+
+        .product-card:not(.coming-soon):hover .product-card-arrow {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        .product-card.coming-soon .product-card-arrow {
+            opacity: 1;
+            transform: translateX(0);
+            color: var(--ac-gray-40);
+        }
+
+        /* Contact Section */
+        .contact-section {
+            padding: 120px 0;
+            text-align: center;
+        }
+
+        .contact-title {
+            font-family: var(--font-serif);
+            font-size: clamp(2rem, 4.5vw, 3rem);
+            letter-spacing: -0.03em;
+            margin-bottom: 20px;
+        }
+
+        .contact-email {
+            font-family: var(--font-serif);
+            font-style: italic;
+            font-size: 1.375rem;
+            color: var(--ac-black);
+            text-decoration: none;
+            border-bottom: 1px solid var(--ac-gray-20);
+            transition: border-color var(--transition);
+        }
+
+        .contact-email:hover {
+            border-color: var(--ac-black);
+        }
+
+        .contact-note {
+            margin-top: 20px;
+            color: var(--ac-gray-40);
+            font-size: 0.875rem;
+        }
+
+        .contact-note a {
+            color: var(--ac-black);
+            font-weight: 500;
+            text-decoration: none;
+        }
+
+        .contact-note a:hover {
+            text-decoration: underline;
+        }
+
+        /* Footer */
+        footer {
+            padding: 40px 48px;
+            border-top: 1px solid var(--ac-gray-05);
+            text-align: center;
+        }
+
+        .footer-text {
+            font-family: var(--font-serif);
+            font-style: italic;
+            font-size: 0.9375rem;
+            color: var(--ac-gray-30);
+        }
+
+        /* Animations */
+        .reveal {
+            opacity: 0;
+            transform: translateY(24px);
+            transition: opacity 0.8s cubic-bezier(0.2, 0.8, 0.2, 1),
+                        transform 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+
+        .reveal.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* STUB PAGE OVERLAY */
+        .stub-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--ac-white);
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.5s ease, visibility 0.5s ease;
+        }
+
+        .stub-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .stub-content {
+            text-align: center;
+            max-width: 600px;
+            padding: 48px;
+        }
+
+        .stub-smiley {
+            font-size: 4rem;
+            margin-bottom: 24px;
+            display: block;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .stub-title {
+            font-family: var(--font-serif);
+            font-size: clamp(2rem, 5vw, 3rem);
+            margin-bottom: 16px;
+            letter-spacing: -0.02em;
+        }
+
+        .stub-text {
+            font-size: 1.125rem;
+            color: var(--ac-gray-40);
+            margin-bottom: 40px;
+            line-height: 1.6;
+        }
+
+        .stub-link {
+            display: inline-block;
+            padding: 16px 48px;
+            background: var(--ac-black);
+            color: var(--ac-white);
+            text-decoration: none;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.2em;
+            font-weight: 700;
+            transition: all var(--transition);
+            border-radius: 4px;
+            margin-bottom: 24px;
+        }
+
+        .stub-link:hover {
+            opacity: 0.85;
+            transform: translateY(-2px);
+        }
+
+        .stub-close {
+            display: block;
+            font-size: 12px;
+            color: var(--ac-gray-40);
+            text-decoration: none;
+            cursor: pointer;
+            transition: color var(--transition);
+        }
+
+        .stub-close:hover {
+            color: var(--ac-black);
+        }
+
+        /* Responsive */
+        @media (max-width: 900px) {
+            .container { padding: 0 24px; }
+            .navbar { 
+                flex-direction: column; 
+                gap: 20px;
+                padding: 24px;
+            }
+            .nav-links { gap: 20px; flex-wrap: wrap; justify-content: center; }
+            .btn-login { margin-left: 0; }
+            .products-grid { grid-template-columns: 1fr; gap: 40px; }
+            .hero { padding: 32px 0 96px; }
+            .hero-title { font-size: clamp(2rem, 7vw, 3.5rem); }
+            .stub-content { padding: 24px; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- STUB PAGE OVERLAY -->
+<div class="stub-overlay" id="stub-page">
+    <div class="stub-content">
+        <span class="stub-smiley">🙂</span>
+        <h2 class="stub-title">Скоро всё будет готово</h2>
+        <p class="stub-text">
+            Мы заканчиваем разработку единого кабинета.<br>
+            Пока что приглашаем вас в наш DevOps-сервис.
+        </p>
+        <a href="https://commit.arlist.tech" class="stub-link" target="_blank">Перейти в Commit</a>
+        <br>
+        <span class="stub-close" id="stub-close">Вернуться на сайт</span>
+    </div>
+</div>
+
+<nav class="navbar">
+    <a href="/" class="logo">Арлист</a>
+    <ul class="nav-links">
+        <li><a href="#about" class="nav-link">О нас</a></li>
+        <li><a href="#products" class="nav-link">Решения</a></li>
+        <li><button class="btn-login" id="login-btn">ВХОД</button></li>
+    </ul>
+</nav>
+
+<main>
+    <section class="hero">
+        <div class="container">
+            <div class="hero-inner">
+                <p class="hero-label reveal">Честные технологии</p>
+                <h1 class="hero-title reveal">Сервисы для людей,<br>а не ради импортозамещения.</h1>
+                <p class="hero-subtitle reveal">Мы создаем программное обеспечение, которое уважает пользователя. Без лишней бюрократии, без навязанных шаблонов. Только чистота кода и удобство для человека.</p>
+                <a href="#products" class="btn-primary reveal">Наши решения</a>
+            </div>
+        </div>
+    </section>
+
+    <section id="products" class="products-section">
+        <div class="container">
+            <div class="section-header">
+                <p class="section-label reveal">Экосистема</p>
+                <h2 class="section-title reveal">Инструменты для работы и жизни</h2>
+            </div>
+
+            <div class="products-grid">
+                <!-- Active Service -->
+                <a href="https://commit.arlist.tech" class="product-card reveal" target="_blank">
+                    <p class="product-card-label">
+                        DevOps
+                        <span class="badge-active">Доступен</span>
+                    </p>
+                    <h3 class="product-card-title">Commit</h3>
+                    <p class="product-card-desc">Git-сервис для команд. Хостинг репозиториев, CI/CD и совместная работа — всё в одном месте.</p>
+                    <span class="product-card-arrow">Перейти →</span>
+                </a>
+
+                <!-- Coming Soon Services -->
+                <div class="product-card coming-soon reveal">
+                    <p class="product-card-label">
+                        Защита
+                        <span class="badge-soon">СКОРО</span>
+                    </p>
+                    <h3 class="product-card-title">Арлист Айди</h3>
+                    <p class="product-card-desc">Единый доступ ко всем инструментам. Безопасность, основанная на прозрачности и здравом смысле.</p>
+                    <span class="product-card-arrow">В разработке →</span>
+                </div>
+
+                <div class="product-card coming-soon reveal">
+                    <p class="product-card-label">
+                        Разум
+                        <span class="badge-soon">СКОРО</span>
+                    </p>
+                    <h3 class="product-card-title">ЛмАПИ</h3>
+                    <p class="product-card-desc">Мощь нейросетевых моделей в простом интерфейсе. Интеллект как инструмент, а не как лозунг.</p>
+                    <span class="product-card-arrow">В разработке →</span>
+                </div>
+
+                <div class="product-card coming-soon reveal">
+                    <p class="product-card-label">
+                        Связи
+                        <span class="badge-soon">СКОРО</span>
+                    </p>
+                    <h3 class="product-card-title">Трекер</h3>
+                    <p class="product-card-desc">Умные ссылки и подробная аналитика. Понимайте свой путь без лишних усилий.</p>
+                    <span class="product-card-arrow">В разработке →</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="contact" class="contact-section">
+        <div class="container">
+            <p class="section-label reveal">Диалог</p>
+            <h2 class="contact-title reveal">Давайте создадим<br>что-то настоящее.</h2>
+            <a href="mailto:letunovskiy@arlist.tech" class="contact-email reveal">letunovskiy@arlist.tech</a>
+            <p class="contact-note">
+                Или зарегистрируйтесь в нашем Git-сервисе: 
+                <a href="https://commit.arlist.tech" target="_blank">commit.arlist.tech</a>
+            </p>
+        </div>
+    </section>
+</main>
+
+<footer>
+    <p class="footer-text">© 2026 Арлист Технологии. Высокая культура кода и уважение к человеку.</p>
+</footer>
+
+<script>
+    // Stub Page Logic
+    const loginBtn = document.getElementById('login-btn');
+    const stubPage = document.getElementById('stub-page');
+    const stubClose = document.getElementById('stub-close');
+
+    loginBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        stubPage.classList.add('active');
+        document.body.classList.add('stub-open');
+    });
+
+    stubClose.addEventListener('click', () => {
+        stubPage.classList.remove('active');
+        document.body.classList.remove('stub-open');
+    });
+
+    // Scroll animations
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('visible');
+            }
+        });
+    }, { threshold: 0.1 });
+
+    document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+    // Prevent clicks on coming soon cards
+    document.querySelectorAll('.product-card.coming-soon').forEach(card => {
+        card.addEventListener('click', (e) => {
+            e.preventDefault();
+            alert('Этот сервис скоро будет доступен. Следите за обновлениями!');
+        });
+    });
+</script>
+
+</body>
+</html>

@@ -1,0 +1,9 @@
+services:
+  web:
+    image: nginx:alpine
+    container_name: arlist-main-site
+    restart: always
+    volumes:
+      - ./html:/usr/share/nginx/html
+    ports:
+      - "8086:80"
