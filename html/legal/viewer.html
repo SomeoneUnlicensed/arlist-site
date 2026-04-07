@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Документ | Арлист</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <style>
+        :root {
+            --ac-black: #000000;
+            --ac-white: #ffffff;
+            --ac-gray-05: rgba(0,0,0,0.05);
+            --ac-gray-50: rgba(0,0,0,0.5);
+            --font-serif: 'Playfair Display', Georgia, serif;
+            --font-sans: 'Inter', sans-serif;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { background-color: var(--ac-white); color: var(--ac-black); font-family: var(--font-sans); line-height: 1.6; }
+        .container { max-width: 1400px; margin: 0 auto; padding: 0 48px; }
+        .navbar { padding: 32px 0; border-bottom: 1px solid var(--ac-gray-05); }
+        .logo { font-family: var(--font-serif); font-size: 1.5rem; font-weight: 700; text-decoration: none; color: var(--ac-black); }
+        .content { padding: 80px 0; max-width: 800px; }
+        /* Markdown Styles */
+        #doc-render h1 { font-family: var(--font-serif); font-size: 3rem; margin-bottom: 40px; line-height: 1.1; }
+        #doc-render h2 { font-family: var(--font-serif); font-size: 1.75rem; margin: 40px 0 20px; }
+        #doc-render p { font-size: 1.125rem; color: var(--ac-gray-50); margin-bottom: 24px; }
+        #doc-render ul { margin-bottom: 24px; padding-left: 20px; }
+        .back-btn { display: inline-block; margin-top: 40px; text-decoration: none; color: var(--ac-black); font-size: 11px; text-transform: uppercase; font-weight: 700; letter-spacing: 0.1em; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <nav class="navbar"><a href="/" class="logo">Арлист</a></nav>
+        <main class="content">
+            <div id="doc-render">Загрузка...</div>
+            <a href="/legal" class="back-btn">← Ко всем документам</a>
+        </main>
+    </div>
+    <script>
+        const slug = window.location.pathname.split('/').pop();
+        fetch(`/legal/docs/${slug}.md`)
+            .then(r => {
+                if (!r.ok) throw new Error('Document not found');
+                return r.text();
+            })
+            .then(md => {
+                document.getElementById('doc-render').innerHTML = marked.parse(md);
+                const title = md.split('\n')[0].replace('#', '').trim();
+                document.title = title + ' | Арлист';
+            })
+            .catch(err => {
+                document.getElementById('doc-render').innerHTML = '<h1>404</h1><p>Документ не найден.</p>';
+            });
+    </script>
+</body>
+</html>

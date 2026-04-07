@@ -2,62 +2,63 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Юридическая информация | Арлист</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
-    <link rel="icon" type="image/svg+xml" href="/icon.svg">
     <style>
         :root {
             --ac-black: #000000;
             --ac-white: #ffffff;
             --ac-gray-05: rgba(0,0,0,0.05);
             --ac-gray-10: rgba(0,0,0,0.1);
-            --ac-gray-20: rgba(0,0,0,0.2);
             --ac-gray-30: rgba(0,0,0,0.3);
             --ac-gray-40: rgba(0,0,0,0.4);
             --ac-gray-50: rgba(0,0,0,0.5);
             --font-serif: 'Playfair Display', Georgia, serif;
-            --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            --font-sans: 'Inter', sans-serif;
             --transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         }
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { background-color: var(--ac-white); color: var(--ac-black); font-family: var(--font-sans); line-height: 1.6; -webkit-font-smoothing: antialiased; }
+        body { background-color: var(--ac-white); color: var(--ac-black); font-family: var(--font-sans); line-height: 1.6; }
         .container { max-width: 1400px; margin: 0 auto; padding: 0 48px; }
         .navbar { padding: 32px 0; display: flex; justify-content: space-between; align-items: center; }
-        .logo { font-family: var(--font-serif); font-size: 1.75rem; font-weight: 700; text-decoration: none; color: var(--ac-black); letter-spacing: -0.02em; }
+        .logo { font-family: var(--font-serif); font-size: 1.75rem; font-weight: 700; text-decoration: none; color: var(--ac-black); }
         .content { padding: 80px 0 120px; max-width: 800px; }
         .label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.3em; font-weight: 700; color: var(--ac-gray-30); margin-bottom: 24px; }
-        h1 { font-family: var(--font-serif); font-size: clamp(2.5rem, 5vw, 4rem); line-height: 1.1; margin-bottom: 40px; letter-spacing: -0.02em; }
+        h1 { font-family: var(--font-serif); font-size: clamp(2.5rem, 5vw, 4rem); line-height: 1.1; margin-bottom: 40px; }
         .doc-list { list-style: none; margin-top: 40px; }
         .doc-item { margin-bottom: 24px; padding-bottom: 24px; border-bottom: 1px solid var(--ac-gray-05); }
         .doc-link { text-decoration: none; color: var(--ac-black); font-size: 1.25rem; font-weight: 500; transition: opacity var(--transition); display: block; }
         .doc-link:hover { opacity: 0.6; }
         .doc-meta { font-size: 12px; color: var(--ac-gray-40); margin-top: 8px; text-transform: uppercase; letter-spacing: 0.1em; }
-        .footer { padding: 64px 0; border-top: 1px solid var(--ac-gray-05); margin-top: 80px; }
     </style>
 </head>
 <body>
     <div class="container">
-        <nav class="navbar">
-            <a href="/" class="logo">Арлист</a>
-        </nav>
+        <nav class="navbar"><a href="/" class="logo">Арлист</a></nav>
         <main class="content">
             <div class="label">Документы</div>
             <h1>Юридическая информация</h1>
-            <ul class="doc-list">
-                <li class="doc-item">
-                    <span class="doc-link">Политика конфиденциальности</span>
-                    <div class="doc-meta">В разработке</div>
-                </li>
-                <li class="doc-item">
-                    <span class="doc-link">Пользовательское соглашение</span>
-                    <div class="doc-meta">В разработке</div>
-                </li>
+            <ul id="doc-list" class="doc-list">
+                <!-- Will be populated by JS -->
             </ul>
         </main>
-        <footer class="footer">
-            <div class="label">© 2026 Арлист.</div>
-        </footer>
     </div>
+    <script>
+        fetch('./config.json')
+            .then(r => r.json())
+            .then(data => {
+                const list = document.getElementById('doc-list');
+                data.forEach(doc => {
+                    const li = document.createElement('li');
+                    li.className = 'doc-item';
+                    li.innerHTML = `
+                        <a href="/legal/${doc.slug}" class="doc-link">${doc.title}</a>
+                        <div class="doc-meta">${doc.date} • ${doc.description}</div>
+                    `;
+                    list.appendChild(li);
+                });
+            });
+    </script>
 </body>
 </html>
