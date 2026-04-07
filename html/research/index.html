@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Arlist Research | Исследования и инновации</title>
+    <meta name="description" content="Лаборатория Арлист. Мы исследуем границы возможного в биоинформатике, ИИ и спасательных технологиях.">
+    
+    <!-- Maple Mono Font -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/maple-mono@5.2.6/index.css">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="/icon.svg">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+    <link rel="manifest" href="/site.webmanifest">
+    <meta name="theme-color" content="#000000">
+
+    <style>
+        :root {
+            --ac-black: #000000;
+            --ac-white: #ffffff;
+            --ac-gray-05: rgba(255,255,255,0.05);
+            --ac-gray-10: rgba(255,255,255,0.1);
+            --ac-gray-20: rgba(255,255,255,0.2);
+            --ac-gray-30: rgba(255,255,255,0.3);
+            --ac-gray-40: rgba(255,255,255,0.4);
+            --ac-gray-50: rgba(255,255,255,0.5);
+            --font-mono: 'Maple Mono', monospace;
+            --transition: 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            background-color: var(--ac-black);
+            color: var(--ac-white);
+            font-family: var(--font-mono);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+            overflow-x: hidden;
+        }
+
+        ::selection { background: var(--ac-white); color: var(--ac-black); }
+
+        /* Subtle Background Gradient */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 50% -20%, #111 0%, #000 70%);
+            z-index: -1;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 48px;
+        }
+
+        /* Navigation */
+        .navbar {
+            padding: 48px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .logo {
+            font-size: 1.1rem;
+            font-weight: 700;
+            text-decoration: none;
+            color: var(--ac-white);
+            letter-spacing: -0.05em;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-transform: uppercase;
+        }
+
+        .logo-dot {
+            width: 4px;
+            height: 4px;
+            background: var(--ac-white);
+            border-radius: 50%;
+            box-shadow: 0 0 12px var(--ac-white);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 32px;
+            list-style: none;
+            align-items: center;
+        }
+
+        .nav-link {
+            text-decoration: none;
+            color: var(--ac-gray-40);
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.25em;
+            font-weight: 500;
+            transition: color var(--transition), transform var(--transition);
+        }
+
+        .nav-link:hover { 
+            color: var(--ac-white); 
+            transform: translateY(-1px);
+        }
+
+        /* Hero */
+        .hero {
+            padding: 100px 0 140px;
+            text-align: center;
+        }
+
+        .hero-label {
+            font-size: 9px;
+            text-transform: uppercase;
+            letter-spacing: 0.5em;
+            font-weight: 500;
+            color: var(--ac-gray-30);
+            margin-bottom: 40px;
+            display: block;
+        }
+
+        .hero-title {
+            font-size: clamp(2.5rem, 8vw, 5rem);
+            line-height: 0.95;
+            letter-spacing: -0.07em;
+            margin-bottom: 40px;
+            font-weight: 400;
+        }
+
+        .hero-title span {
+            display: block;
+            color: var(--ac-gray-10);
+        }
+
+        .hero-subtitle {
+            font-size: 0.95rem;
+            color: var(--ac-gray-40);
+            max-width: 540px;
+            margin: 0 auto;
+            line-height: 1.8;
+            letter-spacing: -0.01em;
+        }
+
+        /* Research Grid */
+        .research-section {
+            padding-bottom: 160px;
+        }
+
+        .research-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1px;
+            background: var(--ac-gray-05);
+            border: 1px solid var(--ac-gray-05);
+        }
+
+        .research-card {
+            background: var(--ac-black);
+            padding: 100px 60px;
+            text-decoration: none;
+            color: inherit;
+            transition: all var(--transition);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .research-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 50% 50%, rgba(255,255,255,0.02) 0%, transparent 80%);
+            opacity: 0;
+            transition: opacity var(--transition);
+        }
+
+        .research-card:hover::before {
+            opacity: 1;
+        }
+
+        .research-card-num {
+            font-size: 9px;
+            color: var(--ac-gray-20);
+            margin-bottom: 32px;
+            display: block;
+            letter-spacing: 0.2em;
+        }
+
+        .research-card-title {
+            font-size: 1.75rem;
+            margin-bottom: 24px;
+            font-weight: 400;
+            letter-spacing: -0.04em;
+        }
+
+        .research-card-desc {
+            color: var(--ac-gray-40);
+            font-size: 0.85rem;
+            line-height: 1.8;
+            max-width: 300px;
+        }
+
+        /* Footer */
+        footer {
+            padding: 100px 48px;
+            border-top: 1px solid var(--ac-gray-05);
+            text-align: center;
+        }
+
+        .footer-text {
+            font-size: 9px;
+            text-transform: uppercase;
+            letter-spacing: 0.3em;
+            color: var(--ac-gray-30);
+        }
+
+        /* Animations */
+        .reveal {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 1.2s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .reveal.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-track { background: var(--ac-black); }
+        ::-webkit-scrollbar-thumb { background: var(--ac-gray-10); border-radius: 2px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--ac-gray-20); }
+
+        @media (max-width: 900px) {
+            .navbar { padding: 32px 24px; }
+            .container { padding: 0 24px; }
+            .hero { padding: 60px 0 80px; }
+            .research-grid { grid-template-columns: 1fr; }
+            .research-card { padding: 60px 32px; }
+        }
+    </style>
+</head>
+<body>
+
+<nav class="navbar">
+    <a href="/" class="logo">
+        <span class="logo-dot"></span>
+        Arlist Research
+    </a>
+    <ul class="nav-links">
+        <li><a href="/" class="nav-link">Home</a></li>
+        <li><a href="https://commit.arlist.tech" class="nav-link">Commit</a></li>
+    </ul>
+</nav>
+
+<main>
+    <section class="hero">
+        <div class="container">
+            <span class="hero-label reveal">Exploration Lab</span>
+            <h1 class="hero-title reveal">
+                Defining the <span>future of tech.</span>
+            </h1>
+            <p class="hero-subtitle reveal">
+                Мы исследуем границы возможного, объединяя чистый код с научным подходом. 
+                Лаборатория Арлист — это пространство для экспериментов, которые меняют реальность.
+            </p>
+        </div>
+    </section>
+
+    <section class="research-section">
+        <div class="container">
+            <div class="research-grid">
+                <!-- Bioinformatics -->
+                <div class="research-card reveal">
+                    <span class="research-card-num">#01</span>
+                    <h2 class="research-card-title">Bioinformatics</h2>
+                    <p class="research-card-desc">
+                        Анализ биологических данных через призму алгоритмов. Понимаем код жизни так же глубоко, как и системный код.
+                    </p>
+                </div>
+
+                <!-- AI -->
+                <div class="research-card reveal">
+                    <span class="research-card-num">#02</span>
+                    <h2 class="research-card-title">Artificial Intelligence</h2>
+                    <p class="research-card-desc">
+                        Разработка специализированных моделей, способных решать прикладные задачи с минимальными ресурсами.
+                    </p>
+                </div>
+
+                <!-- Gamedev -->
+                <div class="research-card reveal">
+                    <span class="research-card-num">#03</span>
+                    <h2 class="research-card-title">Game Development</h2>
+                    <p class="research-card-desc">
+                        Исследование процедурных миров и новых механик взаимодействия. Игра как среда для обучения и творчества.
+                    </p>
+                </div>
+
+                <!-- Search & Rescue -->
+                <div class="research-card reveal">
+                    <span class="research-card-num">#04</span>
+                    <h2 class="research-card-title">Search & Rescue</h2>
+                    <p class="research-card-desc">
+                        Создание отказоустойчивых систем для поиска людей. Технологии, спасающие жизни в экстремальных условиях.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+</main>
+
+<footer>
+    <p class="footer-text">© 2026 Arlist Technologies. Built with purpose.</p>
+</footer>
+
+<script>
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('visible');
+            }
+        });
+    }, { threshold: 0.1 });
+
+    document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+</script>
+
+</body>
+</html>
