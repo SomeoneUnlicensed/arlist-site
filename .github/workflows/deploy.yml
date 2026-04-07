@@ -18,4 +18,4 @@ jobs:
           rsync -av --exclude='.git*' ./ ~/services/arlist-site/
           
           # Optional: restart containers if needed
-          # cd ~/services/arlist-site && docker compose up -d
+          cd ~/services/arlist-site && docker compose up -d
