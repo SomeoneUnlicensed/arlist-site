@@ -1,0 +1,21 @@
+name: Deploy to Server
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  deploy:
+    runs-on: self-hosted
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Update files
+        run: |
+          # Syncing files to the target directory on the same server
+          rsync -av --exclude='.git*' ./ ~/services/arlist-site/
+          
+          # Optional: restart containers if needed
+          # cd ~/services/arlist-site && docker compose up -d
