@@ -5,56 +5,65 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Арлист | Сервисы для людей</title>
     <meta name="description" content="Честные технологии без лишней бюрократии. Создаем ПО, которое уважает пользователя.">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+    
+    <!-- Maple Mono Font -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/maple-mono@5.2.6/index.css">
+    
     <!-- Favicon -->
     <link rel="icon" type="image/svg+xml" href="/icon.svg">
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
     <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
     <link rel="manifest" href="/site.webmanifest">
-    <meta name="theme-color" content="#ffffff">
+    <meta name="theme-color" content="#000000">
+
     <style>
         :root {
             --ac-black: #000000;
             --ac-white: #ffffff;
-            --ac-gray-05: rgba(0,0,0,0.05);
-            --ac-gray-10: rgba(0,0,0,0.1);
-            --ac-gray-20: rgba(0,0,0,0.2);
-            --ac-gray-30: rgba(0,0,0,0.3);
-            --ac-gray-40: rgba(0,0,0,0.4);
-            --ac-gray-50: rgba(0,0,0,0.5);
-            --font-serif: 'Playfair Display', Georgia, serif;
-            --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            --transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            --ac-gray-05: rgba(255,255,255,0.05);
+            --ac-gray-10: rgba(255,255,255,0.1);
+            --ac-gray-20: rgba(255,255,255,0.2);
+            --ac-gray-30: rgba(255,255,255,0.3);
+            --ac-gray-40: rgba(255,255,255,0.4);
+            --ac-gray-50: rgba(255,255,255,0.5);
+            --font-mono: 'Maple Mono', monospace;
+            --transition: 0.6s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
-            background-color: var(--ac-white);
-            color: var(--ac-black);
-            font-family: var(--font-sans);
+            background-color: var(--ac-black);
+            color: var(--ac-white);
+            font-family: var(--font-mono);
             line-height: 1.6;
             -webkit-font-smoothing: antialiased;
             overflow-x: hidden;
         }
 
-        /* Заблокировать скролл когда открыта заглушка */
-        body.stub-open {
-            overflow: hidden;
+        ::selection { background: var(--ac-white); color: var(--ac-black); }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 50% -20%, #111 0%, #000 70%);
+            z-index: -1;
         }
 
-        ::selection { background: var(--ac-black); color: var(--ac-white); }
-
         .container {
-            max-width: 1400px;
+            max-width: 1200px;
             margin: 0 auto;
             padding: 0 48px;
         }
 
         /* Navigation */
         .navbar {
-            padding: 32px 48px;
+            padding: 48px;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -63,17 +72,25 @@
         }
 
         .logo {
-            font-family: var(--font-serif);
-            font-size: 1.75rem;
+            font-size: 1.25rem;
             font-weight: 700;
             text-decoration: none;
-            color: var(--ac-black);
-            letter-spacing: -0.02em;
+            color: var(--ac-white);
+            letter-spacing: -0.05em;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-transform: uppercase;
+        }
+
+        .logo-icon {
+            height: 24px;
+            width: auto;
         }
 
         .nav-links {
             display: flex;
-            gap: 48px;
+            gap: 32px;
             list-style: none;
             align-items: center;
         }
@@ -81,284 +98,173 @@
         .nav-link {
             text-decoration: none;
             color: var(--ac-gray-40);
-            font-size: 11px;
-            text-transform: uppercase;
-            letter-spacing: 0.2em;
-            font-weight: 600;
-            transition: color var(--transition);
-            border: none;
-            background: none;
-            cursor: pointer;
-        }
-
-        .nav-link:hover { color: var(--ac-black); }
-        .nav-link.active { color: var(--ac-black); font-weight: 700; }
-
-        .btn-login {
-            display: inline-block;
-            padding: 10px 24px;
-            background: var(--ac-black);
-            color: var(--ac-white);
-            text-decoration: none;
             font-size: 10px;
             text-transform: uppercase;
-            letter-spacing: 0.2em;
-            font-weight: 700;
-            transition: all var(--transition);
-            border-radius: 4px;
-            margin-left: 16px;
-            cursor: pointer;
-            border: none;
+            letter-spacing: 0.25em;
+            font-weight: 500;
+            transition: color var(--transition), transform var(--transition);
         }
 
-        .btn-login:hover {
-            opacity: 0.85;
-            transform: translateY(-2px);
+        .nav-link:hover { 
+            color: var(--ac-white); 
+            transform: translateY(-1px);
         }
 
         /* Hero */
         .hero {
-            padding: 40px 0 120px;
-        }
-
-        .hero-inner {
-            max-width: 800px;
+            padding: 100px 0 140px;
         }
 
         .hero-label {
-            font-size: 10px;
+            font-size: 9px;
             text-transform: uppercase;
-            letter-spacing: 0.3em;
-            font-weight: 700;
+            letter-spacing: 0.5em;
+            font-weight: 500;
             color: var(--ac-gray-30);
-            margin-bottom: 24px;
+            margin-bottom: 40px;
+            display: block;
         }
 
         .hero-title {
-            font-family: var(--font-serif);
-            font-size: clamp(2.5rem, 6vw, 4.5rem);
-            line-height: 1.05;
-            letter-spacing: -0.03em;
-            margin-bottom: 24px;
+            font-size: clamp(2.5rem, 8vw, 5rem);
+            line-height: 0.95;
+            letter-spacing: -0.07em;
+            margin-bottom: 40px;
+            font-weight: 400;
+            max-width: 900px;
+        }
+
+        .hero-title span {
+            display: block;
+            background: linear-gradient(90deg, #ffffff, #88ccff, #88ffcc);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
 
         .hero-subtitle {
-            font-size: 1.125rem;
+            font-size: 0.95rem;
             color: var(--ac-gray-40);
-            max-width: 580px;
-            line-height: 1.7;
-            margin-bottom: 40px;
+            max-width: 540px;
+            line-height: 1.8;
+            letter-spacing: -0.01em;
+            margin-bottom: 48px;
         }
 
         .btn-primary {
             display: inline-block;
-            padding: 14px 40px;
-            background: var(--ac-black);
+            padding: 16px 40px;
+            border: 1px solid var(--ac-white);
             color: var(--ac-white);
             text-decoration: none;
             font-size: 10px;
             text-transform: uppercase;
-            letter-spacing: 0.2em;
-            font-weight: 700;
+            letter-spacing: 0.3em;
+            font-weight: 600;
             transition: all var(--transition);
-            border-radius: 4px;
         }
 
         .btn-primary:hover {
-            opacity: 0.85;
+            background: var(--ac-white);
+            color: var(--ac-black);
             transform: translateY(-2px);
         }
 
-        /* Products Section */
+        /* Products Grid */
         .products-section {
-            padding: 100px 0;
-            border-top: 1px solid var(--ac-gray-05);
-        }
-
-        .section-header {
-            margin-bottom: 64px;
-        }
-
-        .section-label {
-            font-size: 10px;
-            text-transform: uppercase;
-            letter-spacing: 0.3em;
-            font-weight: 700;
-            color: var(--ac-gray-30);
-            margin-bottom: 16px;
-        }
-
-        .section-title {
-            font-family: var(--font-serif);
-            font-size: clamp(1.75rem, 3.5vw, 2.5rem);
-            letter-spacing: -0.02em;
+            padding-bottom: 160px;
         }
 
         .products-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
-            gap: 48px;
+            gap: 1px;
+            background: var(--ac-gray-05);
+            border: 1px solid var(--ac-gray-05);
         }
 
         .product-card {
-            border-top: 1px solid var(--ac-gray-10);
-            padding-top: 24px;
+            background: var(--ac-black);
+            padding: 80px 60px;
             text-decoration: none;
             color: inherit;
             transition: all var(--transition);
-            display: block;
             position: relative;
+            overflow: hidden;
+        }
+
+        .product-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 50% 50%, rgba(255,255,255,0.02) 0%, transparent 80%);
+            opacity: 0;
+            transition: opacity var(--transition);
+        }
+
+        .product-card:hover::before {
+            opacity: 1;
         }
 
         .product-card.coming-soon {
-            opacity: 0.6;
-            pointer-events: none;
-            cursor: not-allowed;
+            opacity: 0.5;
+            cursor: default;
         }
 
-        .product-card:hover {
-            transform: translateY(-6px);
-            border-color: var(--ac-gray-30);
-        }
-
-        .product-card.coming-soon:hover {
-            transform: none;
-        }
-
-        .product-card-label {
-            font-size: 10px;
-            text-transform: uppercase;
-            letter-spacing: 0.25em;
-            color: var(--ac-gray-30);
-            margin-bottom: 12px;
+        .product-label {
+            font-size: 9px;
+            color: var(--ac-gray-20);
+            margin-bottom: 32px;
             display: flex;
             align-items: center;
-            gap: 8px;
-        }
-
-        .badge-soon {
-            background: var(--ac-gray-10);
-            color: var(--ac-gray-40);
-            padding: 2px 8px;
-            border-radius: 4px;
-            font-size: 9px;
-            font-weight: 700;
+            gap: 12px;
+            letter-spacing: 0.2em;
             text-transform: uppercase;
-            letter-spacing: 0.1em;
         }
 
-        .badge-active {
-            background: var(--ac-black);
-            color: var(--ac-white);
+        .badge {
+            font-size: 8px;
             padding: 2px 8px;
-            border-radius: 4px;
-            font-size: 9px;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.1em;
+            border: 1px solid var(--ac-gray-20);
+            border-radius: 20px;
         }
 
-        .product-card-title {
-            font-family: var(--font-serif);
-            font-size: 2rem;
-            margin-bottom: 12px;
+        .product-title {
+            font-size: 1.75rem;
+            margin-bottom: 24px;
             font-weight: 400;
+            letter-spacing: -0.04em;
         }
 
-        .product-card-desc {
-            color: var(--ac-gray-50);
-            font-size: 0.9375rem;
-            line-height: 1.7;
-        }
-
-        .product-card-arrow {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            margin-top: 20px;
-            font-size: 10px;
-            text-transform: uppercase;
-            letter-spacing: 0.15em;
-            font-weight: 600;
-            opacity: 0;
-            transform: translateX(-10px);
-            transition: all var(--transition);
-        }
-
-        .product-card:not(.coming-soon):hover .product-card-arrow {
-            opacity: 1;
-            transform: translateX(0);
-        }
-
-        .product-card.coming-soon .product-card-arrow {
-            opacity: 1;
-            transform: translateX(0);
+        .product-desc {
             color: var(--ac-gray-40);
-        }
-
-        /* Contact Section */
-        .contact-section {
-            padding: 120px 0;
-            text-align: center;
-        }
-
-        .contact-title {
-            font-family: var(--font-serif);
-            font-size: clamp(2rem, 4.5vw, 3rem);
-            letter-spacing: -0.03em;
-            margin-bottom: 20px;
-        }
-
-        .contact-email {
-            font-family: var(--font-serif);
-            font-style: italic;
-            font-size: 1.375rem;
-            color: var(--ac-black);
-            text-decoration: none;
-            border-bottom: 1px solid var(--ac-gray-20);
-            transition: border-color var(--transition);
-        }
-
-        .contact-email:hover {
-            border-color: var(--ac-black);
-        }
-
-        .contact-note {
-            margin-top: 20px;
-            color: var(--ac-gray-40);
-            font-size: 0.875rem;
-        }
-
-        .contact-note a {
-            color: var(--ac-black);
-            font-weight: 500;
-            text-decoration: none;
-        }
-
-        .contact-note a:hover {
-            text-decoration: underline;
+            font-size: 0.85rem;
+            line-height: 1.8;
+            max-width: 320px;
         }
 
         /* Footer */
         footer {
-            padding: 40px 48px;
+            padding: 100px 48px;
             border-top: 1px solid var(--ac-gray-05);
             text-align: center;
         }
 
         .footer-text {
-            font-family: var(--font-serif);
-            font-style: italic;
-            font-size: 0.9375rem;
+            font-size: 9px;
+            text-transform: uppercase;
+            letter-spacing: 0.3em;
             color: var(--ac-gray-30);
         }
 
         /* Animations */
         .reveal {
             opacity: 0;
-            transform: translateY(24px);
-            transition: opacity 0.8s cubic-bezier(0.2, 0.8, 0.2, 1),
-                        transform 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
+            transform: translateY(20px);
+            transition: all 1.2s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
         .reveal.visible {
@@ -373,7 +279,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: var(--ac-white);
+            background: var(--ac-black);
             z-index: 9999;
             display: flex;
             align-items: center;
@@ -394,182 +300,141 @@
             padding: 48px;
         }
 
-        .stub-smiley {
-            font-size: 4rem;
-            margin-bottom: 24px;
-            display: block;
-            animation: float 3s ease-in-out infinite;
-        }
-
-        @keyframes float {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-10px); }
-        }
-
         .stub-title {
-            font-family: var(--font-serif);
-            font-size: clamp(2rem, 5vw, 3rem);
-            margin-bottom: 16px;
-            letter-spacing: -0.02em;
+            font-size: 2.5rem;
+            margin-bottom: 24px;
+            letter-spacing: -0.05em;
         }
 
         .stub-text {
-            font-size: 1.125rem;
+            font-size: 1rem;
             color: var(--ac-gray-40);
             margin-bottom: 40px;
-            line-height: 1.6;
+            line-height: 1.8;
         }
 
         .stub-link {
             display: inline-block;
             padding: 16px 48px;
-            background: var(--ac-black);
+            border: 1px solid var(--ac-white);
             color: var(--ac-white);
             text-decoration: none;
-            font-size: 11px;
+            font-size: 10px;
             text-transform: uppercase;
             letter-spacing: 0.2em;
-            font-weight: 700;
             transition: all var(--transition);
-            border-radius: 4px;
-            margin-bottom: 24px;
         }
 
         .stub-link:hover {
-            opacity: 0.85;
-            transform: translateY(-2px);
+            background: var(--ac-white);
+            color: var(--ac-black);
         }
 
         .stub-close {
             display: block;
-            font-size: 12px;
-            color: var(--ac-gray-40);
-            text-decoration: none;
+            margin-top: 24px;
+            font-size: 10px;
+            color: var(--ac-gray-30);
+            text-decoration: underline;
             cursor: pointer;
-            transition: color var(--transition);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
         }
 
-        .stub-close:hover {
-            color: var(--ac-black);
-        }
-
-        /* Responsive */
         @media (max-width: 900px) {
+            .navbar { padding: 32px 24px; }
             .container { padding: 0 24px; }
-            .navbar { 
-                flex-direction: column; 
-                gap: 20px;
-                padding: 24px;
-            }
-            .nav-links { gap: 20px; flex-wrap: wrap; justify-content: center; }
-            .btn-login { margin-left: 0; }
-            .products-grid { grid-template-columns: 1fr; gap: 40px; }
-            .hero { padding: 32px 0 96px; }
-            .hero-title { font-size: clamp(2rem, 7vw, 3.5rem); }
-            .stub-content { padding: 24px; }
+            .hero { padding: 60px 0 80px; }
+            .products-grid { grid-template-columns: 1fr; }
+            .product-card { padding: 60px 32px; }
         }
     </style>
 </head>
 <body>
 
-<!-- STUB PAGE OVERLAY -->
 <div class="stub-overlay" id="stub-page">
     <div class="stub-content">
-        <span class="stub-smiley">🙂</span>
-        <h2 class="stub-title">Скоро всё будет готово</h2>
+        <h2 class="stub-title">Личный кабинет</h2>
         <p class="stub-text">
-            Мы заканчиваем разработку единого кабинета.<br>
-            Пока что приглашаем вас в наш DevOps-сервис.
+            Мы завершаем работу над единой системой авторизации.<br>
+            Пока что приглашаем вас в наш Git-сервис.
         </p>
         <a href="https://commit.arlist.tech" class="stub-link" target="_blank">Перейти в Commit</a>
-        <br>
-        <span class="stub-close" id="stub-close">Вернуться на сайт</span>
+        <span class="stub-close" id="stub-close">Вернуться назад</span>
     </div>
 </div>
 
 <nav class="navbar">
-    <a href="/" class="logo">Арлист</a>
+    <a href="/" class="logo">
+        <img src="/icon.svg" alt="Arlist" class="logo-icon">
+        Арлист
+    </a>
     <ul class="nav-links">
-        <li><a href="#about" class="nav-link">О нас</a></li>
-        <li><a href="#products" class="nav-link">Решения</a></li>
-        <li><button class="btn-login" id="login-btn">ВХОД</button></li>
+        <li><a href="/research" class="nav-link">Исследования</a></li>
+        <li><a href="/gr" class="nav-link">ГР</a></li>
+        <li><a href="/forEdu" class="nav-link">Образование</a></li>
+        <li><button class="nav-link" id="login-btn" style="background: none; border: none; cursor: pointer;">Вход</button></li>
     </ul>
 </nav>
 
 <main>
     <section class="hero">
         <div class="container">
-            <div class="hero-inner">
-                <p class="hero-label reveal">Честные технологии</p>
-                <h1 class="hero-title reveal">Сервисы для людей,<br>а не ради импортозамещения.</h1>
-                <p class="hero-subtitle reveal">Мы создаем программное обеспечение, которое уважает пользователя. Без лишней бюрократии, без навязанных шаблонов. Только чистота кода и удобство для человека.</p>
-                <a href="#products" class="btn-primary reveal">Наши решения</a>
-            </div>
+            <span class="hero-label reveal">Честные технологии</span>
+            <h1 class="hero-title reveal">
+                Сервисы для людей, <span>а не ради лозунгов.</span>
+            </h1>
+            <p class="hero-subtitle reveal">
+                Мы создаем программное обеспечение, которое уважает пользователя. 
+                Без лишней бюрократии и навязанных шаблонов. Только чистота кода и удобство для человека.
+            </p>
+            <a href="#products" class="btn-primary reveal">Наши решения</a>
         </div>
     </section>
 
     <section id="products" class="products-section">
         <div class="container">
-            <div class="section-header">
-                <p class="section-label reveal">Экосистема</p>
-                <h2 class="section-title reveal">Инструменты для работы и жизни</h2>
-            </div>
-
             <div class="products-grid">
-                <!-- Active Service -->
+                <!-- Commit -->
                 <a href="https://commit.arlist.tech" class="product-card reveal" target="_blank">
-                    <p class="product-card-label">
+                    <span class="product-label">
                         DevOps
-                        <span class="badge-active">Доступен</span>
-                    </p>
-                    <h3 class="product-card-title">Commit</h3>
-                    <p class="product-card-desc">Git-сервис для команд. Хостинг репозиториев, CI/CD и совместная работа — всё в одном месте.</p>
-                    <span class="product-card-arrow">Перейти →</span>
+                        <span class="badge">Доступен</span>
+                    </span>
+                    <h3 class="product-title">Commit</h3>
+                    <p class="product-desc">Git-сервис для команд. Хостинг репозиториев, CI/CD и совместная работа — всё в одном месте.</p>
                 </a>
 
-                <!-- Coming Soon Services -->
+                <!-- Arlist ID -->
                 <div class="product-card coming-soon reveal">
-                    <p class="product-card-label">
+                    <span class="product-label">
                         Защита
-                        <span class="badge-soon">СКОРО</span>
-                    </p>
-                    <h3 class="product-card-title">Арлист Айди</h3>
-                    <p class="product-card-desc">Единый доступ ко всем инструментам. Безопасность, основанная на прозрачности и здравом смысле.</p>
-                    <span class="product-card-arrow">В разработке →</span>
+                        <span class="badge">Скоро</span>
+                    </span>
+                    <h3 class="product-title">Арлист Айди</h3>
+                    <p class="product-desc">Единый доступ ко всем инструментам. Безопасность, основанная на прозрачности и здравом смысле.</p>
                 </div>
 
+                <!-- LmAPI -->
                 <div class="product-card coming-soon reveal">
-                    <p class="product-card-label">
+                    <span class="product-label">
                         Разум
-                        <span class="badge-soon">СКОРО</span>
-                    </p>
-                    <h3 class="product-card-title">ЛмАПИ</h3>
-                    <p class="product-card-desc">Мощь нейросетевых моделей в простом интерфейсе. Интеллект как инструмент, а не как лозунг.</p>
-                    <span class="product-card-arrow">В разработке →</span>
+                        <span class="badge">Скоро</span>
+                    </span>
+                    <h3 class="product-title">ЛмАПИ</h3>
+                    <p class="product-desc">Мощь нейросетевых моделей в простом интерфейсе. Интеллект как инструмент, а не как лозунг.</p>
                 </div>
 
+                <!-- Tracker -->
                 <div class="product-card coming-soon reveal">
-                    <p class="product-card-label">
+                    <span class="product-label">
                         Связи
-                        <span class="badge-soon">СКОРО</span>
-                    </p>
-                    <h3 class="product-card-title">Трекер</h3>
-                    <p class="product-card-desc">Умные ссылки и подробная аналитика. Понимайте свой путь без лишних усилий.</p>
-                    <span class="product-card-arrow">В разработке →</span>
+                        <span class="badge">Скоро</span>
+                    </span>
+                    <h3 class="product-title">Трекер</h3>
+                    <p class="product-desc">Умные ссылки и подробная аналитика. Понимайте свой путь без лишних усилий.</p>
                 </div>
             </div>
-        </div>
-    </section>
-
-    <section id="contact" class="contact-section">
-        <div class="container">
-            <p class="section-label reveal">Диалог</p>
-            <h2 class="contact-title reveal">Давайте создадим<br>что-то настоящее.</h2>
-            <a href="mailto:letunovskiy@arlist.tech" class="contact-email reveal">letunovskiy@arlist.tech</a>
-            <p class="contact-note">
-                Или зарегистрируйтесь в нашем Git-сервисе: 
-                <a href="https://commit.arlist.tech" target="_blank">commit.arlist.tech</a>
-            </p>
         </div>
     </section>
 </main>
@@ -579,23 +444,22 @@
 </footer>
 
 <script>
-    // Stub Page Logic
+    // Stub Logic
     const loginBtn = document.getElementById('login-btn');
     const stubPage = document.getElementById('stub-page');
     const stubClose = document.getElementById('stub-close');
 
     loginBtn.addEventListener('click', (e) => {
-        e.preventDefault();
         stubPage.classList.add('active');
-        document.body.classList.add('stub-open');
+        document.body.style.overflow = 'hidden';
     });
 
     stubClose.addEventListener('click', () => {
         stubPage.classList.remove('active');
-        document.body.classList.remove('stub-open');
+        document.body.style.overflow = '';
     });
 
-    // Scroll animations
+    // Reveal Logic
     const observer = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
             if (entry.isIntersecting) {
@@ -605,14 +469,6 @@
     }, { threshold: 0.1 });
 
     document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
-
-    // Prevent clicks on coming soon cards
-    document.querySelectorAll('.product-card.coming-soon').forEach(card => {
-        card.addEventListener('click', (e) => {
-            e.preventDefault();
-            alert('Этот сервис скоро будет доступен. Следите за обновлениями!');
-        });
-    });
 </script>
 
 </body>

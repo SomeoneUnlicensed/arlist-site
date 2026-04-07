@@ -2,17 +2,180 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Промо-акции | Арлист</title>
+    
+    <!-- Maple Mono Font -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/maple-mono@5.2.6/index.css">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="/icon.svg">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+    <link rel="manifest" href="/site.webmanifest">
+    <meta name="theme-color" content="#000000">
+
     <style>
-        body { font-family: sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
-        .content { text-align: center; }
+        :root {
+            --ac-black: #000000;
+            --ac-white: #ffffff;
+            --ac-gray-05: rgba(255,255,255,0.05);
+            --ac-gray-10: rgba(255,255,255,0.1);
+            --ac-gray-30: rgba(255,255,255,0.3);
+            --ac-gray-40: rgba(255,255,255,0.4);
+            --font-mono: 'Maple Mono', monospace;
+            --transition: 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            background-color: var(--ac-black);
+            color: var(--ac-white);
+            font-family: var(--font-mono);
+            line-height: 1.6;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 50% -20%, #111 0%, #000 70%);
+            z-index: -1;
+        }
+
+        .navbar {
+            padding: 48px;
+            display: flex;
+            justify-content: flex-start;
+            align-items: center;
+            width: 100%;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .logo {
+            font-size: 1.1rem;
+            font-weight: 700;
+            text-decoration: none;
+            color: var(--ac-white);
+            letter-spacing: -0.05em;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-transform: uppercase;
+        }
+
+        .logo-icon {
+            height: 24px;
+            width: auto;
+        }
+
+        main {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 48px;
+        }
+
+        .content {
+            text-align: center;
+            max-width: 600px;
+        }
+
+        .label {
+            font-size: 9px;
+            text-transform: uppercase;
+            letter-spacing: 0.5em;
+            font-weight: 500;
+            color: var(--ac-gray-30);
+            margin-bottom: 32px;
+            display: block;
+        }
+
+        h1 {
+            font-size: clamp(2.5rem, 8vw, 4rem);
+            line-height: 1;
+            margin-bottom: 24px;
+            letter-spacing: -0.07em;
+            font-weight: 400;
+        }
+
+        p {
+            font-size: 1rem;
+            color: var(--ac-gray-40);
+            margin-bottom: 48px;
+            line-height: 1.8;
+        }
+
+        .btn-back {
+            display: inline-block;
+            padding: 16px 40px;
+            border: 1px solid var(--ac-white);
+            color: var(--ac-white);
+            text-decoration: none;
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.3em;
+            font-weight: 600;
+            transition: all var(--transition);
+        }
+
+        .btn-back:hover {
+            background: var(--ac-white);
+            color: var(--ac-black);
+            transform: translateY(-2px);
+        }
+
+        /* Animations */
+        .reveal {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 1.2s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .reveal.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
     </style>
 </head>
 <body>
-    <div class="content">
-        <h1>Промо-акции</h1>
-        <p>Здесь скоро появятся наши специальные предложения.</p>
-        <a href="/">На главную</a>
-    </div>
+    <nav class="navbar">
+        <a href="/" class="logo">
+            <img src="/icon.svg" alt="Arlist" class="logo-icon">
+            Арлист
+        </a>
+    </nav>
+    
+    <main>
+        <div class="content">
+            <span class="label reveal">Специальные предложения</span>
+            <h1 class="reveal">Промо-акции</h1>
+            <p class="reveal">Мы готовим нечто особенное. Совсем скоро здесь появятся предложения, которые вам понравятся.</p>
+            <a href="/" class="btn-back reveal">На главную</a>
+        </div>
+    </main>
+
+    <script>
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, { threshold: 0.1 });
+
+        document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+    </script>
 </body>
 </html>

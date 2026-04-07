@@ -2,63 +2,256 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Юридическая информация | Арлист</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+    
+    <!-- Maple Mono Font -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/maple-mono@5.2.6/index.css">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="/icon.svg">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+    <link rel="manifest" href="/site.webmanifest">
+    <meta name="theme-color" content="#000000">
+
     <style>
         :root {
             --ac-black: #000000;
             --ac-white: #ffffff;
-            --ac-gray-05: rgba(0,0,0,0.05);
-            --ac-gray-10: rgba(0,0,0,0.1);
-            --ac-gray-30: rgba(0,0,0,0.3);
-            --ac-gray-40: rgba(0,0,0,0.4);
-            --ac-gray-50: rgba(0,0,0,0.5);
-            --font-serif: 'Playfair Display', Georgia, serif;
-            --font-sans: 'Inter', sans-serif;
-            --transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            --ac-gray-05: rgba(255,255,255,0.05);
+            --ac-gray-10: rgba(255,255,255,0.1);
+            --ac-gray-20: rgba(255,255,255,0.2);
+            --ac-gray-30: rgba(255,255,255,0.3);
+            --ac-gray-40: rgba(255,255,255,0.4);
+            --ac-gray-50: rgba(255,255,255,0.5);
+            --font-mono: 'Maple Mono', monospace;
+            --transition: 0.6s cubic-bezier(0.16, 1, 0.3, 1);
         }
+
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { background-color: var(--ac-white); color: var(--ac-black); font-family: var(--font-sans); line-height: 1.6; }
-        .container { max-width: 1400px; margin: 0 auto; padding: 0 48px; }
-        .navbar { padding: 32px 0; display: flex; justify-content: space-between; align-items: center; }
-        .logo { font-family: var(--font-serif); font-size: 1.75rem; font-weight: 700; text-decoration: none; color: var(--ac-black); }
-        .content { padding: 80px 0 120px; max-width: 800px; }
-        .label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.3em; font-weight: 700; color: var(--ac-gray-30); margin-bottom: 24px; }
-        h1 { font-family: var(--font-serif); font-size: clamp(2.5rem, 5vw, 4rem); line-height: 1.1; margin-bottom: 40px; }
-        .doc-list { list-style: none; margin-top: 40px; }
-        .doc-item { margin-bottom: 24px; padding-bottom: 24px; border-bottom: 1px solid var(--ac-gray-05); }
-        .doc-link { text-decoration: none; color: var(--ac-black); font-size: 1.25rem; font-weight: 500; transition: opacity var(--transition); display: block; }
-        .doc-link:hover { opacity: 0.6; }
-        .doc-meta { font-size: 12px; color: var(--ac-gray-40); margin-top: 8px; text-transform: uppercase; letter-spacing: 0.1em; }
+
+        body {
+            background-color: var(--ac-black);
+            color: var(--ac-white);
+            font-family: var(--font-mono);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+            overflow-x: hidden;
+        }
+
+        ::selection { background: var(--ac-white); color: var(--ac-black); }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 50% -20%, #111 0%, #000 70%);
+            z-index: -1;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 48px;
+        }
+
+        /* Navigation */
+        .navbar {
+            padding: 48px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .logo {
+            font-size: 1.25rem;
+            font-weight: 700;
+            text-decoration: none;
+            color: var(--ac-white);
+            letter-spacing: -0.05em;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-transform: uppercase;
+        }
+
+        .logo-icon {
+            width: 24px;
+            height: 24px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 32px;
+            list-style: none;
+            align-items: center;
+        }
+
+        .nav-link {
+            text-decoration: none;
+            color: var(--ac-gray-40);
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.25em;
+            font-weight: 500;
+            transition: color var(--transition), transform var(--transition);
+        }
+
+        .nav-link:hover { 
+            color: var(--ac-white); 
+            transform: translateY(-1px);
+        }
+
+        .content {
+            padding: 80px 0 120px;
+            max-width: 800px;
+        }
+
+        .label {
+            font-size: 9px;
+            text-transform: uppercase;
+            letter-spacing: 0.5em;
+            font-weight: 500;
+            color: var(--ac-gray-30);
+            margin-bottom: 24px;
+            display: block;
+        }
+
+        h1 {
+            font-size: clamp(2rem, 6vw, 4rem);
+            line-height: 1.1;
+            letter-spacing: -0.06em;
+            margin-bottom: 60px;
+            font-weight: 400;
+        }
+
+        .doc-list {
+            list-style: none;
+            margin-top: 40px;
+        }
+
+        .doc-item {
+            margin-bottom: 32px;
+            padding: 40px;
+            border: 1px solid var(--ac-gray-05);
+            transition: all var(--transition);
+        }
+
+        .doc-item:hover {
+            background: rgba(255,255,255,0.02);
+            border-color: var(--ac-gray-20);
+        }
+
+        .doc-link {
+            text-decoration: none;
+            color: var(--ac-white);
+            font-size: 1.5rem;
+            font-weight: 400;
+            display: block;
+            margin-bottom: 12px;
+            letter-spacing: -0.03em;
+        }
+
+        .doc-meta {
+            font-size: 11px;
+            color: var(--ac-gray-40);
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+        }
+
+        footer {
+            padding: 100px 48px;
+            border-top: 1px solid var(--ac-gray-05);
+            text-align: center;
+        }
+
+        .footer-text {
+            font-size: 9px;
+            text-transform: uppercase;
+            letter-spacing: 0.3em;
+            color: var(--ac-gray-30);
+        }
+
+        .reveal {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 1.2s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .reveal.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        @media (max-width: 900px) {
+            .navbar { padding: 32px 24px; }
+            .container { padding: 0 24px; }
+            .doc-item { padding: 32px 24px; }
+        }
     </style>
 </head>
 <body>
-    <div class="container">
-        <nav class="navbar"><a href="/" class="logo">Арлист</a></nav>
-        <main class="content">
-            <div class="label">Документы</div>
-            <h1>Юридическая информация</h1>
-            <ul id="doc-list" class="doc-list">
-                <!-- Will be populated by JS -->
-            </ul>
-        </main>
-    </div>
-    <script>
-        fetch('./config.json')
-            .then(r => r.json())
-            .then(data => {
-                const list = document.getElementById('doc-list');
-                data.forEach(doc => {
-                    const li = document.createElement('li');
-                    li.className = 'doc-item';
-                    li.innerHTML = `
-                        <a href="/legal/${doc.slug}" class="doc-link">${doc.title}</a>
-                        <div class="doc-meta">${doc.date} • ${doc.description}</div>
-                    `;
-                    list.appendChild(li);
-                });
+
+<nav class="navbar">
+    <a href="/" class="logo">
+        <img src="/icon.svg" alt="Арлист" class="logo-icon">
+        Арлист
+    </a>
+    <ul class="nav-links">
+        <li><a href="/research" class="nav-link">Исследования</a></li>
+        <li><a href="/gr" class="nav-link">ГР</a></li>
+        <li><a href="/forEdu" class="nav-link">Образование</a></li>
+    </ul>
+</nav>
+
+<div class="container">
+    <main class="content">
+        <span class="label reveal">Юридический отдел</span>
+        <h1 class="reveal">Документация и соглашения</h1>
+        <ul id="doc-list" class="doc-list">
+            <!-- Will be populated by JS -->
+        </ul>
+    </main>
+</div>
+
+<footer>
+    <p class="footer-text">© 2026 Арлист Технологии. Порядок в коде и в делах.</p>
+</footer>
+
+<script>
+    fetch('./config.json')
+        .then(r => r.json())
+        .then(data => {
+            const list = document.getElementById('doc-list');
+            data.forEach(doc => {
+                const li = document.createElement('li');
+                li.className = 'doc-item reveal';
+                li.innerHTML = `
+                    <a href="/legal/${doc.slug}" class="doc-link">${doc.title}</a>
+                    <div class="doc-meta">${doc.date} • ${doc.description}</div>
+                `;
+                list.appendChild(li);
+                observer.observe(li);
             });
-    </script>
+        });
+
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('visible');
+            }
+        });
+    }, { threshold: 0.1 });
+
+    document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+</script>
+
 </body>
 </html>
