@@ -89,6 +89,10 @@
             width: auto;
         }
 
+        .logo img {
+            pointer-events: none;
+        }
+
         .nav-links {
             display: flex;
             gap: 32px;
@@ -188,7 +192,9 @@
         }
 
         .contact-card:hover {
-            background: rgba(255,255,255,0.02);
+            background: rgba(255, 255, 255, 0.02);
+            transform: scale(1.01);
+            z-index: 10;
         }
 
         .contact-label {
@@ -258,7 +264,7 @@
 
 <nav class="navbar">
     <a href="/" class="logo">
-        <img src="/icon.svg" alt="Arlist" class="logo-icon">
+        <img src="/icon.svg" alt="" class="logo-icon">
         Арлист ГР
     </a>
     <ul class="nav-links">
@@ -318,61 +324,6 @@
                 <!-- Taiga Division -->
                 <div class="contact-card reveal">
                     <span class="contact-label">ОС Тайга</span>
-                    <a href="mailto:taiga-division@arlist.tech" class="contact-email">taiga-division@arlist.tech</a>
-                    <p class="contact-desc">Подразделение, занимающееся разработкой и внедрением отечественной операционной системы «Тайга».</p>
-                </div>
-            </div>
-        </div>
-    </section>
-</main>
-
-<footer>
-    <p class="footer-text">© 2026 Арлист Групп. Безопасность. Суверенитет. Честь.</p>
-</footer>
-
-<script>
-    // Stub Logic
-    const loginBtn = document.getElementById('login-btn');
-    const stubPage = document.getElementById('stub-page');
-    const stubClose = document.getElementById('stub-close');
-
-    loginBtn.addEventListener('click', (e) => {
-        stubPage.classList.add('active');
-        document.body.style.overflow = 'hidden';
-    });
-
-    stubClose.addEventListener('click', () => {
-        stubPage.classList.remove('active');
-        document.body.style.overflow = '';
-    });
-
-    const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                entry.target.classList.add('visible');
-            }
-        });
-    }, { threshold: 0.1 });
-
-    document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
-</script>
-
-</body>
-</html>
-{
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                entry.target.classList.add('visible');
-            }
-        });
-    }, { threshold: 0.1 });
-
-    document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
-</script>
-
-</body>
-</html>
-       <span class="contact-label">ОС Тайга</span>
                     <a href="mailto:taiga-division@arlist.tech" class="contact-email">taiga-division@arlist.tech</a>
                     <p class="contact-desc">Подразделение, занимающееся разработкой и внедрением отечественной операционной системы «Тайга».</p>
                 </div>

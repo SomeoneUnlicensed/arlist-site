@@ -87,6 +87,10 @@
             width: auto;
         }
 
+        .logo img {
+            pointer-events: none;
+        }
+
         .nav-links {
             display: flex;
             gap: 32px;
@@ -165,11 +169,14 @@
             background: var(--ac-black);
             padding: 80px 60px;
             transition: all var(--transition);
+            position: relative;
+            overflow: hidden;
         }
 
         .edu-card:hover {
-            background: rgba(255,255,255,0.02);
+            background: rgba(255, 255, 255, 0.02);
             transform: scale(1.01);
+            z-index: 10;
         }
 
         .edu-card-title {
@@ -243,7 +250,7 @@
 
 <nav class="navbar">
     <a href="/" class="logo">
-        <span class="logo-dot"></span>
+        <img src="/icon.svg" alt="" class="logo-icon">
         Арлист Образование
     </a>
     <ul class="nav-links">
@@ -282,67 +289,6 @@
                     <p class="edu-card-desc">
                         В ближайшее время мы расширим программу на все наши сервисы, включая 
                         инструменты защиты данных и нейросетевые модели.
-                    </p>
-                </div>
-            </div>
-
-            <div class="contact-box reveal">
-                <h2 class="edu-card-title">Хотите получить доступ?</h2>
-                <p class="edu-card-desc">Напишите нам, расскажите о своем учебном заведении или проекте.</p>
-                <a href="mailto:letunovskiy@arlist.tech" class="contact-email">letunovskiy@arlist.tech</a>
-            </div>
-        </div>
-    </section>
-</main>
-
-<footer>
-    <p class="footer-text">© 2026 Арлист Групп. Знания. Развитие. Будущее.</p>
-</footer>
-
-<script>
-    const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                entry.target.classList.add('visible');
-            }
-        });
-    }, { threshold: 0.1 });
-
-    document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
-</script>
-
-</body>
-</html>
-) => {
-        stubPage.classList.remove('active');
-        document.body.style.overflow = '';
-    });
-
-    const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                entry.target.classList.add('visible');
-            }
-        });
-    }, { threshold: 0.1 });
-
-    document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
-</script>
-
-</body>
-</html>
-entry.isIntersecting) {
-                entry.target.classList.add('visible');
-            }
-        });
-    }, { threshold: 0.1 });
-
-    document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
-</script>
-
-</body>
-</html>
-�вые модели.
                     </p>
                 </div>
             </div>
