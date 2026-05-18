@@ -611,8 +611,10 @@
             return;
         }
 
-        generatedCode = String(Math.floor(100000 + Math.random() * 900000));
-        setStatus(`Демо-режим: код сгенерирован для ${email}. Проверьте тестовый поток подтверждения.`, 'success');
+        const randomArray = new Uint32Array(1);
+        crypto.getRandomValues(randomArray);
+        generatedCode = String(randomArray[0] % 900000 + 100000);
+        setStatus('Демо-режим: код сгенерирован. Проверьте тестовый поток подтверждения.', 'success');
     });
 
     verifyCodeBtn.addEventListener('click', () => {
