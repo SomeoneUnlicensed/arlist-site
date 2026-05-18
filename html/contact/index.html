@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Контакты | Арлист</title>
+    <meta name="description" content="Контакты Арлист: личная и рабочая почта для связи.">
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/maple-mono@5.2.6/index.css">
+    <link rel="icon" type="image/svg+xml" href="/icon.svg">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+    <link rel="manifest" href="/site.webmanifest">
+    <meta name="theme-color" content="#000000">
+
+    <style>
+        :root {
+            --ac-black: #000000;
+            --ac-white: #ffffff;
+            --ac-gray-05: rgba(255,255,255,0.05);
+            --ac-gray-10: rgba(255,255,255,0.1);
+            --ac-gray-30: rgba(255,255,255,0.3);
+            --ac-gray-40: rgba(255,255,255,0.4);
+            --transition: 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+            --font-mono: 'Maple Mono', monospace;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            background-color: var(--ac-black);
+            color: var(--ac-white);
+            font-family: var(--font-mono);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+            overflow-x: hidden;
+        }
+
+        ::selection { background: var(--ac-white); color: var(--ac-black); }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 50% -20%, #111 0%, #000 70%);
+            z-index: -1;
+        }
+
+        .navbar {
+            padding: 48px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .logo {
+            font-size: 1.25rem;
+            font-weight: 700;
+            text-decoration: none;
+            color: var(--ac-white);
+            letter-spacing: -0.05em;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-transform: uppercase;
+        }
+
+        .logo-icon {
+            height: 24px;
+            width: auto;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 32px;
+            list-style: none;
+            align-items: center;
+        }
+
+        .nav-link {
+            text-decoration: none;
+            color: var(--ac-gray-40);
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.25em;
+            font-weight: 500;
+            transition: color var(--transition), transform var(--transition);
+        }
+
+        .nav-link:hover {
+            color: var(--ac-white);
+            transform: translateY(-1px);
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 0 48px 120px;
+        }
+
+        .hero-label {
+            font-size: 9px;
+            text-transform: uppercase;
+            letter-spacing: 0.5em;
+            font-weight: 500;
+            color: var(--ac-gray-30);
+            margin-bottom: 28px;
+            display: block;
+        }
+
+        .hero-title {
+            font-size: clamp(2rem, 6vw, 4rem);
+            line-height: 0.95;
+            letter-spacing: -0.07em;
+            margin-bottom: 56px;
+            font-weight: 400;
+        }
+
+        .contacts-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1px;
+            background: var(--ac-gray-05);
+            border: 1px solid var(--ac-gray-05);
+        }
+
+        .contact-card {
+            background: var(--ac-black);
+            padding: 52px 40px;
+            transition: all var(--transition);
+        }
+
+        .contact-card:hover {
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .contact-label {
+            display: block;
+            font-size: 9px;
+            color: var(--ac-gray-30);
+            text-transform: uppercase;
+            letter-spacing: 0.2em;
+            margin-bottom: 22px;
+        }
+
+        .contact-email {
+            color: var(--ac-white);
+            text-decoration: none;
+            font-size: 1rem;
+            word-break: break-word;
+            border-bottom: 1px solid var(--ac-gray-10);
+            padding-bottom: 4px;
+            transition: border-color var(--transition), color var(--transition);
+        }
+
+        .contact-email:hover {
+            border-color: var(--ac-white);
+        }
+
+        footer {
+            padding: 80px 48px;
+            text-align: center;
+            border-top: 1px solid var(--ac-gray-05);
+        }
+
+        .footer-text {
+            font-size: 9px;
+            letter-spacing: 0.25em;
+            text-transform: uppercase;
+            color: var(--ac-gray-30);
+        }
+
+        @media (max-width: 900px) {
+            .navbar { padding: 32px 24px; }
+            .container { padding: 0 24px 80px; }
+            .contacts-grid { grid-template-columns: 1fr; }
+            .contact-card { padding: 42px 28px; }
+            footer { padding: 64px 24px; }
+        }
+    </style>
+</head>
+<body>
+<nav class="navbar">
+    <a href="/" class="logo">
+        <img src="/icon.svg" alt="" class="logo-icon">
+        Арлист
+    </a>
+    <ul class="nav-links">
+        <li><a href="/" class="nav-link">Главная</a></li>
+        <li><a href="/research" class="nav-link">Исследования</a></li>
+    </ul>
+</nav>
+
+<main class="container">
+    <span class="hero-label">Контакты</span>
+    <h1 class="hero-title">Связь с нами</h1>
+
+    <section class="contacts-grid">
+        <article class="contact-card">
+            <span class="contact-label">Личная почта</span>
+            <a href="mailto:letunovskiu2011@yandex.ru" class="contact-email">letunovskiu2011@yandex.ru</a>
+        </article>
+        <article class="contact-card">
+            <span class="contact-label">Рабочая почта</span>
+            <a href="mailto:letunovskiy@arlist.tech" class="contact-email">letunovskiy@arlist.tech</a>
+        </article>
+    </section>
+</main>
+
+<footer>
+    <p class="footer-text">© 2026 Арлист Технологии</p>
+</footer>
+</body>
+</html>
