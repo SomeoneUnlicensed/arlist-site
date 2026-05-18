@@ -561,7 +561,7 @@
 
 <script>
     // Stub Logic
-    const SECURITY_BYPASS_KEY = 'arlistNotSuspiciousUser';
+    const SECURITY_VERIFICATION_BYPASS_KEY = 'arlistSecurityVerificationBypass';
     const loginBtn = document.getElementById('login-btn');
     const stubPage = document.getElementById('stub-page');
     const stubClose = document.getElementById('stub-close');
@@ -589,11 +589,11 @@
         document.body.style.overflow = '';
     };
 
-    const isBypassed = localStorage.getItem(SECURITY_BYPASS_KEY) === 'true';
-    notSuspiciousToggle.checked = isBypassed;
+    const isVerificationBypassed = () => localStorage.getItem(SECURITY_VERIFICATION_BYPASS_KEY) === 'true';
+    notSuspiciousToggle.checked = isVerificationBypassed();
 
     loginBtn.addEventListener('click', () => {
-        if (localStorage.getItem(SECURITY_BYPASS_KEY) === 'true') {
+        if (isVerificationBypassed()) {
             window.open('https://commit.arlist.tech', '_blank', 'noopener');
             return;
         }
@@ -604,7 +604,7 @@
 
     sendCodeBtn.addEventListener('click', () => {
         const email = emailInput.value.trim();
-        const isValidEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+        const isValidEmail = emailInput.validity.valid && email.length > 0;
 
         if (!isValidEmail) {
             setStatus('Укажите корректный email.', 'error');
@@ -612,7 +612,7 @@
         }
 
         generatedCode = String(Math.floor(100000 + Math.random() * 900000));
-        setStatus(`Код отправлен на ${email}. Тестовый код: ${generatedCode}`, 'success');
+        setStatus(`Демо-режим: код сгенерирован для ${email}. Проверьте тестовый поток подтверждения.`, 'success');
     });
 
     verifyCodeBtn.addEventListener('click', () => {
@@ -634,7 +634,7 @@
     });
 
     notSuspiciousToggle.addEventListener('change', () => {
-        localStorage.setItem(SECURITY_BYPASS_KEY, notSuspiciousToggle.checked ? 'true' : 'false');
+        localStorage.setItem(SECURITY_VERIFICATION_BYPASS_KEY, notSuspiciousToggle.checked ? 'true' : 'false');
         setStatus(
             notSuspiciousToggle.checked
                 ? 'Статус "НЕ ПОДОЗРИТЕЛЕН" включен. Проверка больше не показывается.'
