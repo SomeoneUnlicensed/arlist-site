@@ -323,9 +323,10 @@
         }
 
         .stub-content {
-            text-align: center;
             max-width: 600px;
             padding: 48px;
+            border: 1px solid var(--ac-gray-10);
+            background: #050505;
         }
 
         .stub-title {
@@ -337,25 +338,98 @@
         .stub-text {
             font-size: 1rem;
             color: var(--ac-gray-40);
-            margin-bottom: 40px;
+            margin-bottom: 24px;
             line-height: 1.8;
         }
 
+        .stub-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .stub-input {
+            width: 100%;
+            background: transparent;
+            border: 1px solid var(--ac-gray-10);
+            color: var(--ac-white);
+            padding: 12px 14px;
+            font-family: inherit;
+            font-size: 0.9rem;
+        }
+
+        .stub-input::placeholder {
+            color: var(--ac-gray-30);
+        }
+
         .stub-link {
+            width: 100%;
             display: inline-block;
-            padding: 16px 48px;
+            padding: 12px 18px;
             border: 1px solid var(--ac-white);
+            background: transparent;
             color: var(--ac-white);
             text-decoration: none;
             font-size: 10px;
             text-transform: uppercase;
             letter-spacing: 0.2em;
             transition: all var(--transition);
+            cursor: pointer;
+            text-align: center;
         }
 
-        .stub-link:hover {
+        .stub-link:hover,
+        .stub-link:focus-visible {
             background: var(--ac-white);
             color: var(--ac-black);
+        }
+
+        .stub-status {
+            font-size: 0.85rem;
+            color: var(--ac-gray-40);
+            min-height: 24px;
+            margin-bottom: 8px;
+        }
+
+        .stub-status.success {
+            color: #8cffb8;
+        }
+
+        .stub-status.error {
+            color: #ff8f8f;
+        }
+
+        .stub-admin {
+            border-top: 1px solid var(--ac-gray-10);
+            margin-top: 24px;
+            padding-top: 20px;
+        }
+
+        .stub-admin-title {
+            font-size: 9px;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: var(--ac-gray-30);
+            margin-bottom: 12px;
+        }
+
+        .stub-checkbox {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            font-size: 0.85rem;
+            color: var(--ac-gray-40);
+            margin-bottom: 6px;
+        }
+
+        .stub-checkbox input {
+            accent-color: var(--ac-white);
+        }
+
+        .stub-admin-hint {
+            font-size: 0.75rem;
+            color: var(--ac-gray-30);
         }
 
         .stub-close {
@@ -382,12 +456,25 @@
 
 <div class="stub-overlay" id="stub-page">
     <div class="stub-content">
-        <h2 class="stub-title">Личный кабинет</h2>
+        <h2 class="stub-title">Проверка безопасности</h2>
         <p class="stub-text">
-            Мы завершаем работу над единой системой авторизации.<br>
-            Пока что приглашаем вас в наш Git-сервис.
+            Мы заметили необычную активность. Для продолжения подтвердите вход по email.
         </p>
-        <a href="https://commit.arlist.tech" class="stub-link" target="_blank">Перейти в Commit</a>
+        <div class="stub-actions">
+            <input type="email" class="stub-input" id="security-email" placeholder="Введите email" autocomplete="email">
+            <button class="stub-link" id="send-code-btn" type="button">Отправить код</button>
+            <input type="text" class="stub-input" id="security-code" placeholder="Введите код из email" inputmode="numeric" autocomplete="one-time-code">
+            <button class="stub-link" id="verify-code-btn" type="button">Проверить</button>
+        </div>
+        <p class="stub-status" id="security-status"></p>
+        <div class="stub-admin">
+            <p class="stub-admin-title">Админ-панель · Настройки пользователя</p>
+            <label class="stub-checkbox">
+                <input type="checkbox" id="not-suspicious-toggle">
+                <span>НЕ ПОДОЗРИТЕЛЕН</span>
+            </label>
+            <p class="stub-admin-hint">Если включено, окно проверки безопасности больше не показывается.</p>
+        </div>
         <span class="stub-close" id="stub-close">Вернуться назад</span>
     </div>
 </div>
@@ -474,18 +561,88 @@
 
 <script>
     // Stub Logic
+    const SECURITY_VERIFICATION_BYPASS_KEY = 'arlistSecurityVerificationBypass';
     const loginBtn = document.getElementById('login-btn');
     const stubPage = document.getElementById('stub-page');
     const stubClose = document.getElementById('stub-close');
+    const sendCodeBtn = document.getElementById('send-code-btn');
+    const verifyCodeBtn = document.getElementById('verify-code-btn');
+    const emailInput = document.getElementById('security-email');
+    const codeInput = document.getElementById('security-code');
+    const statusBox = document.getElementById('security-status');
+    const notSuspiciousToggle = document.getElementById('not-suspicious-toggle');
 
-    loginBtn.addEventListener('click', (e) => {
+    let generatedCode = '';
+
+    const setStatus = (message, type = '') => {
+        statusBox.textContent = message;
+        statusBox.className = `stub-status${type ? ` ${type}` : ''}`;
+    };
+
+    const openVerification = () => {
         stubPage.classList.add('active');
         document.body.style.overflow = 'hidden';
-    });
+    };
 
-    stubClose.addEventListener('click', () => {
+    const closeVerification = () => {
         stubPage.classList.remove('active');
         document.body.style.overflow = '';
+    };
+
+    const isVerificationBypassed = () => localStorage.getItem(SECURITY_VERIFICATION_BYPASS_KEY) === 'true';
+    notSuspiciousToggle.checked = isVerificationBypassed();
+
+    loginBtn.addEventListener('click', () => {
+        if (isVerificationBypassed()) {
+            window.open('https://commit.arlist.tech', '_blank', 'noopener');
+            return;
+        }
+        openVerification();
+    });
+
+    stubClose.addEventListener('click', closeVerification);
+
+    sendCodeBtn.addEventListener('click', () => {
+        const email = emailInput.value.trim();
+        const isValidEmail = emailInput.validity.valid && email.length > 0;
+
+        if (!isValidEmail) {
+            setStatus('Укажите корректный email.', 'error');
+            return;
+        }
+
+        const randomArray = new Uint32Array(1);
+        crypto.getRandomValues(randomArray);
+        generatedCode = String(randomArray[0] % 900000 + 100000);
+        setStatus('Демо-режим: код сгенерирован. Проверьте тестовый поток подтверждения.', 'success');
+    });
+
+    verifyCodeBtn.addEventListener('click', () => {
+        if (!generatedCode) {
+            setStatus('Сначала отправьте код подтверждения.', 'error');
+            return;
+        }
+
+        if (codeInput.value.trim() !== generatedCode) {
+            setStatus('Код неверный. Проверьте и попробуйте снова.', 'error');
+            return;
+        }
+
+        setStatus('Подтверждение успешно. Открываем личный кабинет...', 'success');
+        setTimeout(() => {
+            closeVerification();
+            window.open('https://commit.arlist.tech', '_blank', 'noopener');
+        }, 700);
+    });
+
+    notSuspiciousToggle.addEventListener('change', () => {
+        localStorage.setItem(SECURITY_VERIFICATION_BYPASS_KEY, notSuspiciousToggle.checked ? 'true' : 'false');
+        setStatus(
+            notSuspiciousToggle.checked
+                ? 'Статус "НЕ ПОДОЗРИТЕЛЕН" включен. Проверка больше не показывается.'
+                : 'Статус снят. Проверка безопасности снова активна.',
+            'success'
+        );
     });
 
     // Reveal Logic
