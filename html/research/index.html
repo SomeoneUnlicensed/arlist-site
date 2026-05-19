@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>АРЛИСТ ТЕХ | Исследования</title>
-    <meta name="description" content="Лаборатория Арлист. Мы исследуем границы возможного в биоинформатике, ИИ и спасательных технологиях.">
+    <title>АРЛИСТ ТЕХ | RESEARCH LAB</title>
+    <meta name="description" content="Лаборатория Арлист. Исследования на грани кода и науки.">
     
     <!-- Geist Font -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/geist@1.3.0/dist/fonts/geist-sans/style.css">
@@ -22,15 +22,15 @@
         :root {
             --ac-black: #000000;
             --ac-white: #ffffff;
+            --ac-cyan: #00f2ff;
             --ac-gray-05: rgba(255,255,255,0.05);
             --ac-gray-10: rgba(255,255,255,0.1);
             --ac-gray-20: rgba(255,255,255,0.2);
             --ac-gray-30: rgba(255,255,255,0.3);
             --ac-gray-40: rgba(255,255,255,0.4);
-            --ac-gray-50: rgba(255,255,255,0.5);
-            --font-sans: 'Geist Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            --font-sans: 'Geist Sans', sans-serif;
             --font-mono: 'Geist Mono', monospace;
-            --transition: 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            --transition: 0.3s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -39,378 +39,333 @@
             background-color: var(--ac-black);
             color: var(--ac-white);
             font-family: var(--font-sans);
-            line-height: 1.5;
+            line-height: 1.4;
             -webkit-font-smoothing: antialiased;
             overflow-x: hidden;
         }
 
-        ::selection { background: var(--ac-white); color: var(--ac-black); }
-
-        body::before {
-            content: '';
+        /* Scanline Effect */
+        body::after {
+            content: "";
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: radial-gradient(circle at 50% -20%, #151515 0%, #000 80%);
-            z-index: -1;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+            z-index: 1000;
+            background-size: 100% 2px, 3px 100%;
+            pointer-events: none;
+            opacity: 0.3;
         }
 
         .container {
-            max-width: 1200px;
+            max-width: 1400px;
             margin: 0 auto;
-            padding: 0 48px;
+            padding: 0 40px;
         }
 
         /* Navigation */
         .navbar {
-            padding: 48px;
+            padding: 32px 0;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            max-width: 1400px;
-            margin: 0 auto;
+            border-bottom: 1px solid var(--ac-gray-10);
+            margin-bottom: 60px;
         }
 
         .logo {
-            font-size: 1.1rem;
-            font-weight: 600;
+            font-family: var(--font-mono);
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--ac-cyan);
             text-decoration: none;
-            color: var(--ac-white);
-            letter-spacing: -0.03em;
             display: flex;
             align-items: center;
             gap: 12px;
-            text-transform: uppercase;
-            font-family: var(--font-mono);
         }
 
-        .logo-icon {
-            height: 24px;
-            width: auto;
-        }
+        .logo-icon { height: 18px; width: auto; filter: drop-shadow(0 0 5px var(--ac-cyan)); }
 
         .nav-links {
             display: flex;
-            gap: 32px;
+            gap: 24px;
             list-style: none;
-            align-items: center;
         }
 
         .nav-link {
-            text-decoration: none;
-            color: var(--ac-gray-40);
+            font-family: var(--font-mono);
             font-size: 10px;
             text-transform: uppercase;
-            letter-spacing: 0.25em;
-            font-weight: 500;
-            transition: color var(--transition), transform var(--transition);
+            color: var(--ac-gray-40);
+            text-decoration: none;
+            transition: color var(--transition);
         }
 
-        .nav-link:hover { 
-            color: var(--ac-white); 
-            transform: translateY(-1px);
+        .nav-link:hover { color: var(--ac-white); }
+
+        /* Terminal Hero */
+        .lab-header {
+            margin-bottom: 100px;
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 40px;
+            align-items: end;
         }
 
-        /* Hero */
-        .hero {
-            padding: 100px 0 140px;
+        .lab-title-area {
+            border-left: 2px solid var(--ac-cyan);
+            padding-left: 32px;
         }
 
-        .hero-label {
-            font-size: 9px;
+        .lab-status {
+            font-family: var(--font-mono);
+            font-size: 10px;
+            color: var(--ac-cyan);
             text-transform: uppercase;
-            letter-spacing: 0.5em;
-            font-weight: 500;
-            color: var(--ac-gray-30);
-            margin-bottom: 40px;
-            display: block;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .lab-status::before {
+            content: '';
+            width: 6px;
+            height: 6px;
+            background: var(--ac-cyan);
+            border-radius: 50%;
+            display: inline-block;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.3; transform: scale(1.2); }
+            100% { opacity: 1; transform: scale(1); }
         }
 
         .hero-title {
-            font-size: clamp(2.5rem, 8vw, 5rem);
-            line-height: 1.1;
-            letter-spacing: -0.07em;
-            margin-bottom: 64px;
+            font-size: clamp(3rem, 10vw, 6rem);
             font-weight: 400;
-            max-width: 900px;
+            line-height: 0.9;
+            letter-spacing: -0.05em;
+            text-transform: uppercase;
         }
 
-        .hero-title span {
-            display: block;
-            background: linear-gradient(90deg, #88ffcc, #cc88ff, #ff88cc);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            padding-top: 8px;
+        .lab-stats {
+            font-family: var(--font-mono);
+            font-size: 11px;
+            color: var(--ac-gray-30);
+            border: 1px solid var(--ac-gray-10);
+            padding: 24px;
+            background: rgba(255, 255, 255, 0.02);
         }
 
-        .hero-subtitle {
-            font-size: 0.95rem;
-            color: var(--ac-gray-40);
-            max-width: 540px;
-            line-height: 1.8;
-            letter-spacing: -0.01em;
-            margin-bottom: 64px;
+        .stat-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
         }
 
-        /* Research Grid */
-        .research-section {
-            padding-bottom: 160px;
+        .stat-value { color: var(--ac-white); }
+
+        /* Research Feed */
+        .node-list {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            background: var(--ac-gray-10);
+            border: 1px solid var(--ac-gray-10);
         }
 
-        .research-grid {
+        .node-item {
+            background: var(--ac-black);
+            padding: 60px;
             display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 1px;
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-        }
-
-        .research-card {
-            background: #050505;
-            padding: 80px 60px;
+            grid-template-columns: 80px 1fr 300px;
+            gap: 40px;
+            transition: background var(--transition);
             text-decoration: none;
             color: inherit;
-            transition: all var(--transition);
-            position: relative;
-            overflow: hidden;
-            border: 1px solid transparent;
         }
 
-        .research-card:hover {
+        .node-item:hover {
             background: #080808;
-            transform: translateY(-4px);
-            z-index: 10;
-            border-color: rgba(255, 255, 255, 0.1);
         }
 
-        .research-num {
-            font-size: 10px;
-            color: var(--ac-gray-30);
+        .node-index {
             font-family: var(--font-mono);
-            margin-bottom: 24px;
-            display: block;
+            font-size: 12px;
+            color: var(--ac-gray-20);
         }
 
-        .research-title {
-            font-size: 1.5rem;
-            margin-bottom: 20px;
-            font-weight: 500;
+        .node-content h2 {
+            font-size: 2rem;
+            font-weight: 400;
+            margin-bottom: 24px;
             letter-spacing: -0.02em;
         }
 
-        .research-desc {
+        .node-content p {
+            font-size: 1rem;
             color: var(--ac-gray-40);
-            font-size: 0.9rem;
+            max-width: 500px;
             line-height: 1.6;
-            max-width: 320px;
+        }
+
+        .node-meta {
+            font-family: var(--font-mono);
+            font-size: 11px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .meta-tag {
+            display: flex;
+            justify-content: space-between;
+            padding-bottom: 8px;
+            border-bottom: 1px solid var(--ac-gray-05);
+            color: var(--ac-gray-30);
+        }
+
+        .meta-tag span:last-child {
+            color: var(--ac-cyan);
         }
 
         /* Footer */
         .footer {
-            padding: 120px 0 60px;
-            border-top: 1px solid rgba(255, 255, 255, 0.05);
-            background: #000;
-        }
-
-        .footer-content {
+            margin-top: 100px;
+            padding: 60px 0;
+            border-top: 1px solid var(--ac-gray-10);
             display: flex;
             justify-content: space-between;
-            margin-bottom: 80px;
+            align-items: center;
         }
 
-        .footer-links {
-            display: flex;
-            gap: 80px;
-        }
-
-        .footer-col {
-            display: flex;
-            flex-direction: column;
-            gap: 16px;
-        }
-
-        .footer-label {
+        .footer-info {
+            font-family: var(--font-mono);
             font-size: 10px;
+            color: var(--ac-gray-30);
             text-transform: uppercase;
-            letter-spacing: 0.1em;
-            color: var(--ac-gray-30);
-            margin-bottom: 8px;
-            font-family: var(--font-mono);
-        }
-
-        .footer-col a {
-            color: var(--ac-gray-40);
-            text-decoration: none;
-            font-size: 14px;
-            transition: color var(--transition);
-        }
-
-        .footer-col a:hover {
-            color: var(--ac-white);
-        }
-
-        .footer-bottom {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-end;
-            padding-top: 40px;
-            border-top: 1px solid rgba(255, 255, 255, 0.03);
-        }
-
-        .footer-copy {
-            font-size: 11px;
-            color: var(--ac-gray-30);
-            font-family: var(--font-mono);
         }
 
         .footer-cat {
             font-family: var(--font-mono);
             white-space: pre;
-            font-size: 10px;
-            color: var(--ac-gray-30);
-            user-select: none;
-            pointer-events: none;
-            line-height: 1.2;
+            font-size: 8px;
+            color: var(--ac-gray-10);
+            line-height: 1;
         }
 
-        /* Animations */
-        .reveal {
-            opacity: 0;
-            transform: translateY(20px);
-            transition: all 1.2s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-
-        .reveal.visible {
-            opacity: 1;
-            transform: translateY(0);
-        }
-
-        @media (max-width: 900px) {
-            .navbar { padding: 32px 24px; }
-            .container { padding: 0 24px; }
-            .hero { padding: 60px 0 80px; }
-            .research-grid { grid-template-columns: 1fr; }
-            .research-card { padding: 60px 32px; }
+        @media (max-width: 1000px) {
+            .lab-header { grid-template-columns: 1fr; }
+            .node-item { grid-template-columns: 1fr; padding: 40px; }
+            .node-meta { margin-top: 20px; }
         }
     </style>
 </head>
 <body>
 
-<nav class="navbar">
-    <a href="/" class="logo">
-        <img src="/icon.svg" alt="" class="logo-icon">
-        Исследования
-    </a>
-    <ul class="nav-links">
-        <li><a href="/" class="nav-link">Главная</a></li>
-        <li><a href="/gr" class="nav-link">ГР</a></li>
-        <li><a href="/forEdu" class="nav-link">Образование</a></li>
-    </ul>
-</nav>
+<div class="container">
+    <nav class="navbar">
+        <a href="/" class="logo">
+            <img src="/icon.svg" alt="" class="logo-icon">
+            ARLIST.RESEARCH.LAB
+        </a>
+        <ul class="nav-links">
+            <li><a href="/" class="nav-link">Main</a></li>
+            <li><a href="/gr" class="nav-link">GR</a></li>
+            <li><a href="/forEdu" class="nav-link">Edu</a></li>
+        </ul>
+    </nav>
 
-<main>
-    <section class="hero">
-        <div class="container">
-            <span class="hero-label reveal">Exploration Lab</span>
-            <h1 class="hero-title reveal">
-                Определяем <span>будущее технологий.</span>
-            </h1>
-            <p class="hero-subtitle reveal">
-                Мы исследуем границы возможного, объединяя чистый код с научным подходом. 
-                Лаборатория Арлист — это пространство для экспериментов, которые меняют реальность.
-            </p>
+    <header class="lab-header">
+        <div class="lab-title-area">
+            <div class="lab-status">System Operational // Level 5 Access</div>
+            <h1 class="hero-title">Exploration<br>Nodes</h1>
         </div>
-    </section>
+        <div class="lab-stats">
+            <div class="stat-row"><span>Active Nodes</span><span class="stat-value">04</span></div>
+            <div class="stat-row"><span>Data Stream</span><span class="stat-value">Stable</span></div>
+            <div class="stat-row"><span>Last Update</span><span class="stat-value">19.05.2026</span></div>
+            <div class="stat-row"><span>Security</span><span class="stat-value">Encrypted</span></div>
+        </div>
+    </header>
 
-    <section class="research-section">
-        <div class="container">
-            <div class="research-grid">
-                <!-- Bioinformatics -->
-                <div class="research-card reveal">
-                    <span class="research-num">#01</span>
-                    <h3 class="research-title">Биоинформатика</h3>
-                    <p class="research-desc">Анализ биологических данных через призму алгоритмов. Понимаем код жизни так же глубоко, как и системный код.</p>
-                </div>
+    <section class="node-list">
+        <!-- Node 01 -->
+        <div class="node-item">
+            <div class="node-index">NODE_01</div>
+            <div class="node-content">
+                <h2>Биоинформатика</h2>
+                <p>Алгоритмическая дешифровка генетического кода. Мы рассматриваем биологические системы как сложные вычислительные структуры.</p>
+            </div>
+            <div class="node-meta">
+                <div class="meta-tag"><span>Status</span><span>Active</span></div>
+                <div class="meta-tag"><span>Priority</span><span>Critical</span></div>
+                <div class="meta-tag"><span>Impact</span><span>High</span></div>
+            </div>
+        </div>
 
-                <!-- AI -->
-                <div class="research-card reveal">
-                    <span class="research-num">#02</span>
-                    <h3 class="research-title">Искусственный интеллект</h3>
-                    <p class="research-desc">Разработка специализированных моделей, способных решать прикладные задачи с минимальными ресурсами.</p>
-                </div>
+        <!-- Node 02 -->
+        <div class="node-item">
+            <div class="node-index">NODE_02</div>
+            <div class="node-content">
+                <h2>Искусственный интеллект</h2>
+                <p>Разработка локальных LLM моделей с высокой эффективностью. Оптимизация архитектур под специализированные задачи.</p>
+            </div>
+            <div class="node-meta">
+                <div class="meta-tag"><span>Status</span><span>Processing</span></div>
+                <div class="meta-tag"><span>Priority</span><span>High</span></div>
+                <div class="meta-tag"><span>Impact</span><span>Evolutionary</span></div>
+            </div>
+        </div>
 
-                <!-- Gamedev -->
-                <div class="research-card reveal">
-                    <span class="research-num">#03</span>
-                    <h3 class="research-title">Геймдев</h3>
-                    <p class="research-desc">Исследование процедурных миров и новых механик взаимодействия. Игра как среда для обучения и творчества.</p>
-                </div>
+        <!-- Node 03 -->
+        <div class="node-item">
+            <div class="node-index">NODE_03</div>
+            <div class="node-content">
+                <h2>Геймдев / Симуляции</h2>
+                <p>Исследование процедурной генерации и социального взаимодействия в виртуальных мирах. Создание живых экосистем.</p>
+            </div>
+            <div class="node-meta">
+                <div class="meta-tag"><span>Status</span><span>Experimental</span></div>
+                <div class="meta-tag"><span>Priority</span><span>Medium</span></div>
+                <div class="meta-tag"><span>Impact</span><span>Cultural</span></div>
+            </div>
+        </div>
 
-                <!-- Search & Rescue -->
-                <div class="research-card reveal">
-                    <span class="research-num">#04</span>
-                    <h3 class="research-title">Поиск и спасение</h3>
-                    <p class="research-desc">Создание отказоустойчивых систем для поиска людей. Технологии, спасающие жизни в экстремальных условиях.</p>
-                </div>
+        <!-- Node 04 -->
+        <div class="node-item">
+            <div class="node-index">NODE_04</div>
+            <div class="node-content">
+                <h2>Поиск и спасение</h2>
+                <p>Разработка автономных систем для координации спасательных операций. Технологии выживания в экстремальных условиях.</p>
+            </div>
+            <div class="node-meta">
+                <div class="meta-tag"><span>Status</span><span>Field Test</span></div>
+                <div class="meta-tag"><span>Priority</span><span>Vital</span></div>
+                <div class="meta-tag"><span>Impact</span><span>Direct</span></div>
             </div>
         </div>
     </section>
-</main>
 
-<footer class="footer">
-    <div class="container">
-        <div class="footer-content">
-            <div class="footer-brand">
-                <a href="/" class="logo">
-                    <img src="/icon.svg" alt="" class="logo-icon">
-                    Арлист
-                </a>
-            </div>
-            <div class="footer-links">
-                <div class="footer-col">
-                    <span class="footer-label">Сервисы</span>
-                    <a href="https://commit.arlist.tech">Commit</a>
-                    <a href="https://leetcot.ru">ЛитКот</a>
-                </div>
-                <div class="footer-col">
-                    <span class="footer-label">Компания</span>
-                    <a href="/research">Исследования</a>
-                    <a href="/gr">ГР</a>
-                    <a href="/forEdu">Образование</a>
-                </div>
-                <div class="footer-col">
-                    <span class="footer-label">Право</span>
-                    <a href="/legal">Документы</a>
-                    <a href="/legal/commit-privacy">Приватность</a>
-                </div>
-            </div>
+    <footer class="footer">
+        <div class="footer-info">
+            © 2026 АРЛИСТ ТЕХ // DATA PROTECTION ACT ENABLED
         </div>
-        <div class="footer-bottom">
-            <p class="footer-copy">© 2026 АРЛИСТ ТЕХ. Все права защищены.</p>
-            <div class="footer-cat">
+        <div class="footer-cat">
   _._     _,-'""`-._
  (,-.`._,'(       |\`-/|
      `-.-' \ )-`( , o o)
            `-    \`_`"'-
-            </div>
         </div>
-    </div>
-</footer>
-
-<script>
-    const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                entry.target.classList.add('visible');
-            }
-        });
-    }, { threshold: 0.1 });
-
-    document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
-</script>
+    </footer>
+</div>
 
 </body>
 </html>
