@@ -3,11 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>Арлист | Взаимодействие с государством (GR)</title>
-    <meta name="description" content="Арлист Групп. Наш вклад в технологический суверенитет и безопасность страны.">
+    <title>АРЛИСТ ТЕХ | ГР</title>
+    <meta name="description" content="Арлист Тех. Наш вклад в технологический суверенитет и безопасность страны.">
     
-    <!-- Maple Mono Font -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/maple-mono@5.2.6/index.css">
+    <!-- Geist Font -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/geist@1.3.0/dist/fonts/geist-sans/style.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/geist@1.3.0/dist/fonts/geist-mono/style.css">
     
     <!-- Favicon -->
     <link rel="icon" type="image/svg+xml" href="/icon.svg">
@@ -27,8 +28,9 @@
             --ac-gray-30: rgba(255,255,255,0.3);
             --ac-gray-40: rgba(255,255,255,0.4);
             --ac-gray-50: rgba(255,255,255,0.5);
-            --font-mono: 'Maple Mono', monospace;
-            --transition: 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+            --font-sans: 'Geist Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            --font-mono: 'Geist Mono', monospace;
+            --transition: 0.4s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -36,15 +38,14 @@
         body {
             background-color: var(--ac-black);
             color: var(--ac-white);
-            font-family: var(--font-mono);
-            line-height: 1.6;
+            font-family: var(--font-sans);
+            line-height: 1.5;
             -webkit-font-smoothing: antialiased;
             overflow-x: hidden;
         }
 
         ::selection { background: var(--ac-white); color: var(--ac-black); }
 
-        /* Subtle Background Gradient */
         body::before {
             content: '';
             position: fixed;
@@ -52,12 +53,12 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: radial-gradient(circle at 50% -20%, #111 0%, #000 70%);
+            background: linear-gradient(180deg, #0a0a0a 0%, #000 100%);
             z-index: -1;
         }
 
         .container {
-            max-width: 1200px;
+            max-width: 1000px;
             margin: 0 auto;
             padding: 0 48px;
         }
@@ -74,23 +75,20 @@
 
         .logo {
             font-size: 1.1rem;
-            font-weight: 700;
+            font-weight: 600;
             text-decoration: none;
             color: var(--ac-white);
-            letter-spacing: -0.05em;
+            letter-spacing: -0.03em;
             display: flex;
             align-items: center;
             gap: 12px;
             text-transform: uppercase;
+            font-family: var(--font-mono);
         }
 
         .logo-icon {
             height: 24px;
             width: auto;
-        }
-
-        .logo img {
-            pointer-events: none;
         }
 
         .nav-links {
@@ -107,143 +105,195 @@
             text-transform: uppercase;
             letter-spacing: 0.25em;
             font-weight: 500;
-            transition: color var(--transition), transform var(--transition);
+            transition: color var(--transition);
         }
 
         .nav-link:hover { 
             color: var(--ac-white); 
-            transform: translateY(-1px);
         }
 
         /* Hero */
         .hero {
-            padding: 100px 0 140px;
-            text-align: center;
+            padding: 120px 0 80px;
+            border-bottom: 1px solid var(--ac-gray-10);
+            margin-bottom: 80px;
         }
 
         .hero-label {
             font-size: 9px;
             text-transform: uppercase;
             letter-spacing: 0.5em;
-            font-weight: 500;
-            color: var(--ac-gray-30);
-            margin-bottom: 40px;
+            font-weight: 600;
+            color: var(--ac-gray-40);
+            margin-bottom: 32px;
             display: block;
         }
 
         .hero-title {
-            font-size: clamp(2rem, 6vw, 4rem);
+            font-size: clamp(2rem, 5vw, 3.5rem);
             line-height: 1.1;
-            letter-spacing: -0.06em;
+            letter-spacing: -0.05em;
             margin-bottom: 40px;
-            font-weight: 400;
+            font-weight: 500;
+            max-width: 800px;
         }
 
         .hero-title span {
-            display: block;
-            background: linear-gradient(90deg, #ff8888, #ffcc88, #88ffcc);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
+            color: var(--ac-gray-30);
         }
 
         .hero-subtitle {
-            font-size: 0.95rem;
-            color: var(--ac-gray-40);
-            max-width: 600px;
-            margin: 0 auto;
-            line-height: 1.8;
-            letter-spacing: -0.01em;
+            font-size: 1.1rem;
+            color: var(--ac-gray-50);
+            max-width: 700px;
+            line-height: 1.6;
         }
 
-        /* Mission Section */
-        .mission-section {
-            padding-bottom: 120px;
-            text-align: center;
+        /* Content Sections */
+        .section {
+            margin-bottom: 120px;
+        }
+
+        .section-title {
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.2em;
+            color: var(--ac-gray-30);
+            margin-bottom: 48px;
+            font-family: var(--font-mono);
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .section-title::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: var(--ac-gray-10);
         }
 
         .mission-text {
-            font-size: 1.1rem;
-            color: var(--ac-gray-50);
-            max-width: 800px;
-            margin: 0 auto;
-            line-height: 2;
+            font-size: 1.25rem;
+            line-height: 1.8;
+            color: var(--ac-white);
+            font-weight: 400;
         }
 
         /* Contacts Grid */
-        .contacts-section {
-            padding-bottom: 160px;
-        }
-
         .contacts-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
-            gap: 1px;
-            background: var(--ac-gray-05);
-            border: 1px solid var(--ac-gray-05);
+            gap: 48px;
         }
 
-        .contact-card {
-            background: var(--ac-black);
-            padding: 80px 60px;
-            transition: all var(--transition);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .contact-card:hover {
-            background: rgba(255, 255, 255, 0.02);
-            transform: scale(1.01);
-            z-index: 10;
+        .contact-item {
+            padding-bottom: 32px;
+            border-bottom: 1px solid var(--ac-gray-05);
         }
 
         .contact-label {
-            font-size: 9px;
-            color: var(--ac-gray-20);
-            margin-bottom: 24px;
-            display: block;
-            letter-spacing: 0.2em;
+            font-size: 10px;
+            color: var(--ac-gray-40);
             text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: 16px;
+            display: block;
+            font-family: var(--font-mono);
         }
 
         .contact-email {
-            font-size: 1.25rem;
+            font-size: 1.2rem;
             color: var(--ac-white);
             text-decoration: none;
             display: block;
-            margin-bottom: 16px;
-            transition: color var(--transition);
+            margin-bottom: 12px;
+            transition: opacity var(--transition);
         }
 
         .contact-email:hover {
-            color: #ffcc88;
+            opacity: 0.7;
         }
 
         .contact-desc {
+            font-size: 0.9rem;
             color: var(--ac-gray-40);
-            font-size: 0.85rem;
             line-height: 1.6;
         }
 
         /* Footer */
-        footer {
-            padding: 100px 48px;
-            border-top: 1px solid var(--ac-gray-05);
-            text-align: center;
+        .footer {
+            padding: 120px 0 60px;
+            border-top: 1px solid var(--ac-gray-10);
+            background: #000;
         }
 
-        .footer-text {
-            font-size: 9px;
+        .footer-content {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 80px;
+        }
+
+        .footer-links {
+            display: flex;
+            gap: 80px;
+        }
+
+        .footer-col {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .footer-label {
+            font-size: 10px;
             text-transform: uppercase;
-            letter-spacing: 0.3em;
+            letter-spacing: 0.1em;
             color: var(--ac-gray-30);
+            margin-bottom: 8px;
+            font-family: var(--font-mono);
+        }
+
+        .footer-col a {
+            color: var(--ac-gray-40);
+            text-decoration: none;
+            font-size: 14px;
+            transition: color var(--transition);
+        }
+
+        .footer-col a:hover {
+            color: var(--ac-white);
+        }
+
+        .footer-bottom {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            padding-top: 40px;
+            border-top: 1px solid rgba(255, 255, 255, 0.03);
+        }
+
+        .footer-copy {
+            font-size: 11px;
+            color: var(--ac-gray-30);
+            font-family: var(--font-mono);
+        }
+
+        .footer-cat {
+            font-family: var(--font-mono);
+            white-space: pre;
+            font-size: 10px;
+            color: var(--ac-gray-30);
+            user-select: none;
+            pointer-events: none;
+            line-height: 1.2;
         }
 
         /* Animations */
         .reveal {
             opacity: 0;
-            transform: translateY(20px);
-            transition: all 1.2s cubic-bezier(0.16, 1, 0.3, 1);
+            transform: translateY(10px);
+            transition: all 0.8s ease-out;
         }
 
         .reveal.visible {
@@ -254,9 +304,8 @@
         @media (max-width: 900px) {
             .navbar { padding: 32px 24px; }
             .container { padding: 0 24px; }
-            .hero { padding: 60px 0 80px; }
-            .contacts-grid { grid-template-columns: 1fr; }
-            .contact-card { padding: 60px 32px; }
+            .hero { padding: 80px 0 40px; }
+            .contacts-grid { grid-template-columns: 1fr; gap: 32px; }
         }
     </style>
 </head>
@@ -270,6 +319,7 @@
     <ul class="nav-links">
         <li><a href="/" class="nav-link">Главная</a></li>
         <li><a href="/research" class="nav-link">Исследования</a></li>
+        <li><a href="/forEdu" class="nav-link">Образование</a></li>
     </ul>
 </nav>
 
@@ -287,53 +337,89 @@
         </div>
     </section>
 
-    <section class="mission-section">
-        <div class="container">
+    <div class="container">
+        <section class="section">
+            <span class="section-title reveal">Миссия</span>
             <div class="mission-text reveal">
                 Мы верим в потенциал нашей страны и направляем все свои знания на создание 
                 защищенных, независимых и эффективных систем. Наша работа — это вклад 
                 в технологическую мощь и уверенное будущее.
             </div>
-        </div>
-    </section>
+        </section>
 
-    <section class="contacts-section">
-        <div class="container">
+        <section class="section">
+            <span class="section-title reveal">Прямая связь</span>
             <div class="contacts-grid">
                 <!-- CEO -->
-                <div class="contact-card reveal">
+                <div class="contact-item reveal">
                     <span class="contact-label">Генеральный директор</span>
                     <a href="mailto:letunovskiy@arlist.tech" class="contact-email">letunovskiy@arlist.tech</a>
                     <p class="contact-desc">Прямой канал связи по стратегическим вопросам и партнерствам.</p>
                 </div>
 
                 <!-- Safety -->
-                <div class="contact-card reveal">
+                <div class="contact-item reveal">
                     <span class="contact-label">Безопасность</span>
                     <a href="mailto:safety@arlist.tech" class="contact-email">safety@arlist.tech</a>
                     <p class="contact-desc">Вопросы информационной защиты, аудита и устойчивости систем.</p>
                 </div>
 
                 <!-- Support -->
-                <div class="contact-card reveal">
+                <div class="contact-item reveal">
                     <span class="contact-label">Поддержка</span>
                     <a href="mailto:support@arlist.tech" class="contact-email">support@arlist.tech</a>
                     <p class="contact-desc">Оперативная помощь и консультации по текущим решениям.</p>
                 </div>
 
                 <!-- Taiga Division -->
-                <div class="contact-card reveal">
+                <div class="contact-item reveal">
                     <span class="contact-label">ОС Тайга</span>
                     <a href="mailto:taiga-division@arlist.tech" class="contact-email">taiga-division@arlist.tech</a>
                     <p class="contact-desc">Подразделение, занимающееся разработкой и внедрением отечественной операционной системы «Тайга».</p>
                 </div>
             </div>
-        </div>
-    </section>
+        </section>
+    </div>
 </main>
 
-<footer>
-    <p class="footer-text">© 2026 Арлист Групп. Безопасность. Суверенитет. Честь.</p>
+<footer class="footer">
+    <div class="container">
+        <div class="footer-content">
+            <div class="footer-brand">
+                <a href="/" class="logo">
+                    <img src="/icon.svg" alt="" class="logo-icon">
+                    Арлист
+                </a>
+            </div>
+            <div class="footer-links">
+                <div class="footer-col">
+                    <span class="footer-label">Сервисы</span>
+                    <a href="https://commit.arlist.tech">Commit</a>
+                    <a href="https://leetcot.ru">ЛитКот</a>
+                </div>
+                <div class="footer-col">
+                    <span class="footer-label">Компания</span>
+                    <a href="/research">Исследования</a>
+                    <a href="/gr">ГР</a>
+                    <a href="/forEdu">Образование</a>
+                </div>
+                <div class="footer-col">
+                    <span class="footer-label">Право</span>
+                    <a href="/legal">Документы</a>
+                    <a href="/legal/commit-privacy">Приватность</a>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p class="footer-copy">© 2026 АРЛИСТ ТЕХ. Все права защищены.</p>
+            <div class="footer-cat">
+  _._     _,-'""`-._
+ (,-.`._,'(       |\`-/|
+     `-.-' \ )-`( , o o)
+           `-    \`_`"'-
+            </div>
+        </div>
+    </div>
 </footer>
 
 <script>

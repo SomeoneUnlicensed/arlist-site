@@ -3,11 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>Arlist Research | Исследования и инновации</title>
+    <title>АРЛИСТ ТЕХ | Исследования</title>
     <meta name="description" content="Лаборатория Арлист. Мы исследуем границы возможного в биоинформатике, ИИ и спасательных технологиях.">
     
-    <!-- Maple Mono Font -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/maple-mono@5.2.6/index.css">
+    <!-- Geist Font -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/geist@1.3.0/dist/fonts/geist-sans/style.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/geist@1.3.0/dist/fonts/geist-mono/style.css">
     
     <!-- Favicon -->
     <link rel="icon" type="image/svg+xml" href="/icon.svg">
@@ -27,8 +28,9 @@
             --ac-gray-30: rgba(255,255,255,0.3);
             --ac-gray-40: rgba(255,255,255,0.4);
             --ac-gray-50: rgba(255,255,255,0.5);
-            --font-mono: 'Maple Mono', monospace;
-            --transition: 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+            --font-sans: 'Geist Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            --font-mono: 'Geist Mono', monospace;
+            --transition: 0.4s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -36,15 +38,14 @@
         body {
             background-color: var(--ac-black);
             color: var(--ac-white);
-            font-family: var(--font-mono);
-            line-height: 1.6;
+            font-family: var(--font-sans);
+            line-height: 1.5;
             -webkit-font-smoothing: antialiased;
             overflow-x: hidden;
         }
 
         ::selection { background: var(--ac-white); color: var(--ac-black); }
 
-        /* Subtle Background Gradient */
         body::before {
             content: '';
             position: fixed;
@@ -52,7 +53,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: radial-gradient(circle at 50% -20%, #111 0%, #000 70%);
+            background: radial-gradient(circle at 50% -20%, #151515 0%, #000 80%);
             z-index: -1;
         }
 
@@ -74,23 +75,20 @@
 
         .logo {
             font-size: 1.1rem;
-            font-weight: 700;
+            font-weight: 600;
             text-decoration: none;
             color: var(--ac-white);
-            letter-spacing: -0.05em;
+            letter-spacing: -0.03em;
             display: flex;
             align-items: center;
             gap: 12px;
             text-transform: uppercase;
+            font-family: var(--font-mono);
         }
 
         .logo-icon {
             height: 24px;
             width: auto;
-        }
-
-        .logo img {
-            pointer-events: none;
         }
 
         .nav-links {
@@ -118,7 +116,6 @@
         /* Hero */
         .hero {
             padding: 100px 0 140px;
-            text-align: center;
         }
 
         .hero-label {
@@ -133,10 +130,11 @@
 
         .hero-title {
             font-size: clamp(2.5rem, 8vw, 5rem);
-            line-height: 0.95;
+            line-height: 1.1;
             letter-spacing: -0.07em;
-            margin-bottom: 40px;
+            margin-bottom: 64px;
             font-weight: 400;
+            max-width: 900px;
         }
 
         .hero-title span {
@@ -145,15 +143,16 @@
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
+            padding-top: 8px;
         }
 
         .hero-subtitle {
             font-size: 0.95rem;
             color: var(--ac-gray-40);
             max-width: 540px;
-            margin: 0 auto;
             line-height: 1.8;
             letter-spacing: -0.01em;
+            margin-bottom: 64px;
         }
 
         /* Research Grid */
@@ -165,76 +164,116 @@
             display: grid;
             grid-template-columns: repeat(2, 1fr);
             gap: 1px;
-            background: var(--ac-gray-05);
-            border: 1px solid var(--ac-gray-05);
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.05);
         }
 
         .research-card {
-            background: var(--ac-black);
-            padding: 100px 60px;
+            background: #050505;
+            padding: 80px 60px;
             text-decoration: none;
             color: inherit;
             transition: all var(--transition);
             position: relative;
             overflow: hidden;
+            border: 1px solid transparent;
         }
 
         .research-card:hover {
-            background: rgba(255, 255, 255, 0.02);
-            transform: scale(1.01);
+            background: #080808;
+            transform: translateY(-4px);
             z-index: 10;
+            border-color: rgba(255, 255, 255, 0.1);
         }
 
-        .research-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: radial-gradient(circle at 50% 50%, rgba(255,255,255,0.02) 0%, transparent 80%);
-            opacity: 0;
-            transition: opacity var(--transition);
-        }
-
-        .research-card:hover::before {
-            opacity: 1;
-        }
-
-        .research-card-num {
-            font-size: 9px;
-            color: var(--ac-gray-20);
-            margin-bottom: 32px;
-            display: block;
-            letter-spacing: 0.2em;
-        }
-
-        .research-card-title {
-            font-size: 1.75rem;
+        .research-num {
+            font-size: 10px;
+            color: var(--ac-gray-30);
+            font-family: var(--font-mono);
             margin-bottom: 24px;
-            font-weight: 400;
-            letter-spacing: -0.04em;
+            display: block;
         }
 
-        .research-card-desc {
+        .research-title {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            font-weight: 500;
+            letter-spacing: -0.02em;
+        }
+
+        .research-desc {
             color: var(--ac-gray-40);
-            font-size: 0.85rem;
-            line-height: 1.8;
-            max-width: 300px;
+            font-size: 0.9rem;
+            line-height: 1.6;
+            max-width: 320px;
         }
 
         /* Footer */
-        footer {
-            padding: 100px 48px;
-            border-top: 1px solid var(--ac-gray-05);
-            text-align: center;
+        .footer {
+            padding: 120px 0 60px;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            background: #000;
         }
 
-        .footer-text {
-            font-size: 9px;
+        .footer-content {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 80px;
+        }
+
+        .footer-links {
+            display: flex;
+            gap: 80px;
+        }
+
+        .footer-col {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .footer-label {
+            font-size: 10px;
             text-transform: uppercase;
-            letter-spacing: 0.3em;
+            letter-spacing: 0.1em;
             color: var(--ac-gray-30);
+            margin-bottom: 8px;
+            font-family: var(--font-mono);
+        }
+
+        .footer-col a {
+            color: var(--ac-gray-40);
+            text-decoration: none;
+            font-size: 14px;
+            transition: color var(--transition);
+        }
+
+        .footer-col a:hover {
+            color: var(--ac-white);
+        }
+
+        .footer-bottom {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            padding-top: 40px;
+            border-top: 1px solid rgba(255, 255, 255, 0.03);
+        }
+
+        .footer-copy {
+            font-size: 11px;
+            color: var(--ac-gray-30);
+            font-family: var(--font-mono);
+        }
+
+        .footer-cat {
+            font-family: var(--font-mono);
+            white-space: pre;
+            font-size: 10px;
+            color: var(--ac-gray-30);
+            user-select: none;
+            pointer-events: none;
+            line-height: 1.2;
         }
 
         /* Animations */
@@ -248,12 +287,6 @@
             opacity: 1;
             transform: translateY(0);
         }
-
-        /* Custom Scrollbar */
-        ::-webkit-scrollbar { width: 4px; }
-        ::-webkit-scrollbar-track { background: var(--ac-black); }
-        ::-webkit-scrollbar-thumb { background: var(--ac-gray-10); border-radius: 2px; }
-        ::-webkit-scrollbar-thumb:hover { background: var(--ac-gray-20); }
 
         @media (max-width: 900px) {
             .navbar { padding: 32px 24px; }
@@ -269,11 +302,12 @@
 <nav class="navbar">
     <a href="/" class="logo">
         <img src="/icon.svg" alt="" class="logo-icon">
-        Arlist Research
+        Исследования
     </a>
     <ul class="nav-links">
         <li><a href="/" class="nav-link">Главная</a></li>
-        <li><a href="https://commit.arlist.tech" class="nav-link">Commit</a></li>
+        <li><a href="/gr" class="nav-link">ГР</a></li>
+        <li><a href="/forEdu" class="nav-link">Образование</a></li>
     </ul>
 </nav>
 
@@ -296,46 +330,74 @@
             <div class="research-grid">
                 <!-- Bioinformatics -->
                 <div class="research-card reveal">
-                    <span class="research-card-num">#01</span>
-                    <h2 class="research-card-title">Биоинформатика</h2>
-                    <p class="research-card-desc">
-                        Анализ биологических данных через призму алгоритмов. Понимаем код жизни так же глубоко, как и системный код.
-                    </p>
+                    <span class="research-num">#01</span>
+                    <h3 class="research-title">Биоинформатика</h3>
+                    <p class="research-desc">Анализ биологических данных через призму алгоритмов. Понимаем код жизни так же глубоко, как и системный код.</p>
                 </div>
 
                 <!-- AI -->
                 <div class="research-card reveal">
-                    <span class="research-card-num">#02</span>
-                    <h2 class="research-card-title">Искусственный интеллект</h2>
-                    <p class="research-card-desc">
-                        Разработка специализированных моделей, способных решать прикладные задачи с минимальными ресурсами.
-                    </p>
+                    <span class="research-num">#02</span>
+                    <h3 class="research-title">Искусственный интеллект</h3>
+                    <p class="research-desc">Разработка специализированных моделей, способных решать прикладные задачи с минимальными ресурсами.</p>
                 </div>
 
                 <!-- Gamedev -->
                 <div class="research-card reveal">
-                    <span class="research-card-num">#03</span>
-                    <h2 class="research-card-title">Геймдев</h2>
-                    <p class="research-card-desc">
-                        Исследование процедурных миров и новых механик взаимодействия. Игра как среда для обучения и творчества.
-                    </p>
+                    <span class="research-num">#03</span>
+                    <h3 class="research-title">Геймдев</h3>
+                    <p class="research-desc">Исследование процедурных миров и новых механик взаимодействия. Игра как среда для обучения и творчества.</p>
                 </div>
 
                 <!-- Search & Rescue -->
                 <div class="research-card reveal">
-                    <span class="research-card-num">#04</span>
-                    <h2 class="research-card-title">Поиск и спасение</h2>
-                    <p class="research-card-desc">
-                        Создание отказоустойчивых систем для поиска людей. Технологии, спасающие жизни в экстремальных условиях.
-                    </p>
+                    <span class="research-num">#04</span>
+                    <h3 class="research-title">Поиск и спасение</h3>
+                    <p class="research-desc">Создание отказоустойчивых систем для поиска людей. Технологии, спасающие жизни в экстремальных условиях.</p>
                 </div>
             </div>
         </div>
     </section>
 </main>
 
-<footer>
-    <p class="footer-text">© 2026 Arlist Technologies. Built with purpose.</p>
+<footer class="footer">
+    <div class="container">
+        <div class="footer-content">
+            <div class="footer-brand">
+                <a href="/" class="logo">
+                    <img src="/icon.svg" alt="" class="logo-icon">
+                    Арлист
+                </a>
+            </div>
+            <div class="footer-links">
+                <div class="footer-col">
+                    <span class="footer-label">Сервисы</span>
+                    <a href="https://commit.arlist.tech">Commit</a>
+                    <a href="https://leetcot.ru">ЛитКот</a>
+                </div>
+                <div class="footer-col">
+                    <span class="footer-label">Компания</span>
+                    <a href="/research">Исследования</a>
+                    <a href="/gr">ГР</a>
+                    <a href="/forEdu">Образование</a>
+                </div>
+                <div class="footer-col">
+                    <span class="footer-label">Право</span>
+                    <a href="/legal">Документы</a>
+                    <a href="/legal/commit-privacy">Приватность</a>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p class="footer-copy">© 2026 АРЛИСТ ТЕХ. Все права защищены.</p>
+            <div class="footer-cat">
+  _._     _,-'""`-._
+ (,-.`._,'(       |\`-/|
+     `-.-' \ )-`( , o o)
+           `-    \`_`"'-
+            </div>
+        </div>
+    </div>
 </footer>
 
 <script>
