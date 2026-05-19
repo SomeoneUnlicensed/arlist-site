@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Контакты | Арлист</title>
+    
+    <!-- Geist Font -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/geist@1.3.0/dist/fonts/geist-sans/style.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/geist@1.3.0/dist/fonts/geist-mono/style.css">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="/icon.svg">
+    <meta name="theme-color" content="#000000">
+
+    <style>
+        :root {
+            --ac-black: #000000;
+            --ac-white: #ffffff;
+            --ac-gray-05: rgba(255,255,255,0.05);
+            --ac-gray-10: rgba(255,255,255,0.1);
+            --ac-gray-40: rgba(255,255,255,0.4);
+            --font-sans: 'Geist Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            --font-mono: 'Geist Mono', monospace;
+            --transition: 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            background-color: var(--ac-black);
+            color: var(--ac-white);
+            font-family: var(--font-sans);
+            line-height: 1.5;
+            -webkit-font-smoothing: antialiased;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 50% -20%, #151515 0%, #000 80%);
+            z-index: -1;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 48px;
+        }
+
+        /* Navigation */
+        .navbar {
+            padding: 48px 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.1rem;
+            font-weight: 600;
+            text-decoration: none;
+            color: var(--ac-white);
+            letter-spacing: -0.03em;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-transform: uppercase;
+            font-family: var(--font-mono);
+        }
+
+        .logo-icon {
+            height: 24px;
+            width: auto;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 32px;
+        }
+
+        .nav-link {
+            text-decoration: none;
+            color: var(--ac-gray-40);
+            font-size: 0.9rem;
+            transition: var(--transition);
+        }
+
+        .nav-link:hover {
+            color: var(--ac-white);
+        }
+
+        /* Hero */
+        .hero {
+            padding: 100px 0 60px;
+        }
+
+        h1 {
+            font-size: clamp(3rem, 10vw, 6rem);
+            font-weight: 600;
+            letter-spacing: -0.05em;
+            line-height: 0.9;
+            margin-bottom: 40px;
+        }
+
+        /* Contact Grid */
+        .contact-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1px;
+            background: var(--ac-gray-10);
+            border: 1px solid var(--ac-gray-10);
+            margin-top: 60px;
+        }
+
+        .contact-item {
+            background: var(--ac-black);
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .contact-label {
+            font-family: var(--font-mono);
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--ac-gray-40);
+        }
+
+        .contact-value {
+            font-size: 1.5rem;
+            text-decoration: none;
+            color: var(--ac-white);
+            transition: var(--transition);
+        }
+
+        .contact-value:hover {
+            opacity: 0.7;
+        }
+
+        .contact-desc {
+            font-size: 0.9rem;
+            color: var(--ac-gray-40);
+            max-width: 250px;
+        }
+
+        footer {
+            margin-top: 100px;
+            padding: 48px 0;
+            border-top: 1px solid var(--ac-gray-05);
+            color: var(--ac-gray-40);
+            font-size: 0.9rem;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        @media (max-width: 768px) {
+            .container { padding: 0 24px; }
+            .navbar { padding: 32px 0; }
+            .nav-links { display: none; }
+            h1 { font-size: 3.5rem; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <nav class="navbar">
+        <a href="/" class="logo">
+            <img src="/icon.svg" alt="" class="logo-icon">
+            АРЛИСТ
+        </a>
+        <div class="nav-links">
+            <a href="/research" class="nav-link">Исследования</a>
+            <a href="/gr" class="nav-link">ГР</a>
+            <a href="/legal" class="nav-link">Документы</a>
+        </div>
+    </nav>
+
+    <main>
+        <header class="hero">
+            <h1>На связи.</h1>
+        </header>
+
+        <section class="contact-grid">
+            <div class="contact-item">
+                <span class="contact-label">Почта</span>
+                <a href="mailto:hello@arlist.tech" class="contact-value">hello@arlist.tech</a>
+                <p class="contact-desc">Общие вопросы, предложения о сотрудничестве и приветы.</p>
+            </div>
+            <div class="contact-item">
+                <span class="contact-label">Техподдержка</span>
+                <a href="mailto:support@arlist.tech" class="contact-value">support@arlist.tech</a>
+                <p class="contact-desc">Если что-то сломалось или работает не так, как ожидалось.</p>
+            </div>
+            <div class="contact-item">
+                <span class="contact-label">GitHub</span>
+                <a href="https://github.com/arlist-tech" class="contact-value">arlist-tech</a>
+                <p class="contact-desc">Наш код, открытые проекты и контрибьюторы.</p>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <span>© 2026 Арлист</span>
+        <span>Сделано с уважением к человеку.</span>
+    </footer>
+</div>
+
+</body>
+</html>

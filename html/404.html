@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>404 | Опа, ешкин кот.</title>
+    
+    <!-- Geist Font -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/geist@1.3.0/dist/fonts/geist-sans/style.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/geist@1.3.0/dist/fonts/geist-mono/style.css">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="/icon.svg">
+    <meta name="theme-color" content="#000000">
+
+    <style>
+        :root {
+            --ac-black: #000000;
+            --ac-white: #ffffff;
+            --ac-gray-40: rgba(255, 255, 255, 0.4);
+            --font-sans: 'Geist Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            --font-mono: 'Geist Mono', monospace;
+            --transition: 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            background-color: var(--ac-black);
+            color: var(--ac-white);
+            font-family: var(--font-sans);
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            overflow: hidden;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 50% 50%, #151515 0%, #000 80%);
+            z-index: -1;
+        }
+
+        .content {
+            padding: 20px;
+            max-width: 600px;
+            animation: fadeIn 1s var(--transition);
+        }
+
+        .cat-container {
+            margin-bottom: 40px;
+        }
+
+        .error-code {
+            font-family: var(--font-mono);
+            font-size: 1.2rem;
+            color: var(--ac-gray-40);
+            margin-bottom: 16px;
+            letter-spacing: 0.2em;
+        }
+
+        h1 {
+            font-size: clamp(2rem, 8vw, 4rem);
+            font-weight: 600;
+            letter-spacing: -0.04em;
+            margin-bottom: 24px;
+            line-height: 1.1;
+        }
+
+        p {
+            font-size: 1.1rem;
+            color: var(--ac-gray-40);
+            margin-bottom: 40px;
+        }
+
+        .back-link {
+            display: inline-block;
+            color: var(--ac-white);
+            text-decoration: none;
+            font-family: var(--font-mono);
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            padding: 12px 24px;
+            border: 1px solid var(--ac-gray-40);
+            border-radius: 4px;
+            transition: var(--transition);
+        }
+
+        .back-link:hover {
+            background: var(--ac-white);
+            color: var(--ac-black);
+            border-color: var(--ac-white);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Scared Cat SVG Styles */
+        .scared-cat {
+            width: 200px;
+            height: 200px;
+        }
+        
+        .eye {
+            animation: blink 4s infinite;
+        }
+
+        @keyframes blink {
+            0%, 90%, 100% { transform: scaleY(1); }
+            95% { transform: scaleY(0.1); }
+        }
+    </style>
+</head>
+<body>
+
+<div class="content">
+    <div class="cat-container">
+        <svg class="scared-cat" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <!-- Tail -->
+            <path d="M150 150Q180 120 160 90" stroke="white" stroke-width="4" stroke-linecap="round" fill="none">
+                <animate attributeName="d" dur="2s" repeatCount="indefinite"
+                    values="M150 150Q180 120 160 90; M150 150Q190 130 170 100; M150 150Q180 120 160 90" />
+            </path>
+            <!-- Body (Arched back) -->
+            <path d="M50 150Q100 30 150 150" stroke="white" stroke-width="6" fill="none" />
+            <!-- Legs -->
+            <path d="M60 150V170M80 150V170M120 150V170M140 150V170" stroke="white" stroke-width="4" stroke-linecap="round" />
+            <!-- Head -->
+            <circle cx="100" cy="70" r="35" stroke="white" stroke-width="4" fill="black" />
+            <!-- Ears (Pushed back/alert) -->
+            <path d="M75 50L60 20L90 45" stroke="white" stroke-width="4" fill="black" />
+            <path d="M125 50L140 20L110 45" stroke="white" stroke-width="4" fill="black" />
+            <!-- Eyes (Scared/Wide) -->
+            <g class="eye">
+                <circle cx="85" cy="70" r="8" fill="white" />
+                <circle cx="85" cy="70" r="3" fill="black" />
+            </g>
+            <g class="eye">
+                <circle cx="115" cy="70" r="8" fill="white" />
+                <circle cx="115" cy="70" r="3" fill="black" />
+            </g>
+            <!-- Whiskers (Bristled) -->
+            <path d="M70 75L40 65M70 80L40 85" stroke="white" stroke-width="2" />
+            <path d="M130 75L160 65M130 80L160 85" stroke="white" stroke-width="2" />
+            <!-- Mouth (Small 'o') -->
+            <circle cx="100" cy="85" r="3" stroke="white" stroke-width="2" fill="none" />
+        </svg>
+    </div>
+    <div class="error-code">ERROR 404</div>
+    <h1>Опа, ешкин кот.</h1>
+    <p>Похоже, эта страница удрала быстрее, чем наш котяра при виде пылесоса.</p>
+    <a href="/" class="back-link">Вернуться домой</a>
+</div>
+
+</body>
+</html>
