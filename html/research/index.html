@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>ARLIST RESEARCH | Applied Science & Technology</title>
+    <title>АРЛИСТ ТЕХ | Исследования</title>
     
-    <!-- Modern Serif & Sans Stack -->
+    <!-- Шрифты -->
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap">
     
     <!-- Favicon -->
@@ -18,7 +18,6 @@
             --text: #000000;
             --gray: #666666;
             --light-gray: #f5f5f5;
-            --accent: #2c3e50;
             --font-sans: 'Inter', sans-serif;
             --font-serif: 'Playfair Display', serif;
             --transition: 0.5s cubic-bezier(0.19, 1, 0.22, 1);
@@ -40,7 +39,7 @@
             padding: 0 60px;
         }
 
-        /* Unique Navigation */
+        /* Навигация */
         .nav {
             padding: 60px 0;
             display: flex;
@@ -49,12 +48,20 @@
         }
 
         .nav-brand {
-            font-family: var(--font-serif);
-            font-size: 1.5rem;
-            font-weight: 700;
+            font-size: 1.1rem;
+            font-weight: 600;
             text-decoration: none;
             color: var(--text);
-            letter-spacing: -0.02em;
+            letter-spacing: -0.03em;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-transform: uppercase;
+        }
+
+        .logo-icon {
+            height: 24px;
+            width: auto;
         }
 
         .nav-links {
@@ -74,15 +81,15 @@
 
         .nav-link:hover { opacity: 0.5; }
 
-        /* Hero Section */
+        /* Hero секция */
         .hero {
             padding: 100px 0 160px;
         }
 
         .hero-title {
             font-family: var(--font-serif);
-            font-size: clamp(4rem, 12vw, 8.5rem);
-            line-height: 0.9;
+            font-size: clamp(3rem, 10vw, 7rem);
+            line-height: 0.95;
             font-weight: 400;
             letter-spacing: -0.04em;
             margin-bottom: 60px;
@@ -95,7 +102,7 @@
             font-weight: 300;
         }
 
-        /* Research Sections */
+        /* Контент */
         .content {
             padding-bottom: 200px;
         }
@@ -158,7 +165,7 @@
             border-radius: 50%;
         }
 
-        /* Footer */
+        /* Подвал */
         .footer {
             padding: 100px 0 60px;
             background: var(--light-gray);
@@ -171,9 +178,11 @@
         }
 
         .footer-brand {
-            font-family: var(--font-serif);
-            font-size: 2rem;
+            font-size: 1.5rem;
+            font-weight: 600;
             margin-bottom: 30px;
+            text-transform: uppercase;
+            letter-spacing: -0.03em;
         }
 
         .footer-col h4 {
@@ -205,7 +214,7 @@
             color: var(--gray);
         }
 
-        /* Animation */
+        /* Анимация */
         .reveal {
             opacity: 0;
             transform: translateY(30px);
@@ -219,7 +228,7 @@
 
         @media (max-width: 1000px) {
             .article { grid-template-columns: 1fr; gap: 40px; }
-            .hero-title { font-size: 4rem; }
+            .hero-title { font-size: 3rem; }
         }
     </style>
 </head>
@@ -227,23 +236,26 @@
 
 <div class="container">
     <nav class="nav">
-        <a href="/" class="nav-brand">ARLIST RESEARCH</a>
+        <a href="/" class="nav-brand">
+            <img src="/icon.svg" alt="" class="logo-icon">
+            АРЛИСТ ТЕХ
+        </a>
         <div class="nav-links">
-            <a href="/" class="nav-link">Home</a>
-            <a href="/gr" class="nav-link">GR</a>
-            <a href="/legal" class="nav-link">Legal</a>
+            <a href="/" class="nav-link">Главная</a>
+            <a href="/gr" class="nav-link">ГР</a>
+            <a href="/legal" class="nav-link">Документы</a>
         </div>
     </nav>
 
     <header class="hero">
-        <h1 class="hero-title reveal">Where Code meets Science.</h1>
+        <h1 class="hero-title reveal">Где код встречается с наукой.</h1>
         <p class="hero-desc reveal">
             Лаборатория прикладных исследований Арлист занимается фундаментальными разработками на стыке информационных технологий, биологии и социальных систем.
         </p>
     </header>
 
     <main class="content">
-        <!-- Section 01 -->
+        <!-- Секция 01 -->
         <section class="article reveal">
             <div class="article-header">
                 <span class="article-num">I.</span>
@@ -260,7 +272,7 @@
             </div>
         </section>
 
-        <!-- Section 02 -->
+        <!-- Секция 02 -->
         <section class="article reveal">
             <div class="article-header">
                 <span class="article-num">II.</span>
@@ -268,7 +280,7 @@
             </div>
             <div class="article-body">
                 <p>Исследование и разработка специализированных архитектур искусственного интеллекта, ориентированных на высокую эффективность в условиях ограниченных ресурсов.</p>
-                <p>Вместо простого увеличения масштабов, мы фокусируемся на оптимизации структуры и механизмов внимания, стремясь к созданию «умного» кода, а не просто «большого».</p>
+                <p>Вместо простого увеличения масштабов, мы фокусируемся на оптимизации структуры и механизмов внимания, стремясь к созданию эффективных алгоритмов.</p>
                 <ul class="article-focus">
                     <li>Локальные языковые модели (Edge AI)</li>
                     <li>Оптимизация механизмов внимания</li>
@@ -277,7 +289,7 @@
             </div>
         </section>
 
-        <!-- Section 03 -->
+        <!-- Секция 03 -->
         <section class="article reveal">
             <div class="article-header">
                 <span class="article-num">III.</span>
@@ -294,7 +306,7 @@
             </div>
         </section>
 
-        <!-- Section 04 -->
+        <!-- Секция 04 -->
         <section class="article reveal">
             <div class="article-header">
                 <span class="article-num">IV.</span>
@@ -317,24 +329,23 @@
     <div class="container">
         <div class="footer-grid">
             <div class="footer-brand-area">
-                <div class="footer-brand">ARLIST</div>
-                <p style="color: var(--gray); font-size: 0.9rem;">Advancing technology through human-centric research and scientific rigor.</p>
+                <div class="footer-brand">АРЛИСТ ТЕХ</div>
+                <p style="color: var(--gray); font-size: 0.9rem;">Прикладные исследования и научный подход в разработке технологий.</p>
             </div>
             <div class="footer-col">
-                <h4>Navigation</h4>
-                <a href="/">Main Platform</a>
-                <a href="/gr">Government Relations</a>
-                <a href="/legal">Legal Documents</a>
+                <h4>Навигация</h4>
+                <a href="/">Главная платформа</a>
+                <a href="/gr">Взаимодействие с государством</a>
+                <a href="/legal">Документы</a>
             </div>
             <div class="footer-col">
-                <h4>Contact</h4>
+                <h4>Контакты</h4>
                 <a href="mailto:research@arlist.tech">research@arlist.tech</a>
                 <a href="https://github.com/arlist-tech">GitHub</a>
             </div>
         </div>
         <div class="footer-bottom">
-            <span>© 2026 ARLIST TECHNOLOGIES</span>
-            <span style="font-family: monospace; opacity: 0.3;">04. LAB. ACCESS. GRANTED.</span>
+            <span>© 2026 АРЛИСТ ТЕХ</span>
         </div>
     </div>
 </footer>
