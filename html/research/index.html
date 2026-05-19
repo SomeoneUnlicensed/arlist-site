@@ -3,418 +3,338 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>АРЛИСТ ТЕХ | Исследования</title>
-    <meta name="description" content="Лаборатория Арлист. Мы исследуем границы возможного в биоинформатике, ИИ и спасательных технологиях.">
+    <title>ARLIST RESEARCH | Applied Science & Technology</title>
     
-    <!-- Geist Font -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/geist@1.3.0/dist/fonts/geist-sans/style.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/geist@1.3.0/dist/fonts/geist-mono/style.css">
+    <!-- Modern Serif & Sans Stack -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap">
     
     <!-- Favicon -->
     <link rel="icon" type="image/svg+xml" href="/icon.svg">
-    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
-    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
-    <link rel="manifest" href="/site.webmanifest">
-    <meta name="theme-color" content="#000000">
+    <meta name="theme-color" content="#ffffff">
 
     <style>
         :root {
-            --ac-black: #000000;
-            --ac-white: #ffffff;
-            --ac-gray-05: rgba(255,255,255,0.05);
-            --ac-gray-10: rgba(255,255,255,0.1);
-            --ac-gray-20: rgba(255,255,255,0.2);
-            --ac-gray-30: rgba(255,255,255,0.3);
-            --ac-gray-40: rgba(255,255,255,0.4);
-            --ac-gray-50: rgba(255,255,255,0.5);
-            --font-sans: 'Geist Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            --font-mono: 'Geist Mono', monospace;
-            --transition: 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            --bg: #ffffff;
+            --text: #000000;
+            --gray: #666666;
+            --light-gray: #f5f5f5;
+            --accent: #2c3e50;
+            --font-sans: 'Inter', sans-serif;
+            --font-serif: 'Playfair Display', serif;
+            --transition: 0.5s cubic-bezier(0.19, 1, 0.22, 1);
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
-            background-color: var(--ac-black);
-            color: var(--ac-white);
+            background-color: var(--bg);
+            color: var(--text);
             font-family: var(--font-sans);
-            line-height: 1.5;
+            line-height: 1.6;
             -webkit-font-smoothing: antialiased;
-            overflow-x: hidden;
-        }
-
-        ::selection { background: var(--ac-white); color: var(--ac-black); }
-
-        body::before {
-            content: '';
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: radial-gradient(circle at 50% -20%, #151515 0%, #000 80%);
-            z-index: -1;
         }
 
         .container {
-            max-width: 1200px;
+            max-width: 1400px;
             margin: 0 auto;
-            padding: 0 48px;
+            padding: 0 60px;
         }
 
-        /* Navigation */
-        .navbar {
-            padding: 48px;
+        /* Unique Navigation */
+        .nav {
+            padding: 60px 0;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            max-width: 1400px;
-            margin: 0 auto;
         }
 
-        .logo {
-            font-size: 1.1rem;
-            font-weight: 600;
+        .nav-brand {
+            font-family: var(--font-serif);
+            font-size: 1.5rem;
+            font-weight: 700;
             text-decoration: none;
-            color: var(--ac-white);
-            letter-spacing: -0.03em;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            text-transform: uppercase;
-            font-family: var(--font-mono);
-        }
-
-        .logo-icon {
-            height: 24px;
-            width: auto;
+            color: var(--text);
+            letter-spacing: -0.02em;
         }
 
         .nav-links {
             display: flex;
-            gap: 32px;
-            list-style: none;
-            align-items: center;
+            gap: 40px;
         }
 
         .nav-link {
             text-decoration: none;
-            color: var(--ac-gray-40);
-            font-size: 10px;
+            color: var(--text);
+            font-size: 0.8rem;
             text-transform: uppercase;
-            letter-spacing: 0.25em;
+            letter-spacing: 0.1em;
             font-weight: 500;
-            transition: color var(--transition), transform var(--transition);
+            transition: opacity 0.3s ease;
         }
 
-        .nav-link:hover { 
-            color: var(--ac-white); 
-            transform: translateY(-1px);
-        }
+        .nav-link:hover { opacity: 0.5; }
 
-        /* Hero */
+        /* Hero Section */
         .hero {
-            padding: 100px 0 140px;
-        }
-
-        .hero-label {
-            font-size: 9px;
-            text-transform: uppercase;
-            letter-spacing: 0.5em;
-            font-weight: 500;
-            color: var(--ac-gray-30);
-            margin-bottom: 40px;
-            display: block;
+            padding: 100px 0 160px;
         }
 
         .hero-title {
-            font-size: clamp(2.5rem, 8vw, 5rem);
-            line-height: 1.1;
-            letter-spacing: -0.07em;
-            margin-bottom: 64px;
+            font-family: var(--font-serif);
+            font-size: clamp(4rem, 12vw, 8.5rem);
+            line-height: 0.9;
             font-weight: 400;
-            max-width: 900px;
+            letter-spacing: -0.04em;
+            margin-bottom: 60px;
         }
 
-        .hero-title span {
-            display: block;
-            background: linear-gradient(90deg, #88ffcc, #cc88ff, #ff88cc);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            padding-top: 8px;
-        }
-
-        .hero-subtitle {
-            font-size: 0.95rem;
-            color: var(--ac-gray-40);
-            max-width: 540px;
-            line-height: 1.8;
-            letter-spacing: -0.01em;
-            margin-bottom: 64px;
+        .hero-desc {
+            font-size: 1.25rem;
+            max-width: 700px;
+            color: var(--gray);
+            font-weight: 300;
         }
 
         /* Research Sections */
-        .research-section {
-            padding-bottom: 160px;
+        .content {
+            padding-bottom: 200px;
         }
 
-        .research-item {
+        .article {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 80px;
-            padding: 100px 0;
-            border-top: 1px solid var(--ac-gray-10);
+            gap: 100px;
+            padding: 120px 0;
+            border-top: 1px solid var(--text);
         }
 
-        .research-info h2 {
-            font-size: 2.5rem;
-            font-weight: 400;
-            margin-bottom: 32px;
-            letter-spacing: -0.04em;
-        }
-
-        .research-info p {
-            font-size: 1.1rem;
-            color: var(--ac-gray-40);
-            line-height: 1.8;
+        .article-num {
+            font-family: var(--font-serif);
+            font-size: 1.25rem;
+            font-style: italic;
             margin-bottom: 40px;
-        }
-
-        .research-meta {
-            font-family: var(--font-mono);
-            font-size: 12px;
-            color: var(--ac-gray-30);
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 24px;
-        }
-
-        .meta-box {
-            padding: 24px;
-            background: rgba(255, 255, 255, 0.02);
-            border: 1px solid var(--ac-gray-05);
-        }
-
-        .meta-label {
             display: block;
-            margin-bottom: 8px;
-            text-transform: uppercase;
-            letter-spacing: 0.1em;
         }
 
-        .meta-value {
-            color: var(--ac-white);
-            font-size: 14px;
+        .article-title {
+            font-family: var(--font-serif);
+            font-size: 3.5rem;
+            line-height: 1.1;
+            margin-bottom: 40px;
+            font-weight: 400;
+        }
+
+        .article-body {
+            font-size: 1.1rem;
+            color: var(--text);
+            max-width: 500px;
+        }
+
+        .article-body p {
+            margin-bottom: 30px;
+        }
+
+        .article-focus {
+            list-style: none;
+            margin-top: 40px;
+            padding-top: 40px;
+            border-top: 1px solid #eee;
+        }
+
+        .article-focus li {
+            font-size: 0.9rem;
+            color: var(--gray);
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .article-focus li::before {
+            content: '';
+            width: 4px;
+            height: 4px;
+            background: var(--text);
+            border-radius: 50%;
         }
 
         /* Footer */
         .footer {
-            padding: 120px 0 60px;
-            border-top: 1px solid rgba(255, 255, 255, 0.05);
-            background: #000;
+            padding: 100px 0 60px;
+            background: var(--light-gray);
         }
 
-        .footer-content {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 80px;
+        .footer-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr;
+            gap: 60px;
         }
 
-        .footer-links {
-            display: flex;
-            gap: 80px;
+        .footer-brand {
+            font-family: var(--font-serif);
+            font-size: 2rem;
+            margin-bottom: 30px;
         }
 
-        .footer-col {
-            display: flex;
-            flex-direction: column;
-            gap: 16px;
-        }
-
-        .footer-label {
-            font-size: 10px;
+        .footer-col h4 {
+            font-size: 0.8rem;
             text-transform: uppercase;
             letter-spacing: 0.1em;
-            color: var(--ac-gray-30);
-            margin-bottom: 8px;
-            font-family: var(--font-mono);
+            margin-bottom: 24px;
         }
 
         .footer-col a {
-            color: var(--ac-gray-40);
+            display: block;
             text-decoration: none;
-            font-size: 14px;
-            transition: color var(--transition);
+            color: var(--gray);
+            font-size: 0.9rem;
+            margin-bottom: 12px;
+            transition: color 0.3s ease;
         }
 
-        .footer-col a:hover {
-            color: var(--ac-white);
-        }
+        .footer-col a:hover { color: var(--text); }
 
         .footer-bottom {
+            margin-top: 100px;
+            padding-top: 40px;
+            border-top: 1px solid #ddd;
             display: flex;
             justify-content: space-between;
-            align-items: flex-end;
-            padding-top: 40px;
-            border-top: 1px solid rgba(255, 255, 255, 0.03);
+            align-items: center;
+            font-size: 0.8rem;
+            color: var(--gray);
         }
 
-        .footer-copy {
-            font-size: 11px;
-            color: var(--ac-gray-30);
-            font-family: var(--font-mono);
-        }
-
-        .footer-cat {
-            font-family: var(--font-mono);
-            white-space: pre;
-            font-size: 10px;
-            color: var(--ac-gray-30);
-            user-select: none;
-            pointer-events: none;
-            line-height: 1.2;
-        }
-
-        /* Animations */
+        /* Animation */
         .reveal {
             opacity: 0;
-            transform: translateY(20px);
-            transition: all 1.2s cubic-bezier(0.16, 1, 0.3, 1);
+            transform: translateY(30px);
+            transition: var(--transition);
         }
 
-        .reveal.visible {
+        .reveal.active {
             opacity: 1;
             transform: translateY(0);
         }
 
-        @media (max-width: 900px) {
-            .navbar { padding: 32px 24px; }
-            .container { padding: 0 24px; }
-            .hero { padding: 60px 0 80px; }
-            .research-item { grid-template-columns: 1fr; gap: 40px; }
+        @media (max-width: 1000px) {
+            .article { grid-template-columns: 1fr; gap: 40px; }
+            .hero-title { font-size: 4rem; }
         }
     </style>
 </head>
 <body>
 
-<nav class="navbar">
-    <a href="/" class="logo">
-        <img src="/icon.svg" alt="" class="logo-icon">
-        АРЛИСТ ТЕХ
-    </a>
-    <ul class="nav-links">
-        <li><a href="/research" class="nav-link">Исследования</a></li>
-        <li><a href="/gr" class="nav-link">ГР</a></li>
-        <li><a href="/forEdu" class="nav-link">Образование</a></li>
-        <li><a href="/#login" class="nav-link">Вход</a></li>
-    </ul>
-</nav>
-
-<main>
-    <section class="hero">
-        <div class="container">
-            <span class="hero-label reveal">Research Lab</span>
-            <h1 class="hero-title reveal">
-                Определяем <span>будущее технологий.</span>
-            </h1>
-            <p class="hero-subtitle reveal">
-                Мы исследуем границы возможного, объединяя чистый код с научным подходом. 
-                Лаборатория Арлист — это пространство для экспериментов, которые меняют реальность.
-            </p>
+<div class="container">
+    <nav class="nav">
+        <a href="/" class="nav-brand">ARLIST RESEARCH</a>
+        <div class="nav-links">
+            <a href="/" class="nav-link">Home</a>
+            <a href="/gr" class="nav-link">GR</a>
+            <a href="/legal" class="nav-link">Legal</a>
         </div>
-    </section>
+    </nav>
 
-    <section class="research-section">
-        <div class="container">
-            <!-- Bioinformatics -->
-            <div class="research-item reveal">
-                <div class="research-info">
-                    <h2>Биоинформатика</h2>
-                    <p>Алгоритмическая дешифровка генетического кода. Мы рассматриваем биологические системы как сложные вычислительные структуры, требующие новых методов анализа.</p>
-                </div>
-                <div class="research-meta">
-                    <div class="meta-box"><span class="meta-label">Status</span><span class="meta-value">Active</span></div>
-                    <div class="meta-box"><span class="meta-label">Focus</span><span class="meta-value">Genomics</span></div>
-                </div>
-            </div>
+    <header class="hero">
+        <h1 class="hero-title reveal">Where Code meets Science.</h1>
+        <p class="hero-desc reveal">
+            Лаборатория прикладных исследований Арлист занимается фундаментальными разработками на стыке информационных технологий, биологии и социальных систем.
+        </p>
+    </header>
 
-            <!-- AI -->
-            <div class="research-item reveal">
-                <div class="research-info">
-                    <h2>Искусственный интеллект</h2>
-                    <p>Разработка локальных LLM моделей с высокой эффективностью. Оптимизация нейросетевых архитектур под узкоспециализированные прикладные задачи.</p>
-                </div>
-                <div class="research-meta">
-                    <div class="meta-box"><span class="meta-label">Status</span><span class="meta-value">Processing</span></div>
-                    <div class="meta-box"><span class="meta-label">Focus</span><span class="meta-value">Edge AI</span></div>
-                </div>
+    <main class="content">
+        <!-- Section 01 -->
+        <section class="article reveal">
+            <div class="article-header">
+                <span class="article-num">I.</span>
+                <h2 class="article-title">Биоинформатика и системная биология</h2>
             </div>
+            <div class="article-body">
+                <p>Мы разрабатываем новые алгоритмические подходы к анализу геномных данных, рассматривая биологические системы как высокоуровневые информационные архитектуры.</p>
+                <p>Наша цель — создание инструментов для дешифровки сложных взаимодействий внутри живых клеток с использованием методов машинного обучения и теории графов.</p>
+                <ul class="article-focus">
+                    <li>Анализ полногеномных последовательностей</li>
+                    <li>Моделирование белковых взаимодействий</li>
+                    <li>Вычислительная транскриптомика</li>
+                </ul>
+            </div>
+        </section>
 
-            <!-- Gamedev -->
-            <div class="research-item reveal">
-                <div class="research-info">
-                    <h2>Геймдев / Симуляции</h2>
-                    <p>Исследование процедурной генерации и социального взаимодействия в виртуальных мирах. Создание живых экосистем внутри цифровых пространств.</p>
-                </div>
-                <div class="research-meta">
-                    <div class="meta-box"><span class="meta-label">Status</span><span class="meta-value">Experimental</span></div>
-                    <div class="meta-box"><span class="meta-label">Focus</span><span class="meta-value">Ecosystems</span></div>
-                </div>
+        <!-- Section 02 -->
+        <section class="article reveal">
+            <div class="article-header">
+                <span class="article-num">II.</span>
+                <h2 class="article-title">Архитектура нейронных систем</h2>
             </div>
+            <div class="article-body">
+                <p>Исследование и разработка специализированных архитектур искусственного интеллекта, ориентированных на высокую эффективность в условиях ограниченных ресурсов.</p>
+                <p>Вместо простого увеличения масштабов, мы фокусируемся на оптимизации структуры и механизмов внимания, стремясь к созданию «умного» кода, а не просто «большого».</p>
+                <ul class="article-focus">
+                    <li>Локальные языковые модели (Edge AI)</li>
+                    <li>Оптимизация механизмов внимания</li>
+                    <li>Энергоэффективные вычисления</li>
+                </ul>
+            </div>
+        </section>
 
-            <!-- Search & Rescue -->
-            <div class="research-item reveal">
-                <div class="research-info">
-                    <h2>Поиск и спасение</h2>
-                    <p>Разработка автономных систем для координации спасательных операций. Технологии выживания и связи в экстремальных условиях.</p>
-                </div>
-                <div class="research-meta">
-                    <div class="meta-box"><span class="meta-label">Status</span><span class="meta-value">Field Test</span></div>
-                    <div class="meta-box"><span class="meta-label">Focus</span><span class="meta-value">Reliability</span></div>
-                </div>
+        <!-- Section 03 -->
+        <section class="article reveal">
+            <div class="article-header">
+                <span class="article-num">III.</span>
+                <h2 class="article-title">Процедурные миры и симуляции</h2>
             </div>
-        </div>
-    </section>
-</main>
+            <div class="article-body">
+                <p>Изучение механизмов возникновения сложных социальных структур внутри виртуальных пространств через процедурную генерацию и агентное моделирование.</p>
+                <p>Мы создаем цифровые экосистемы, которые служат полигонами для тестирования социальных и экономических теорий в контролируемой среде.</p>
+                <ul class="article-focus">
+                    <li>Алгоритмы процедурного ландшафта</li>
+                    <li>Моделирование агентных систем</li>
+                    <li>Цифровая социология</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- Section 04 -->
+        <section class="article reveal">
+            <div class="article-header">
+                <span class="article-num">IV.</span>
+                <h2 class="article-title">Системы критического спасения</h2>
+            </div>
+            <div class="article-body">
+                <p>Проектирование и испытание отказоустойчивых технологических решений для координации действий в экстремальных условиях и зонах бедствия.</p>
+                <p>Наши разработки включают в себя автономные сети связи и алгоритмы предиктивного анализа рисков для эффективного поиска и спасения людей.</p>
+                <ul class="article-focus">
+                    <li> Mesh-сети в условиях изоляции</li>
+                    <li>Алгоритмы автономного поиска</li>
+                    <li>Предиктивная аналитика ЧС</li>
+                </ul>
+            </div>
+        </section>
+    </main>
+</div>
 
 <footer class="footer">
     <div class="container">
-        <div class="footer-content">
-            <div class="footer-brand">
-                <a href="/" class="logo">
-                    <img src="/icon.svg" alt="" class="logo-icon">
-                    АРЛИСТ ТЕХ
-                </a>
+        <div class="footer-grid">
+            <div class="footer-brand-area">
+                <div class="footer-brand">ARLIST</div>
+                <p style="color: var(--gray); font-size: 0.9rem;">Advancing technology through human-centric research and scientific rigor.</p>
             </div>
-            <div class="footer-links">
-                <div class="footer-col">
-                    <span class="footer-label">Сервисы</span>
-                    <a href="https://commit.arlist.tech">Commit</a>
-                    <a href="https://leetcot.ru">ЛитКот</a>
-                </div>
-                <div class="footer-col">
-                    <span class="footer-label">Компания</span>
-                    <a href="/research">Исследования</a>
-                    <a href="/gr">ГР</a>
-                    <a href="/forEdu">Образование</a>
-                </div>
-                <div class="footer-col">
-                    <span class="footer-label">Право</span>
-                    <a href="/legal">Документы</a>
-                    <a href="/legal/commit-privacy">Приватность</a>
-                </div>
+            <div class="footer-col">
+                <h4>Navigation</h4>
+                <a href="/">Main Platform</a>
+                <a href="/gr">Government Relations</a>
+                <a href="/legal">Legal Documents</a>
+            </div>
+            <div class="footer-col">
+                <h4>Contact</h4>
+                <a href="mailto:research@arlist.tech">research@arlist.tech</a>
+                <a href="https://github.com/arlist-tech">GitHub</a>
             </div>
         </div>
         <div class="footer-bottom">
-            <p class="footer-copy">© 2026 АРЛИСТ ТЕХ. Все права защищены.</p>
-            <div class="footer-cat">
-  _._     _,-'""`-._
- (,-.`._,'(       |\`-/|
-     `-.-' \ )-`( , o o)
-           `-    \`_`"'-
-            </div>
+            <span>© 2026 ARLIST TECHNOLOGIES</span>
+            <span style="font-family: monospace; opacity: 0.3;">04. LAB. ACCESS. GRANTED.</span>
         </div>
     </div>
 </footer>
@@ -423,7 +343,7 @@
     const observer = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
             if (entry.isIntersecting) {
-                entry.target.classList.add('visible');
+                entry.target.classList.add('active');
             }
         });
     }, { threshold: 0.1 });
