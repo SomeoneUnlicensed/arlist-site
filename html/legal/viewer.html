@@ -3,14 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>Документ | Арлист</title>
+    <title>Документ | АРЛИСТ ТЕХ</title>
     
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
 
-    <!-- Maple Mono Font -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/maple-mono@5.2.6/index.css">
+    <!-- Geist Font -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/geist@1.3.0/dist/fonts/geist-sans/style.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/geist@1.3.0/dist/fonts/geist-mono/style.css">
     
     <!-- Favicon -->
     <link rel="icon" type="image/svg+xml" href="/icon.svg">
@@ -28,11 +29,13 @@
             --ac-white: #ffffff;
             --ac-gray-05: rgba(255,255,255,0.05);
             --ac-gray-10: rgba(255,255,255,0.1);
+            --ac-gray-20: rgba(255,255,255,0.2);
             --ac-gray-30: rgba(255,255,255,0.3);
             --ac-gray-40: rgba(255,255,255,0.4);
             --ac-gray-50: rgba(255,255,255,0.5);
-            --font-mono: 'Maple Mono', monospace;
-            --transition: 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+            --font-sans: 'Geist Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            --font-mono: 'Geist Mono', monospace;
+            --transition: 0.4s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -40,10 +43,13 @@
         body {
             background-color: var(--ac-black);
             color: var(--ac-white);
-            font-family: var(--font-mono);
-            line-height: 1.6;
+            font-family: var(--font-sans);
+            line-height: 1.5;
             -webkit-font-smoothing: antialiased;
+            overflow-x: hidden;
         }
+
+        ::selection { background: var(--ac-white); color: var(--ac-black); }
 
         body::before {
             content: '';
@@ -52,7 +58,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: radial-gradient(circle at 50% -20%, #111 0%, #000 70%);
+            background: radial-gradient(circle at 50% -20%, #151515 0%, #000 80%);
             z-index: -1;
         }
 
@@ -62,6 +68,7 @@
             padding: 0 48px;
         }
 
+        /* Navigation */
         .navbar {
             padding: 48px;
             display: flex;
@@ -69,24 +76,46 @@
             align-items: center;
             max-width: 1400px;
             margin: 0 auto;
-            border-bottom: 1px solid var(--ac-gray-05);
         }
 
         .logo {
             font-size: 1.1rem;
-            font-weight: 700;
+            font-weight: 600;
             text-decoration: none;
             color: var(--ac-white);
-            letter-spacing: -0.05em;
+            letter-spacing: -0.03em;
             display: flex;
             align-items: center;
             gap: 12px;
             text-transform: uppercase;
+            font-family: var(--font-mono);
         }
 
         .logo-icon {
             height: 24px;
             width: auto;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 32px;
+            list-style: none;
+            align-items: center;
+        }
+
+        .nav-link {
+            text-decoration: none;
+            color: var(--ac-gray-40);
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.25em;
+            font-weight: 500;
+            transition: color var(--transition), transform var(--transition);
+        }
+
+        .nav-link:hover { 
+            color: var(--ac-white); 
+            transform: translateY(-1px);
         }
 
         .content {
@@ -146,6 +175,142 @@
             border-color: var(--ac-white);
         }
 
+        /* STUB PAGE OVERLAY */
+        .stub-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--ac-black);
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.5s ease, visibility 0.5s ease;
+        }
+
+        .stub-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .stub-content {
+            text-align: center;
+            max-width: 600px;
+            padding: 48px;
+        }
+
+        .stub-title {
+            font-size: 2.5rem;
+            margin-bottom: 24px;
+            letter-spacing: -0.05em;
+        }
+
+        .stub-text {
+            font-size: 1rem;
+            color: var(--ac-gray-40);
+            margin-bottom: 40px;
+            line-height: 1.8;
+        }
+
+        .stub-link {
+            display: inline-block;
+            padding: 16px 48px;
+            border: 1px solid var(--ac-white);
+            color: var(--ac-white);
+            text-decoration: none;
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.2em;
+            transition: all var(--transition);
+        }
+
+        .stub-link:hover {
+            background: var(--ac-white);
+            color: var(--ac-black);
+        }
+
+        .stub-close {
+            display: block;
+            margin-top: 24px;
+            font-size: 10px;
+            color: var(--ac-gray-30);
+            text-decoration: underline;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+
+        /* Footer */
+        .footer {
+            padding: 120px 0 60px;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            background: #000;
+        }
+
+        .footer-content {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 80px;
+        }
+
+        .footer-links {
+            display: flex;
+            gap: 80px;
+        }
+
+        .footer-col {
+            display: flex;
+            flex-direction: column; gap: 16px;
+        }
+
+        .footer-label {
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--ac-gray-30);
+            margin-bottom: 8px;
+            font-family: var(--font-mono);
+        }
+
+        .footer-col a {
+            color: var(--ac-gray-40);
+            text-decoration: none;
+            font-size: 14px;
+            transition: color var(--transition);
+        }
+
+        .footer-col a:hover {
+            color: var(--ac-white);
+        }
+
+        .footer-bottom {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            padding-top: 40px;
+            border-top: 1px solid rgba(255, 255, 255, 0.03);
+        }
+
+        .footer-copy {
+            font-size: 11px;
+            color: var(--ac-gray-30);
+            font-family: var(--font-mono);
+        }
+
+        .footer-cat {
+            font-family: var(--font-mono);
+            white-space: pre;
+            font-size: 10px;
+            color: var(--ac-gray-30);
+            user-select: none;
+            pointer-events: none;
+            line-height: 1.2;
+        }
+
         /* Animations */
         .reveal {
             opacity: 0;
@@ -181,7 +346,7 @@
     <nav class="navbar">
         <a href="/" class="logo">
             <img src="/icon.svg" alt="" class="logo-icon">
-            Арлист
+            АРЛИСТ ТЕХ
         </a>
         <ul class="nav-links">
             <li><a href="/research" class="nav-link">Исследования</a></li>
@@ -197,6 +362,46 @@
         </main>
     </div>
 
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-brand">
+                    <a href="/" class="logo">
+                        <img src="/icon.svg" alt="" class="logo-icon">
+                        АРЛИСТ ТЕХ
+                    </a>
+                </div>
+                <div class="footer-links">
+                    <div class="footer-col">
+                        <span class="footer-label">Сервисы</span>
+                        <a href="https://commit.arlist.tech">Commit</a>
+                        <a href="https://leetcot.ru">ЛитКот</a>
+                    </div>
+                    <div class="footer-col">
+                        <span class="footer-label">Компания</span>
+                        <a href="/research">Исследования</a>
+                        <a href="/gr">ГР</a>
+                        <a href="/forEdu">Образование</a>
+                    </div>
+                    <div class="footer-col">
+                        <span class="footer-label">Право</span>
+                        <a href="/legal">Документы</a>
+                        <a href="/legal/commit-privacy">Приватность</a>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p class="footer-copy">© 2026 АРЛИСТ ТЕХ. Все права защищены.</p>
+                <div class="footer-cat">
+  _._     _,-'""`-._
+ (,-.`._,'(       |\`-/|
+     `-.-' \ )-`( , o o)
+           `-    \`_`"'-
+                </div>
+            </div>
+        </div>
+    </footer>
+
     <script>
         const observer = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
@@ -206,6 +411,22 @@
             });
         }, { threshold: 0.1 });
 
+        // Stub Logic
+        const loginBtn = document.getElementById('login-btn');
+        const stubPage = document.getElementById('stub-page');
+        const stubClose = document.getElementById('stub-close');
+
+        loginBtn.addEventListener('click', (e) => {
+            stubPage.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        });
+
+        stubClose.addEventListener('click', () => {
+            stubPage.classList.remove('active');
+            document.body.style.overflow = '';
+        });
+
+        // Document loading logic
         const slug = window.location.pathname.split('/').pop();
         fetch(`/legal/docs/${slug}.md`)
             .then(r => {
@@ -217,29 +438,13 @@
                 const firstLine = md.trim().split('\n')[0];
                 const title = firstLine.replace(/^#+\s*/, '').trim();
                 if (title) {
-                    document.title = title + ' | Арлист';
+                    document.title = title + ' | АРЛИСТ ТЕХ';
                 }
             })
             .catch(err => {
                 document.getElementById('doc-render').innerHTML = '<h1>404</h1><p>Документ не найден.</p>';
             })
             .finally(() => {
-                document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
-            });
-    </script>
-</body>
-</html>
- if (!r.ok) throw new Error('Document not found');
-                return r.text();
-            })
-            .then(md => {
-                document.getElementById('doc-render').innerHTML = marked.parse(md);
-                const title = md.split('\n')[0].replace('#', '').trim();
-                document.title = title + ' | Арлист';
-                document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
-            })
-            .catch(err => {
-                document.getElementById('doc-render').innerHTML = '<h1>404</h1><p>Документ не найден.</p>';
                 document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
             });
     </script>
