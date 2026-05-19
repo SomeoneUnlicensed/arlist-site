@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>404 | Опа, ешкин кот.</title>
+    <title>Ошибка 404 | Опа, ешкин кот.</title>
     
     <!-- Geist Font -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/geist@1.3.0/dist/fonts/geist-sans/style.css">
@@ -17,6 +17,7 @@
         :root {
             --ac-black: #000000;
             --ac-white: #ffffff;
+            --ac-gray-30: rgba(255, 255, 255, 0.3);
             --ac-gray-40: rgba(255, 255, 255, 0.4);
             --font-sans: 'Geist Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             --font-mono: 'Geist Mono', monospace;
@@ -55,16 +56,25 @@
             animation: fadeIn 1s var(--transition);
         }
 
-        .cat-container {
+        .ascii-cat {
+            font-family: var(--font-mono);
+            white-space: pre;
+            font-size: 14px;
+            line-height: 1.2;
+            color: var(--ac-gray-30);
             margin-bottom: 40px;
+            user-select: none;
+            display: inline-block;
+            text-align: left;
         }
 
-        .error-code {
+        .error-label {
             font-family: var(--font-mono);
-            font-size: 1.2rem;
+            font-size: 1rem;
             color: var(--ac-gray-40);
             margin-bottom: 16px;
             letter-spacing: 0.2em;
+            text-transform: uppercase;
         }
 
         h1 {
@@ -105,62 +115,22 @@
             from { opacity: 0; transform: translateY(20px); }
             to { opacity: 1; transform: translateY(0); }
         }
-
-        /* Scared Cat SVG Styles */
-        .scared-cat {
-            width: 200px;
-            height: 200px;
-        }
-        
-        .eye {
-            animation: blink 4s infinite;
-        }
-
-        @keyframes blink {
-            0%, 90%, 100% { transform: scaleY(1); }
-            95% { transform: scaleY(0.1); }
-        }
     </style>
 </head>
 <body>
 
 <div class="content">
-    <div class="cat-container">
-        <svg class="scared-cat" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <!-- Tail -->
-            <path d="M150 150Q180 120 160 90" stroke="white" stroke-width="4" stroke-linecap="round" fill="none">
-                <animate attributeName="d" dur="2s" repeatCount="indefinite"
-                    values="M150 150Q180 120 160 90; M150 150Q190 130 170 100; M150 150Q180 120 160 90" />
-            </path>
-            <!-- Body (Arched back) -->
-            <path d="M50 150Q100 30 150 150" stroke="white" stroke-width="6" fill="none" />
-            <!-- Legs -->
-            <path d="M60 150V170M80 150V170M120 150V170M140 150V170" stroke="white" stroke-width="4" stroke-linecap="round" />
-            <!-- Head -->
-            <circle cx="100" cy="70" r="35" stroke="white" stroke-width="4" fill="black" />
-            <!-- Ears (Pushed back/alert) -->
-            <path d="M75 50L60 20L90 45" stroke="white" stroke-width="4" fill="black" />
-            <path d="M125 50L140 20L110 45" stroke="white" stroke-width="4" fill="black" />
-            <!-- Eyes (Scared/Wide) -->
-            <g class="eye">
-                <circle cx="85" cy="70" r="8" fill="white" />
-                <circle cx="85" cy="70" r="3" fill="black" />
-            </g>
-            <g class="eye">
-                <circle cx="115" cy="70" r="8" fill="white" />
-                <circle cx="115" cy="70" r="3" fill="black" />
-            </g>
-            <!-- Whiskers (Bristled) -->
-            <path d="M70 75L40 65M70 80L40 85" stroke="white" stroke-width="2" />
-            <path d="M130 75L160 65M130 80L160 85" stroke="white" stroke-width="2" />
-            <!-- Mouth (Small 'o') -->
-            <circle cx="100" cy="85" r="3" stroke="white" stroke-width="2" fill="none" />
-        </svg>
+    <div class="ascii-cat">
+   |\__/,|   (`\
+   |o o  |__ _) )
+ _.( T   )  `  /
+  ((_ `^--' /_/
+   `-'  `-'
     </div>
-    <div class="error-code">ERROR 404</div>
+    <div class="error-label">ОШИБКА 404</div>
     <h1>Опа, ешкин кот.</h1>
     <p>Похоже, эта страница удрала быстрее, чем наш котяра при виде пылесоса.</p>
-    <a href="/" class="back-link">Вернуться домой</a>
+    <a href="/" class="back-link">Вернуться на главную</a>
 </div>
 
 </body>
