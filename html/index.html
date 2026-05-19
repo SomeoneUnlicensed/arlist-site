@@ -6,8 +6,9 @@
     <title>Арлист | Сервисы для людей</title>
     <meta name="description" content="Честные технологии без лишней бюрократии. Создаем ПО, которое уважает пользователя.">
     
-    <!-- Maple Mono Font -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/maple-mono@5.2.6/index.css">
+    <!-- Geist Font -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/geist@1.3.0/dist/fonts/geist-sans/style.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/geist@1.3.0/dist/fonts/geist-mono/style.css">
     
     <!-- Favicon -->
     <link rel="icon" type="image/svg+xml" href="/icon.svg">
@@ -27,8 +28,9 @@
             --ac-gray-30: rgba(255,255,255,0.3);
             --ac-gray-40: rgba(255,255,255,0.4);
             --ac-gray-50: rgba(255,255,255,0.5);
-            --font-mono: 'Maple Mono', monospace;
-            --transition: 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+            --font-sans: 'Geist Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            --font-mono: 'Geist Mono', monospace;
+            --transition: 0.4s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -36,8 +38,8 @@
         body {
             background-color: var(--ac-black);
             color: var(--ac-white);
-            font-family: var(--font-mono);
-            line-height: 1.6;
+            font-family: var(--font-sans);
+            line-height: 1.5;
             -webkit-font-smoothing: antialiased;
             overflow-x: hidden;
         }
@@ -51,7 +53,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: radial-gradient(circle at 50% -20%, #111 0%, #000 70%);
+            background: radial-gradient(circle at 50% -20%, #151515 0%, #000 80%);
             z-index: -1;
         }
 
@@ -72,15 +74,16 @@
         }
 
         .logo {
-            font-size: 1.25rem;
-            font-weight: 700;
+            font-size: 1.1rem;
+            font-weight: 600;
             text-decoration: none;
             color: var(--ac-white);
-            letter-spacing: -0.05em;
+            letter-spacing: -0.03em;
             display: flex;
             align-items: center;
             gap: 12px;
             text-transform: uppercase;
+            font-family: var(--font-mono);
         }
 
         .logo-icon {
@@ -131,9 +134,9 @@
 
         .hero-title {
             font-size: clamp(2.5rem, 8vw, 5rem);
-            line-height: 0.95;
+            line-height: 1.1;
             letter-spacing: -0.07em;
-            margin-bottom: 40px;
+            margin-bottom: 64px;
             font-weight: 400;
             max-width: 900px;
         }
@@ -144,6 +147,7 @@
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
+            padding-top: 8px;
         }
 
         .hero-subtitle {
@@ -152,7 +156,7 @@
             max-width: 540px;
             line-height: 1.8;
             letter-spacing: -0.01em;
-            margin-bottom: 48px;
+            margin-bottom: 64px;
         }
 
         .btn-primary {
@@ -183,24 +187,27 @@
             display: grid;
             grid-template-columns: repeat(2, 1fr);
             gap: 1px;
-            background: var(--ac-gray-05);
-            border: 1px solid var(--ac-gray-05);
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.05);
         }
 
         .product-card {
-            background: var(--ac-black);
+            background: #050505;
             padding: 80px 60px;
             text-decoration: none;
             color: inherit;
             transition: all var(--transition);
             position: relative;
             overflow: hidden;
+            border: 1px solid transparent;
         }
 
         .product-card:hover {
-            background: rgba(255, 255, 255, 0.02);
-            transform: scale(1.01);
+            background: #080808;
+            transform: translateY(-4px);
             z-index: 10;
+            border-color: rgba(255, 255, 255, 0.1);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
         }
 
         .product-card::before {
@@ -210,7 +217,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: radial-gradient(circle at 50% 50%, rgba(255,255,255,0.02) 0%, transparent 80%);
+            background: radial-gradient(circle at top left, rgba(255,255,255,0.03) 0%, transparent 70%);
             opacity: 0;
             transition: opacity var(--transition);
         }
@@ -220,39 +227,41 @@
         }
 
         .product-card.coming-soon {
-            opacity: 0.5;
+            opacity: 0.4;
             cursor: default;
         }
 
         .product-label {
-            font-size: 9px;
-            color: var(--ac-gray-20);
+            font-size: 10px;
+            color: var(--ac-gray-40);
             margin-bottom: 32px;
             display: flex;
             align-items: center;
             gap: 12px;
-            letter-spacing: 0.2em;
+            letter-spacing: 0.1em;
             text-transform: uppercase;
+            font-family: var(--font-mono);
         }
 
         .badge {
-            font-size: 8px;
-            padding: 2px 8px;
-            border: 1px solid var(--ac-gray-20);
-            border-radius: 20px;
+            font-size: 9px;
+            padding: 2px 10px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+            background: rgba(255, 255, 255, 0.03);
         }
 
         .product-title {
-            font-size: 1.75rem;
-            margin-bottom: 24px;
-            font-weight: 400;
-            letter-spacing: -0.04em;
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            font-weight: 500;
+            letter-spacing: -0.02em;
         }
 
         .product-desc {
             color: var(--ac-gray-40);
-            font-size: 0.85rem;
-            line-height: 1.8;
+            font-size: 0.9rem;
+            line-height: 1.6;
             max-width: 320px;
         }
 
@@ -260,13 +269,14 @@
             display: inline-flex;
             align-items: center;
             margin-top: 32px;
-            font-size: 10px;
+            font-size: 11px;
             text-transform: uppercase;
-            letter-spacing: 0.2em;
+            letter-spacing: 0.1em;
             color: var(--ac-white);
             opacity: 0;
             transform: translateX(-10px);
             transition: all var(--transition);
+            font-family: var(--font-mono);
         }
 
         .product-card:not(.coming-soon):hover .product-arrow {
@@ -275,17 +285,71 @@
         }
 
         /* Footer */
-        footer {
-            padding: 100px 48px;
-            border-top: 1px solid var(--ac-gray-05);
-            text-align: center;
+        .footer {
+            padding: 120px 0 60px;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            background: #000;
         }
 
-        .footer-text {
-            font-size: 9px;
+        .footer-content {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 80px;
+        }
+
+        .footer-links {
+            display: flex;
+            gap: 80px;
+        }
+
+        .footer-col {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .footer-label {
+            font-size: 10px;
             text-transform: uppercase;
-            letter-spacing: 0.3em;
+            letter-spacing: 0.1em;
             color: var(--ac-gray-30);
+            margin-bottom: 8px;
+            font-family: var(--font-mono);
+        }
+
+        .footer-col a {
+            color: var(--ac-gray-40);
+            text-decoration: none;
+            font-size: 14px;
+            transition: color var(--transition);
+        }
+
+        .footer-col a:hover {
+            color: var(--ac-white);
+        }
+
+        .footer-bottom {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            padding-top: 40px;
+            border-top: 1px solid rgba(255, 255, 255, 0.03);
+        }
+
+        .footer-copy {
+            font-size: 11px;
+            color: var(--ac-gray-30);
+            font-family: var(--font-mono);
+        }
+
+        .footer-cat {
+            font-family: var(--font-mono);
+            white-space: pre;
+            font-size: 10px;
+            color: var(--ac-gray-30);
+            user-select: none;
+            pointer-events: none;
+            line-height: 1.2;
         }
 
         /* Animations */
@@ -434,43 +498,107 @@
                     <span class="product-arrow">Перейти →</span>
                 </a>
 
+                <!-- LeetKot -->
+                <a href="https://leetcot.ru" class="product-card reveal" target="_blank">
+                    <span class="product-label">
+                        Мяу-образование
+                        <span class="badge">Мурчит</span>
+                    </span>
+                    <div style="font-family: monospace; white-space: pre; font-size: 10px; line-height: 1.2; color: var(--ac-gray-30); margin-bottom: 20px;">
+  /\_/\
+ ( o.o )
+  > ^ <
+                    </div>
+                    <h3 class="product-title">ЛитКот</h3>
+                    <p class="product-desc">Разминай лапки и мозги! Платформа для тех, кто хочет щелкать алгоритмы как рыбку и готовиться к интервью с кошачьей грацией.</p>
+                    <span class="product-arrow">Зайти за сметаной →</span>
+                </a>
+
                 <!-- Arlist ID -->
                 <div class="product-card coming-soon reveal">
                     <span class="product-label">
                         Защита
                         <span class="badge">Скоро</span>
                     </span>
-                    <h3 class="product-title">Арлист Айди</h3>
+                    <div style="font-family: 'Geist Mono', monospace; font-size: 2.5rem; font-weight: 300; letter-spacing: -0.05em; margin-bottom: 20px; color: var(--ac-white); font-style: italic;">
+                        AID
+                    </div>
+                    <h3 class="product-title">Arlist ID</h3>
                     <p class="product-desc">Единый доступ ко всем инструментам. Безопасность, основанная на прозрачности и здравом смысле.</p>
                 </div>
 
-                <!-- LmAPI -->
+                <!-- Gate -->
                 <div class="product-card coming-soon reveal">
                     <span class="product-label">
-                        Разум
+                        Шлюз
                         <span class="badge">Скоро</span>
                     </span>
-                    <h3 class="product-title">ЛмАПИ</h3>
-                    <p class="product-desc">Мощь нейросетевых моделей в простом интерфейсе. Интеллект как инструмент, а не как лозунг.</p>
+                    <div style="width: 40px; height: 40px; border: 1px solid var(--ac-gray-30); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-bottom: 24px; position: relative;">
+                        <div style="width: 12px; height: 12px; border-top: 1px solid var(--ac-white); border-right: 1px solid var(--ac-white); transform: rotate(45deg); margin-right: 4px;"></div>
+                        <div style="width: 16px; height: 1px; background: var(--ac-white); position: absolute; left: 10px;"></div>
+                    </div>
+                    <h3 class="product-title">Гейт</h3>
+                    <p class="product-desc">Универсальный API-шлюз для ваших сервисов. Вход свободный, выход — по правилам.</p>
                 </div>
 
-                <!-- Tracker -->
+                <!-- Analysis -->
                 <div class="product-card coming-soon reveal">
                     <span class="product-label">
-                        Связи
+                        Big Data
                         <span class="badge">Скоро</span>
                     </span>
-                    <h3 class="product-title">Трекер</h3>
-                    <p class="product-desc">Умные ссылки и подробная аналитика. Понимайте свой путь без лишних усилий.</p>
+                    <div style="font-family: monospace; white-space: pre; font-size: 10px; line-height: 1.2; color: var(--ac-gray-30); margin-bottom: 20px;">
+  |\__/,|   (`\
+  |o o  |__ _) )
+_.( T   )  `  /
+                    </div>
+                    <h3 class="product-title">Анализ</h3>
+                    <p class="product-desc">Глубокая аналитика данных и котиков. Понимайте скрытые паттерны в огромных массивах информации.</p>
                 </div>
             </div>
         </div>
     </section>
 </main>
 
-<footer>
-    <p class="footer-text">© 2026 Арлист Технологии. Высокая культура кода и уважение к человеку.</p>
-</footer>
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-brand">
+                    <a href="/" class="logo">
+                        <img src="/icon.svg" alt="" class="logo-icon">
+                        Арлист
+                    </a>
+                </div>
+                <div class="footer-links">
+                    <div class="footer-col">
+                        <span class="footer-label">Сервисы</span>
+                        <a href="https://commit.arlist.tech">Commit</a>
+                        <a href="https://leetcot.ru">ЛитКот</a>
+                    </div>
+                    <div class="footer-col">
+                        <span class="footer-label">Компания</span>
+                        <a href="/research">Исследования</a>
+                        <a href="/gr">ГР</a>
+                        <a href="/forEdu">Образование</a>
+                    </div>
+                    <div class="footer-col">
+                        <span class="footer-label">Право</span>
+                        <a href="/legal">Документы</a>
+                        <a href="/legal/commit-privacy">Приватность</a>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p class="footer-copy">© 2026 АРЛИСТ ТЕХ. Все права защищены.</p>
+                <div class="footer-cat">
+  _._     _,-'""`-._
+ (,-.`._,'(       |\`-/|
+     `-.-' \ )-`( , o o)
+           `-    \`_`"'-
+                </div>
+            </div>
+        </div>
+    </footer>
 
 <script>
     // Stub Logic

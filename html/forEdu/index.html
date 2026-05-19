@@ -6,8 +6,9 @@
     <title>Арлист | Для образования</title>
     <meta name="description" content="Арлист — поддержка учебных заведений и студентов. Бесплатные подписки на Commit и другие сервисы.">
     
-    <!-- Maple Mono Font -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/maple-mono@5.2.6/index.css">
+    <!-- Geist Font -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/geist@1.3.0/dist/fonts/geist-sans/style.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/geist@1.3.0/dist/fonts/geist-mono/style.css">
     
     <!-- Favicon -->
     <link rel="icon" type="image/svg+xml" href="/icon.svg">
@@ -27,8 +28,9 @@
             --ac-gray-30: rgba(255,255,255,0.3);
             --ac-gray-40: rgba(255,255,255,0.4);
             --ac-gray-50: rgba(255,255,255,0.5);
-            --font-mono: 'Maple Mono', monospace;
-            --transition: 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+            --font-sans: 'Geist Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            --font-mono: 'Geist Mono', monospace;
+            --transition: 0.4s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -36,8 +38,8 @@
         body {
             background-color: var(--ac-black);
             color: var(--ac-white);
-            font-family: var(--font-mono);
-            line-height: 1.6;
+            font-family: var(--font-sans);
+            line-height: 1.5;
             -webkit-font-smoothing: antialiased;
             overflow-x: hidden;
         }
@@ -51,7 +53,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: radial-gradient(circle at 50% -20%, #111 0%, #000 70%);
+            background: radial-gradient(circle at 50% -20%, #151515 0%, #000 80%);
             z-index: -1;
         }
 
@@ -72,14 +74,15 @@
 
         .logo {
             font-size: 1.1rem;
-            font-weight: 700;
+            font-weight: 600;
             text-decoration: none;
             color: var(--ac-white);
-            letter-spacing: -0.05em;
+            letter-spacing: -0.03em;
             display: flex;
             align-items: center;
             gap: 12px;
             text-transform: uppercase;
+            font-family: var(--font-mono);
         }
 
         .logo-icon {
@@ -145,11 +148,11 @@
         }
 
         .hero-subtitle {
-            font-size: 0.95rem;
+            font-size: 1rem;
             color: var(--ac-gray-40);
             max-width: 600px;
             margin: 0 auto;
-            line-height: 1.8;
+            line-height: 1.6;
             letter-spacing: -0.01em;
         }
 
@@ -161,42 +164,46 @@
             display: grid;
             grid-template-columns: repeat(2, 1fr);
             gap: 1px;
-            background: var(--ac-gray-05);
-            border: 1px solid var(--ac-gray-05);
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.05);
         }
 
         .edu-card {
-            background: var(--ac-black);
+            background: #050505;
             padding: 80px 60px;
             transition: all var(--transition);
             position: relative;
             overflow: hidden;
+            border: 1px solid transparent;
         }
 
         .edu-card:hover {
-            background: rgba(255, 255, 255, 0.02);
-            transform: scale(1.01);
+            background: #080808;
+            transform: translateY(-4px);
             z-index: 10;
+            border-color: rgba(255, 255, 255, 0.1);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
         }
 
         .edu-card-title {
             font-size: 1.5rem;
             margin-bottom: 24px;
-            font-weight: 400;
-            letter-spacing: -0.04em;
+            font-weight: 500;
+            letter-spacing: -0.02em;
         }
 
         .edu-card-desc {
             color: var(--ac-gray-40);
-            font-size: 0.9rem;
-            line-height: 1.8;
+            font-size: 0.95rem;
+            line-height: 1.6;
         }
 
         .contact-box {
             margin-top: 80px;
             padding: 60px;
-            border: 1px solid var(--ac-gray-10);
+            border: 1px solid rgba(255, 255, 255, 0.05);
             text-align: center;
+            background: rgba(255, 255, 255, 0.01);
         }
 
         .contact-email {
@@ -207,6 +214,7 @@
             margin-top: 20px;
             border-bottom: 1px solid var(--ac-gray-20);
             transition: all var(--transition);
+            font-family: var(--font-mono);
         }
 
         .contact-email:hover {
@@ -214,17 +222,73 @@
             color: #88ffcc;
         }
 
-        footer {
-            padding: 100px 48px;
-            border-top: 1px solid var(--ac-gray-05);
-            text-align: center;
+        /* Footer */
+        .footer {
+            padding: 120px 0 60px;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            background: #000;
+            text-align: left;
         }
 
-        .footer-text {
-            font-size: 9px;
+        .footer-content {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 80px;
+        }
+
+        .footer-links {
+            display: flex;
+            gap: 80px;
+        }
+
+        .footer-col {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .footer-label {
+            font-size: 10px;
             text-transform: uppercase;
-            letter-spacing: 0.3em;
+            letter-spacing: 0.1em;
             color: var(--ac-gray-30);
+            margin-bottom: 8px;
+            font-family: var(--font-mono);
+        }
+
+        .footer-col a {
+            color: var(--ac-gray-40);
+            text-decoration: none;
+            font-size: 14px;
+            transition: color var(--transition);
+        }
+
+        .footer-col a:hover {
+            color: var(--ac-white);
+        }
+
+        .footer-bottom {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            padding-top: 40px;
+            border-top: 1px solid rgba(255, 255, 255, 0.03);
+        }
+
+        .footer-copy {
+            font-size: 11px;
+            color: var(--ac-gray-30);
+            font-family: var(--font-mono);
+        }
+
+        .footer-cat {
+            font-family: var(--font-mono);
+            white-space: pre;
+            font-size: 7px;
+            color: rgba(255, 255, 255, 0.02);
+            user-select: none;
+            pointer-events: none;
+            line-height: 1;
         }
 
         .reveal {
@@ -285,6 +349,19 @@
                     </p>
                 </div>
                 <div class="edu-card reveal">
+                    <div style="font-family: monospace; white-space: pre; font-size: 10px; line-height: 1.2; color: var(--ac-gray-30); margin-bottom: 20px;">
+  /\_/\
+ ( ^.^ )
+  > ^ <
+                    </div>
+                    <h2 class="edu-card-title">Платформа «ЛитКот»</h2>
+                    <p class="edu-card-desc">
+                        Специальная песочница для будущих техлидов. Точим когти об сложные алгоритмы и готовимся к собесам в топовые компании. 
+                        Никакой скуки, только чистый азарт охоты за оффером.
+                    </p>
+                    <a href="https://leetcot.ru" target="_blank" style="color: var(--ac-white); font-size: 10px; text-transform: uppercase; letter-spacing: 0.2em; text-decoration: none; margin-top: 24px; display: inline-block; border-bottom: 1px solid var(--ac-gray-20); padding-bottom: 4px; transition: border-color 0.3s ease;">Поймать мышку (задачу) →</a>
+                </div>
+                <div class="edu-card reveal">
                     <h2 class="edu-card-title">Развитие экосистемы</h2>
                     <p class="edu-card-desc">
                         В ближайшее время мы расширим программу на все наши сервисы, включая 
@@ -302,9 +379,45 @@
     </section>
 </main>
 
-<footer>
-    <p class="footer-text">© 2026 Арлист Групп. Знания. Развитие. Будущее.</p>
-</footer>
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-brand">
+                    <a href="/" class="logo">
+                        <img src="/icon.svg" alt="" class="logo-icon">
+                        Арлист
+                    </a>
+                </div>
+                <div class="footer-links">
+                    <div class="footer-col">
+                        <span class="footer-label">Сервисы</span>
+                        <a href="https://commit.arlist.tech">Commit</a>
+                        <a href="https://leetcot.ru">ЛитКот</a>
+                    </div>
+                    <div class="footer-col">
+                        <span class="footer-label">Компания</span>
+                        <a href="/research">Исследования</a>
+                        <a href="/gr">ГР</a>
+                        <a href="/forEdu">Образование</a>
+                    </div>
+                    <div class="footer-col">
+                        <span class="footer-label">Право</span>
+                        <a href="/legal">Документы</a>
+                        <a href="/legal/commit-privacy">Приватность</a>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p class="footer-copy">© 2026 Арлист Групп. Все права защищены.</p>
+                <div class="footer-cat">
+      |\      _,,,---,,_
+ZZZzz /,`.-'`'    -.  ;-;;,_
+     |,4-  ) )-,_. ,\ (  `'-'
+    '---''(_/--'  `-'\_)
+                </div>
+            </div>
+        </div>
+    </footer>
 
 <script>
     const observer = new IntersectionObserver((entries) => {
