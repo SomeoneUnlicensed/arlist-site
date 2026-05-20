@@ -320,13 +320,21 @@
     // Document Loader
     async function loadDocument() {
         const docRender = document.getElementById('doc-render');
-        const pathParts = window.location.pathname.split('/');
-        const slug = pathParts[pathParts.length - 1] || pathParts[pathParts.length - 2];
-        
-        if (!slug || slug === 'legal') {
+        const path = window.location.pathname;
+
+        if (path === '/legal' || path === '/legal/') {
             window.location.href = '/legal';
             return;
         }
+
+        const slugMatch = path.match(/^\/legal\/([a-z0-9-]+)\/?$/);
+        if (!slugMatch) {
+            docRender.innerHTML = '<h1>404</h1><p>Некорректный адрес документа.</p>';
+            docRender.classList.add('visible');
+            return;
+        }
+
+        const slug = slugMatch[1];
 
         // Configure marked
         marked.setOptions({
@@ -337,6 +345,13 @@
         });
 
         try {
+            const docsConfigResponse = await fetch('/legal/config.json');
+            if (!docsConfigResponse.ok) throw new Error('Config not found');
+
+            const docsConfig = await docsConfigResponse.json();
+            const allowedSlugs = new Set(docsConfig.map(doc => doc.slug));
+            if (!allowedSlugs.has(slug)) throw new Error('Unknown slug');
+
             const response = await fetch(`/legal/docs/${slug}.md`);
             if (!response.ok) throw new Error('Not Found');
             
