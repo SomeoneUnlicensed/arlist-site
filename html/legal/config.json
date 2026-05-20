@@ -1,11 +1,5 @@
 [
     {
-        "slug": "commit-terms",
-        "title": "Пользовательское соглашение (Commit)",
-        "date": "17.03.2026",
-        "description": "Правила использования сервиса Commit"
-    },
-    {
         "slug": "commit-privacy",
         "title": "Политика конфиденциальности (Commit)",
         "date": "17.03.2026",
