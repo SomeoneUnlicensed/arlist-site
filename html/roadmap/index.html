@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Роадмап | Арлист</title>
+    
+    <!-- Geist Font -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/geist@1.3.0/dist/fonts/geist-sans/style.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/geist@1.3.0/dist/fonts/geist-mono/style.css">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="/icon.svg">
+    <meta name="theme-color" content="#000000">
+
+    <style>
+        :root {
+            --ac-black: #000000;
+            --ac-white: #ffffff;
+            --ac-gray-05: rgba(255,255,255,0.05);
+            --ac-gray-10: rgba(255,255,255,0.1);
+            --ac-gray-40: rgba(255,255,255,0.4);
+            --ac-gray-60: rgba(255,255,255,0.6);
+            --font-sans: 'Geist Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            --font-mono: 'Geist Mono', monospace;
+            --transition: 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            background-color: var(--ac-black);
+            color: var(--ac-white);
+            font-family: var(--font-sans);
+            line-height: 1.5;
+            -webkit-font-smoothing: antialiased;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 50% -20%, #151515 0%, #000 80%);
+            z-index: -1;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 48px;
+        }
+
+        /* Navigation */
+        .navbar {
+            padding: 48px 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.1rem;
+            font-weight: 600;
+            text-decoration: none;
+            color: var(--ac-white);
+            letter-spacing: -0.03em;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-transform: uppercase;
+            font-family: var(--font-mono);
+        }
+
+        .logo-icon { height: 24px; }
+
+        .nav-links { display: flex; gap: 32px; list-style: none; }
+        .nav-link {
+            text-decoration: none;
+            color: var(--ac-gray-40);
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.25em;
+            transition: color var(--transition);
+        }
+        .nav-link:hover { color: var(--ac-white); }
+
+        /* Roadmap Hero */
+        .hero {
+            padding: 100px 0 60px;
+        }
+
+        h1 {
+            font-size: clamp(3rem, 10vw, 6rem);
+            font-weight: 600;
+            letter-spacing: -0.05em;
+            line-height: 0.9;
+            margin-bottom: 24px;
+        }
+
+        .hero-subtitle {
+            font-size: 1.1rem;
+            color: var(--ac-gray-40);
+            max-width: 600px;
+            margin-bottom: 80px;
+        }
+
+        /* Timeline */
+        .timeline {
+            position: relative;
+            max-width: 800px;
+            margin-top: 40px;
+        }
+
+        .timeline-item {
+            position: relative;
+            padding-left: 48px;
+            margin-bottom: 80px;
+        }
+
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 10px;
+            width: 12px;
+            height: 12px;
+            border: 1px solid var(--ac-white);
+            border-radius: 50%;
+            background: var(--ac-black);
+            z-index: 2;
+        }
+
+        .timeline-item.active::before {
+            background: var(--ac-white);
+            box-shadow: 0 0 15px rgba(255,255,255,0.5);
+        }
+
+        .timeline-item:not(:last-child)::after {
+            content: '';
+            position: absolute;
+            left: 5px;
+            top: 22px;
+            width: 1px;
+            height: calc(100% + 58px);
+            background: var(--ac-gray-10);
+            z-index: 1;
+        }
+
+        .time-label {
+            font-family: var(--font-mono);
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.2em;
+            color: var(--ac-gray-40);
+            margin-bottom: 12px;
+            display: block;
+        }
+
+        .item-title {
+            font-size: 1.5rem;
+            font-weight: 500;
+            margin-bottom: 12px;
+            letter-spacing: -0.02em;
+        }
+
+        .item-desc {
+            color: var(--ac-gray-40);
+            line-height: 1.7;
+            max-width: 500px;
+        }
+
+        .badge {
+            font-size: 9px;
+            padding: 2px 8px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+            background: rgba(255, 255, 255, 0.03);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-left: 12px;
+            vertical-align: middle;
+        }
+
+        .badge.released {
+            background: rgba(136, 255, 204, 0.1);
+            border-color: rgba(136, 255, 204, 0.2);
+            color: #88ffcc;
+        }
+
+        footer {
+            margin-top: 100px;
+            padding: 48px 0;
+            border-top: 1px solid var(--ac-gray-05);
+            color: var(--ac-gray-40);
+            font-size: 0.9rem;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .reveal {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 1.2s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .reveal.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        @media (max-width: 768px) {
+            .container { padding: 0 24px; }
+            .navbar { padding: 32px 0; }
+            .nav-links { display: none; }
+            h1 { font-size: 3.5rem; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <nav class="navbar">
+        <a href="/" class="logo">
+            <img src="/icon.svg" alt="" class="logo-icon">
+            АРЛИСТ
+        </a>
+        <ul class="nav-links">
+            <li><a href="/" class="nav-link">Главная</a></li>
+            <li><a href="/gr" class="nav-link">ГР</a></li>
+            <li><a href="/forEdu" class="nav-link">Образование</a></li>
+            <li><a href="/contacts" class="nav-link">Контакты</a></li>
+        </ul>
+    </nav>
+
+    <main>
+        <header class="hero">
+            <h1 class="reveal">Роадмап</h1>
+            <p class="hero-subtitle reveal">Наш путь развития: от первых строк кода до глобальной экосистемы честных сервисов.</p>
+        </header>
+
+        <section class="timeline">
+            <!-- Now -->
+            <div class="timeline-item active reveal">
+                <span class="time-label">Сейчас</span>
+                <h3 class="item-title">Релиз LeetKot <span class="badge released">Выпущено</span></h3>
+                <p class="item-desc">Запуск платформы для подготовки к алгоритмическим интервью. Разминаем мозги и готовимся к офферам.</p>
+            </div>
+
+            <!-- June/July -->
+            <div class="timeline-item reveal">
+                <span class="time-label">Конец июня — начало июля</span>
+                <h3 class="item-title">Привлечение аудитории</h3>
+                <p class="item-desc">Формирование сообщества вокруг наших ценностей: прозрачность, уважение и чистый код.</p>
+            </div>
+
+            <!-- Next -->
+            <div class="timeline-item reveal">
+                <span class="time-label">Скоро</span>
+                <h3 class="item-title">Релиз Commit</h3>
+                <p class="item-desc">Возвращение и официальный запуск нашего Git-сервиса с новыми возможностями для командной работы.</p>
+            </div>
+
+            <!-- AID -->
+            <div class="timeline-item reveal">
+                <span class="time-label">В планах</span>
+                <h3 class="item-title">Релиз Arlist ID</h3>
+                <p class="item-desc">Единая система авторизации и защиты данных для всей экосистемы сервисов.</p>
+            </div>
+
+            <!-- Business -->
+            <div class="timeline-item reveal">
+                <span class="time-label">Будущее</span>
+                <h3 class="item-title">Сервисы для бизнеса</h3>
+                <p class="item-desc">Инструменты аналитики, управления проектами и автоматизации бизнес-процессов.</p>
+            </div>
+
+            <!-- Offices -->
+            <div class="timeline-item reveal">
+                <span class="time-label">Глобально</span>
+                <h3 class="item-title">Расширение до офисов</h3>
+                <p class="item-desc">Выход в физическое пространство, открытие представительств и создание локальных хабов.</p>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <span>© 2026 Арлист</span>
+        <span>Сделано с уважением к человеку.</span>
+    </footer>
+</div>
+
+<script>
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('visible');
+            }
+        });
+    }, { threshold: 0.1 });
+
+    document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+</script>
+
+</body>
+</html>

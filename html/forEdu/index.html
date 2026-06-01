@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Арлист | Для образования</title>
-    <meta name="description" content="Арлист — поддержка учебных заведений и студентов. Бесплатные подписки на Commit и другие сервисы.">
+    <meta name="description" content="Арлист — поддержка учебных заведений и студентов. Бесплатные подписки на образовательные сервисы.">
     
     <!-- Geist Font -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/geist@1.3.0/dist/fonts/geist-sans/style.css">
@@ -319,7 +319,7 @@
     </a>
     <ul class="nav-links">
         <li><a href="/" class="nav-link">Главная</a></li>
-        <li><a href="/research" class="nav-link">Исследования</a></li>
+        <li><a href="/roadmap" class="nav-link">Роадмап</a></li>
         <li><a href="/gr" class="nav-link">ГР</a></li>
     </ul>
 </nav>
@@ -391,12 +391,10 @@
                 <div class="footer-links">
                     <div class="footer-col">
                         <span class="footer-label">Сервисы</span>
-                        <a href="https://commit.arlist.tech">Commit</a>
                         <a href="https://leetcot.ru">ЛитКот</a>
                     </div>
                     <div class="footer-col">
                         <span class="footer-label">Компания</span>
-                        <a href="/research">Исследования</a>
                         <a href="/gr">ГР</a>
                         <a href="/forEdu">Образование</a>
                         <a href="/contacts">Контакты</a>
@@ -404,7 +402,6 @@
                     <div class="footer-col">
                         <span class="footer-label">Право</span>
                         <a href="/legal">Документы</a>
-                        <a href="/legal/commit-privacy">Приватность</a>
                     </div>
                 </div>
             </div>
@@ -424,6 +421,17 @@ ZZZzz /,`.-'`'    -.  ;-;;,_
     const observer = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
             if (entry.isIntersecting) {
+                entry.target.classList.add('visible');
+            }
+        });
+    }, { threshold: 0.1 });
+
+    document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+</script>
+
+</body>
+</html>
+) {
                 entry.target.classList.add('visible');
             }
         });
