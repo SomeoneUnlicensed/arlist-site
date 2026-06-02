@@ -13,103 +13,9 @@
     <link rel="icon" type="image/svg+xml" href="/icon.svg">
     <meta name="theme-color" content="#000000">
 
+    <link rel="stylesheet" href="/css/global.css">
     <style>
-        :root {
-            --ac-black: #000000;
-            --ac-white: #ffffff;
-            --ac-gray-05: rgba(255,255,255,0.05);
-            --ac-gray-10: rgba(255,255,255,0.1);
-            --ac-gray-40: rgba(255,255,255,0.4);
-            --ac-gray-60: rgba(255,255,255,0.6);
-            --font-sans: 'Geist Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            --font-mono: 'Geist Mono', monospace;
-            --transition: 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-
-        body {
-            background-color: var(--ac-black);
-            color: var(--ac-white);
-            font-family: var(--font-sans);
-            line-height: 1.5;
-            -webkit-font-smoothing: antialiased;
-            overflow-x: hidden;
-            min-height: 100vh;
-        }
-
-        body::before {
-            content: '';
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: radial-gradient(circle at 50% -20%, #151515 0%, #000 80%);
-            z-index: -1;
-        }
-
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 48px;
-        }
-
-        /* Navigation */
-        .navbar {
-            padding: 48px 0;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .logo {
-            font-size: 1.1rem;
-            font-weight: 600;
-            text-decoration: none;
-            color: var(--ac-white);
-            letter-spacing: -0.03em;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            text-transform: uppercase;
-            font-family: var(--font-mono);
-        }
-
-        .logo-icon { height: 24px; }
-
-        .nav-links { display: flex; gap: 32px; list-style: none; }
-        .nav-link {
-            text-decoration: none;
-            color: var(--ac-gray-40);
-            font-size: 10px;
-            text-transform: uppercase;
-            letter-spacing: 0.25em;
-            transition: color var(--transition);
-        }
-        .nav-link:hover { color: var(--ac-white); }
-
-        /* Roadmap Hero */
-        .hero {
-            padding: 100px 0 60px;
-        }
-
-        h1 {
-            font-size: clamp(3rem, 10vw, 6rem);
-            font-weight: 600;
-            letter-spacing: -0.05em;
-            line-height: 0.9;
-            margin-bottom: 24px;
-        }
-
-        .hero-subtitle {
-            font-size: 1.1rem;
-            color: var(--ac-gray-40);
-            max-width: 600px;
-            margin-bottom: 80px;
-        }
-
-        /* Timeline */
+        /* Timeline specific styles */
         .timeline {
             position: relative;
             max-width: 800px;
@@ -191,56 +97,41 @@
             border-color: rgba(136, 255, 204, 0.2);
             color: #88ffcc;
         }
-
-        footer {
-            margin-top: 100px;
-            padding: 48px 0;
-            border-top: 1px solid var(--ac-gray-05);
-            color: var(--ac-gray-40);
-            font-size: 0.9rem;
-            display: flex;
-            justify-content: space-between;
-        }
-
-        .reveal {
-            opacity: 0;
-            transform: translateY(20px);
-            transition: all 1.2s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-
-        .reveal.visible {
-            opacity: 1;
-            transform: translateY(0);
-        }
-
-        @media (max-width: 768px) {
-            .container { padding: 0 24px; }
-            .navbar { padding: 32px 0; }
-            .nav-links { display: none; }
-            h1 { font-size: 3.5rem; }
-        }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <nav class="navbar">
-        <a href="/" class="logo">
-            <img src="/icon.svg" alt="" class="logo-icon">
-            АРЛИСТ
-        </a>
-        <ul class="nav-links">
-            <li><a href="/" class="nav-link">Главная</a></li>
-            <li><a href="/gr" class="nav-link">ГР</a></li>
-            <li><a href="/forEdu" class="nav-link">Образование</a></li>
-            <li><a href="/contacts" class="nav-link">Контакты</a></li>
-        </ul>
-    </nav>
+<div class="stub-overlay" id="stub-page">
+    <div class="stub-content">
+        <h2 class="stub-title">Личный кабинет</h2>
+        <p class="stub-text">
+            Мы завершаем работу над единой системой авторизации.<br>
+            Пока что приглашаем вас в наш Git-сервис.
+        </p>
+        <a href="https://commit.arlist.tech" class="stub-link" target="_blank">Перейти в Commit</a>
+        <span class="stub-close" id="stub-close">Вернуться назад</span>
+    </div>
+</div>
 
-    <main>
-        <header class="hero">
-            <h1 class="reveal">Роадмап</h1>
-            <p class="hero-subtitle reveal">Наш путь развития: от первых строк кода до глобальной экосистемы честных сервисов.</p>
+<nav class="navbar">
+    <a href="/" class="logo">
+        <img src="/icon.svg" alt="" class="logo-icon">
+        Арлист
+    </a>
+    <ul class="nav-links">
+        <li><a href="/roadmap" class="nav-link">Роадмап</a></li>
+        <li><a href="/gr" class="nav-link">ГР</a></li>
+        <li><a href="/forEdu" class="nav-link">Образование</a></li>
+        <li><a href="/contacts" class="nav-link">Контакты</a></li>
+        <li><button class="nav-link login-btn-trigger">Вход</button></li>
+    </ul>
+</nav>
+
+<main>
+    <div class="container">
+        <header class="hero" style="padding: 100px 0 60px;">
+            <h1 class="reveal" style="font-size: clamp(3rem, 10vw, 6rem); font-weight: 600; letter-spacing: -0.05em; line-height: 0.9; margin-bottom: 24px;">Роадмап</h1>
+            <p class="hero-subtitle reveal" style="font-size: 1.1rem; color: var(--ac-gray-40); max-width: 600px; margin-bottom: 80px;">Наш путь развития: от первых строк кода до глобальной экосистемы честных сервисов.</p>
         </header>
 
         <section class="timeline">
@@ -279,25 +170,51 @@
                 <p class="item-desc">Масштабируемые инструменты аналитики, гибкое управление проектами и глубокая автоматизация рутинных задач для команд любого масштаба.</p>
             </div>
         </section>
-    </main>
+    </div>
+</main>
 
-    <footer>
-        <span>© 2026 Арлист</span>
-        <span>Сделано с уважением к человеку.</span>
-    </footer>
-</div>
+<footer class="footer">
+    <div class="container">
+        <div class="footer-content">
+            <div class="footer-brand">
+                <a href="/" class="logo">
+                    <img src="/icon.svg" alt="" class="logo-icon">
+                    АРЛИСТ ТЕХ
+                </a>
+            </div>
+            <div class="footer-links">
+                <div class="footer-col">
+                    <span class="footer-label">Сервисы</span>
+                    <a href="https://commit.arlist.tech">Commit</a>
+                    <a href="https://leetcot.ru">ЛитКот</a>
+                </div>
+                <div class="footer-col">
+                    <span class="footer-label">Компания</span>
+                    <a href="/roadmap">Роадмап</a>
+                    <a href="/gr">ГР</a>
+                    <a href="/forEdu">Образование</a>
+                    <a href="/contacts">Контакты</a>
+                </div>
+                <div class="footer-col">
+                    <span class="footer-label">Право</span>
+                    <a href="/legal">Документы</a>
+                    <a href="/legal/commit-privacy">Приватность</a>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p class="footer-copy">© 2026 АРЛИСТ ТЕХ. Все права защищены.</p>
+            <div class="footer-cat">
+  _._     _,-'""`-._
+ (,-.`._,'(       |\`-/|
+     `-.-' \ )-`( , o o)
+           `-    \`_`"'-
+            </div>
+        </div>
+    </div>
+</footer>
 
-<script>
-    const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                entry.target.classList.add('visible');
-            }
-        });
-    }, { threshold: 0.1 });
-
-    document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
-</script>
+<script src="/js/global.js"></script>
 
 </body>
 </html>

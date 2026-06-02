@@ -13,49 +13,16 @@
     <link rel="icon" type="image/svg+xml" href="/icon.svg">
     <meta name="theme-color" content="#000000">
 
+    <link rel="stylesheet" href="/css/global.css">
     <style>
-        :root {
-            --ac-black: #000000;
-            --ac-white: #ffffff;
-            --ac-gray-30: rgba(255, 255, 255, 0.3);
-            --ac-gray-40: rgba(255, 255, 255, 0.4);
-            --font-sans: 'Geist Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            --font-mono: 'Geist Mono', monospace;
-            --transition: 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-
-        body {
-            background-color: var(--ac-black);
-            color: var(--ac-white);
-            font-family: var(--font-sans);
-            height: 100vh;
+        .content-404 {
+            min-height: 60vh;
             display: flex;
             align-items: center;
             justify-content: center;
             text-align: center;
-            overflow: hidden;
-            -webkit-font-smoothing: antialiased;
+            padding: 48px 24px;
         }
-
-        body::before {
-            content: '';
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: radial-gradient(circle at 50% 50%, #151515 0%, #000 80%);
-            z-index: -1;
-        }
-
-        .content {
-            padding: 20px;
-            max-width: 600px;
-            animation: fadeIn 1s var(--transition);
-        }
-
         .ascii-cat {
             font-family: var(--font-mono);
             white-space: pre;
@@ -67,7 +34,6 @@
             display: inline-block;
             text-align: left;
         }
-
         .error-label {
             font-family: var(--font-mono);
             font-size: 1rem;
@@ -76,22 +42,6 @@
             letter-spacing: 0.2em;
             text-transform: uppercase;
         }
-
-        h1 {
-            font-size: clamp(2rem, 7vw, 3.5rem);
-            font-weight: 600;
-            letter-spacing: -0.04em;
-            margin-bottom: 24px;
-            line-height: 1.2;
-        }
-
-        p {
-            font-size: 1.1rem;
-            color: var(--ac-gray-40);
-            margin-bottom: 40px;
-            line-height: 1.5;
-        }
-
         .back-link {
             display: inline-block;
             color: var(--ac-white);
@@ -104,36 +54,104 @@
             border: 1px solid var(--ac-gray-40);
             border-radius: 4px;
             transition: var(--transition);
+            margin-top: 40px;
         }
-
         .back-link:hover {
             background: var(--ac-white);
             color: var(--ac-black);
             border-color: var(--ac-white);
         }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
     </style>
 </head>
 <body>
 
-<div class="content">
-    <div class="ascii-cat">
+<div class="stub-overlay" id="stub-page">
+    <div class="stub-content">
+        <h2 class="stub-title">Личный кабинет</h2>
+        <p class="stub-text">
+            Мы завершаем работу над единой системой авторизации.<br>
+            Пока что приглашаем вас в наш Git-сервис.
+        </p>
+        <a href="https://commit.arlist.tech" class="stub-link" target="_blank">Перейти в Commit</a>
+        <span class="stub-close" id="stub-close">Вернуться назад</span>
+    </div>
+</div>
+
+<nav class="navbar">
+    <a href="/" class="logo">
+        <img src="/icon.svg" alt="" class="logo-icon">
+        Арлист
+    </a>
+    <ul class="nav-links">
+        <li><a href="/roadmap" class="nav-link">Роадмап</a></li>
+        <li><a href="/gr" class="nav-link">ГР</a></li>
+        <li><a href="/forEdu" class="nav-link">Образование</a></li>
+        <li><a href="/contacts" class="nav-link">Контакты</a></li>
+        <li><button class="nav-link login-btn-trigger">Вход</button></li>
+    </ul>
+</nav>
+
+<main>
+    <div class="content-404">
+        <div style="max-width: 600px;">
+            <div class="ascii-cat">
  /\_/\   ⚡
 ( O.O )  /
  > ^ <  /_
  /    \
  | | | |
 (_|_|_)
+            </div>
+            <div class="error-label">ОШИБКА 404</div>
+            <h1 style="font-size: clamp(2rem, 7vw, 3.5rem); font-weight: 600; letter-spacing: -0.04em; margin-bottom: 24px; line-height: 1.2;">ЧОЙТА — мы такого не знаем!</h1>
+            <p style="font-size: 1.1rem; color: var(--ac-gray-40); line-height: 1.5;">Спасити памагити, тут темно, страшно и нет нужной страницы... Может, скорее вернемся на главную, пока нас никто не покусал?</p>
+            <a href="/" class="back-link">Эвакуироваться на главную</a>
+        </div>
     </div>
-    <div class="error-label">ОШИБКА 404</div>
-    <h1>ЧОЙТА — мы такого не знаем!</h1>
-    <p>Спасити памагити, тут темно, страшно и нет нужной страницы... Может, скорее вернемся на главную, пока нас никто не покусал?</p>
-    <a href="/" class="back-link">Эвакуироваться на главную</a>
-</div>
+</main>
+
+<footer class="footer">
+    <div class="container">
+        <div class="footer-content">
+            <div class="footer-brand">
+                <a href="/" class="logo">
+                    <img src="/icon.svg" alt="" class="logo-icon">
+                    АРЛИСТ ТЕХ
+                </a>
+            </div>
+            <div class="footer-links">
+                <div class="footer-col">
+                    <span class="footer-label">Сервисы</span>
+                    <a href="https://commit.arlist.tech">Commit</a>
+                    <a href="https://leetcot.ru">ЛитКот</a>
+                </div>
+                <div class="footer-col">
+                    <span class="footer-label">Компания</span>
+                    <a href="/roadmap">Роадмап</a>
+                    <a href="/gr">ГР</a>
+                    <a href="/forEdu">Образование</a>
+                    <a href="/contacts">Контакты</a>
+                </div>
+                <div class="footer-col">
+                    <span class="footer-label">Право</span>
+                    <a href="/legal">Документы</a>
+                    <a href="/legal/commit-privacy">Приватность</a>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p class="footer-copy">© 2026 АРЛИСТ ТЕХ. Все права защищены.</p>
+            <div class="footer-cat">
+  _._     _,-'""`-._
+ (,-.`._,'(       |\`-/|
+     `-.-' \ )-`( , o o)
+           `-    \`_`"'-
+            </div>
+        </div>
+    </div>
+</footer>
+
+<script src="/js/global.js"></script>
 
 </body>
 </html>

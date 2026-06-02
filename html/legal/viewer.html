@@ -16,6 +16,7 @@
     <!-- Markdown Renderer -->
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     
+    <link rel="stylesheet" href="/css/global.css">
     <style>
         :root {
             --ac-black: #000000;
@@ -51,46 +52,6 @@
             background: radial-gradient(circle at 50% -20%, #151515 0%, #000 80%);
             z-index: -1;
         }
-
-        .container {
-            max-width: 900px;
-            margin: 0 auto;
-            padding: 0 48px;
-        }
-
-        /* Navbar */
-        .navbar {
-            padding: 48px 0;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .logo {
-            font-size: 1.1rem;
-            font-weight: 600;
-            text-decoration: none;
-            color: var(--ac-white);
-            letter-spacing: -0.03em;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            text-transform: uppercase;
-            font-family: var(--font-mono);
-        }
-
-        .logo-icon { height: 24px; }
-
-        .nav-links { display: flex; gap: 32px; list-style: none; }
-        .nav-link {
-            text-decoration: none;
-            color: var(--ac-gray-40);
-            font-size: 10px;
-            text-transform: uppercase;
-            letter-spacing: 0.25em;
-            transition: color var(--transition);
-        }
-        .nav-link:hover { color: var(--ac-white); }
 
         /* Main Content */
         .doc-content {
@@ -191,64 +152,8 @@
             color: var(--ac-black);
         }
 
-        /* Overlay */
-        .stub-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: var(--ac-black); z-index: 1000;
-            display: none; align-items: center; justify-content: center;
-            text-align: center;
-        }
-        .stub-overlay.active { display: flex; }
-        .stub-content { max-width: 500px; padding: 40px; }
-        .stub-title { font-size: 2rem; margin-bottom: 24px; }
-        .stub-text { color: var(--ac-gray-40); margin-bottom: 32px; }
-        .stub-btn {
-            display: inline-block; padding: 14px 32px;
-            border: 1px solid var(--ac-white); color: var(--ac-white);
-            text-decoration: none; font-size: 10px; text-transform: uppercase;
-            letter-spacing: 0.2em; transition: var(--transition);
-        }
-        .stub-btn:hover { background: var(--ac-white); color: var(--ac-black); }
-        .stub-close {
-            display: block; margin-top: 24px; font-size: 10px;
-            color: var(--ac-gray-30); text-decoration: underline; cursor: pointer;
-        }
-
-        /* Footer */
-        .footer {
-            padding: 80px 0 60px;
-            border-top: 1px solid var(--ac-gray-05);
-            background: #000;
-        }
-
-        .footer-grid {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 60px;
-        }
-
-        .footer-col { display: flex; flex-direction: column; gap: 12px; }
-        .footer-label {
-            font-size: 10px; font-family: var(--font-mono);
-            text-transform: uppercase; letter-spacing: 0.1em;
-            color: var(--ac-gray-30); margin-bottom: 8px;
-        }
-        .footer-link {
-            color: var(--ac-gray-40); text-decoration: none;
-            font-size: 13px; transition: color var(--transition);
-        }
-        .footer-link:hover { color: var(--ac-white); }
-
-        .footer-bottom {
-            display: flex; justify-content: space-between; align-items: center;
-            font-size: 11px; color: var(--ac-gray-30); font-family: var(--font-mono);
-        }
-
         @media (max-width: 768px) {
-            .container { padding: 0 24px; }
-            .navbar { padding: 32px 0; }
-            .nav-links { display: none; }
-            .footer-grid { flex-direction: column; gap: 40px; }
+            .doc-content { padding: 40px 0; }
         }
     </style>
 </head>
@@ -257,25 +162,30 @@
 <div class="stub-overlay" id="stub-page">
     <div class="stub-content">
         <h2 class="stub-title">Личный кабинет</h2>
-        <p class="stub-text">Мы завершаем работу над единой системой авторизации. Личный кабинет будет доступен совсем скоро.</p>
+        <p class="stub-text">
+            Мы завершаем работу над единой системой авторизации.<br>
+            Пока что приглашаем вас в наш Git-сервис.
+        </p>
+        <a href="https://commit.arlist.tech" class="stub-link" target="_blank">Перейти в Commit</a>
         <span class="stub-close" id="stub-close">Вернуться назад</span>
     </div>
 </div>
 
-<div class="container">
-    <nav class="navbar">
-        <a href="/" class="logo">
-            <img src="/icon.svg" alt="" class="logo-icon">
-            Арлист
-        </a>
-        <ul class="nav-links">
-            <li><a href="/roadmap" class="nav-link">Роадмап</a></li>
-            <li><a href="/gr" class="nav-link">ГР</a></li>
-            <li><a href="/forEdu" class="nav-link">Образование</a></li>
-            <li><button class="nav-link" id="login-btn" style="background:none;border:none;cursor:pointer;">Вход</button></li>
-        </ul>
-    </nav>
+<nav class="navbar">
+    <a href="/" class="logo">
+        <img src="/icon.svg" alt="" class="logo-icon">
+        Арлист
+    </a>
+    <ul class="nav-links">
+        <li><a href="/roadmap" class="nav-link">Роадмап</a></li>
+        <li><a href="/gr" class="nav-link">ГР</a></li>
+        <li><a href="/forEdu" class="nav-link">Образование</a></li>
+        <li><a href="/contacts" class="nav-link">Контакты</a></li>
+        <li><button class="nav-link login-btn-trigger">Вход</button></li>
+    </ul>
+</nav>
 
+<div class="container">
     <main class="doc-content">
         <article id="doc-render">
             Загрузка документа...
@@ -289,26 +199,41 @@
 
 <footer class="footer">
     <div class="container">
-        <div class="footer-grid">
-            <div class="footer-col">
-                <span class="footer-label">Экосистема</span>
-                <a href="/" class="footer-link">Главная</a>
-                <a href="/gr" class="footer-link">ГР</a>
-                <a href="/forEdu" class="footer-link">Образование</a>
+        <div class="footer-content">
+            <div class="footer-brand">
+                <a href="/" class="logo">
+                    <img src="/icon.svg" alt="" class="logo-icon">
+                    АРЛИСТ ТЕХ
+                </a>
             </div>
-            <div class="footer-col">
-                <span class="footer-label">Сервисы</span>
-                <a href="https://leetcot.ru" class="footer-link">LeetCot</a>
-            </div>
-            <div class="footer-col">
-                <span class="footer-label">Право</span>
-                <a href="/legal" class="footer-link">Юридический отдел</a>
-                <a href="/contacts" class="footer-link">Контакты</a>
+            <div class="footer-links">
+                <div class="footer-col">
+                    <span class="footer-label">Сервисы</span>
+                    <a href="https://commit.arlist.tech">Commit</a>
+                    <a href="https://leetcot.ru">ЛитКот</a>
+                </div>
+                <div class="footer-col">
+                    <span class="footer-label">Компания</span>
+                    <a href="/roadmap">Роадмап</a>
+                    <a href="/gr">ГР</a>
+                    <a href="/forEdu">Образование</a>
+                    <a href="/contacts">Контакты</a>
+                </div>
+                <div class="footer-col">
+                    <span class="footer-label">Право</span>
+                    <a href="/legal">Документы</a>
+                    <a href="/legal/commit-privacy">Приватность</a>
+                </div>
             </div>
         </div>
         <div class="footer-bottom">
-            <span>© 2026 АРЛИСТ ГРУПП</span>
-            <span>MADE WITH RESPECT</span>
+            <p class="footer-copy">© 2026 АРЛИСТ ТЕХ. Все права защищены.</p>
+            <div class="footer-cat">
+  _._     _,-'""`-._
+ (,-.`._,'(       |\`-/|
+     `-.-' \ )-`( , o o)
+           `-    \`_`"'-
+            </div>
         </div>
     </div>
 </footer>
@@ -317,21 +242,13 @@
     // Document Loader
     async function loadDocument() {
         const docRender = document.getElementById('doc-render');
-        const path = window.location.pathname;
-
-        if (path === '/legal' || path === '/legal/') {
+        const pathParts = window.location.pathname.split('/');
+        const slug = pathParts[pathParts.length - 1] || pathParts[pathParts.length - 2];
+        
+        if (!slug || slug === 'legal') {
             window.location.href = '/legal';
             return;
         }
-
-        const slugMatch = path.match(/^\/legal\/([a-z0-9-]+)\/?$/);
-        if (!slugMatch) {
-            docRender.innerHTML = '<h1>404</h1><p>Некорректный адрес документа.</p>';
-            docRender.classList.add('visible');
-            return;
-        }
-
-        const slug = slugMatch[1];
 
         // Configure marked
         marked.setOptions({
@@ -342,13 +259,6 @@
         });
 
         try {
-            const docsConfigResponse = await fetch('/legal/config.json');
-            if (!docsConfigResponse.ok) throw new Error('Config not found');
-
-            const docsConfig = await docsConfigResponse.json();
-            const allowedSlugs = new Set(docsConfig.map(doc => doc.slug));
-            if (!allowedSlugs.has(slug)) throw new Error('Unknown slug');
-
             const response = await fetch(`/legal/docs/${slug}.md`);
             if (!response.ok) throw new Error('Not Found');
             
@@ -369,14 +279,10 @@
         }
     }
 
-    // Stub Logic
-    const stubPage = document.getElementById('stub-page');
-    document.getElementById('login-btn').addEventListener('click', () => stubPage.classList.add('active'));
-    document.getElementById('stub-close').addEventListener('click', () => stubPage.classList.remove('active'));
-
     // Init
     window.addEventListener('DOMContentLoaded', loadDocument);
 </script>
+<script src="/js/global.js"></script>
 
 </body>
 </html>

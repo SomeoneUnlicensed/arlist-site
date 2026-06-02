@@ -18,308 +18,33 @@
     <link rel="manifest" href="/site.webmanifest">
     <meta name="theme-color" content="#000000">
 
-    <style>
-        :root {
-            --ac-black: #000000;
-            --ac-white: #ffffff;
-            --ac-gray-05: rgba(255,255,255,0.05);
-            --ac-gray-10: rgba(255,255,255,0.1);
-            --ac-gray-20: rgba(255,255,255,0.2);
-            --ac-gray-30: rgba(255,255,255,0.3);
-            --ac-gray-40: rgba(255,255,255,0.4);
-            --ac-gray-50: rgba(255,255,255,0.5);
-            --font-sans: 'Geist Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            --font-mono: 'Geist Mono', monospace;
-            --transition: 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-
-        body {
-            background-color: var(--ac-black);
-            color: var(--ac-white);
-            font-family: var(--font-sans);
-            line-height: 1.5;
-            -webkit-font-smoothing: antialiased;
-            overflow-x: hidden;
-        }
-
-        ::selection { background: var(--ac-white); color: var(--ac-black); }
-
-        body::before {
-            content: '';
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(180deg, #0a0a0a 0%, #000 100%);
-            z-index: -1;
-        }
-
-        .container {
-            max-width: 1000px;
-            margin: 0 auto;
-            padding: 0 48px;
-        }
-
-        /* Navigation */
-        .navbar {
-            padding: 48px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            max-width: 1400px;
-            margin: 0 auto;
-        }
-
-        .logo {
-            font-size: 1.1rem;
-            font-weight: 600;
-            text-decoration: none;
-            color: var(--ac-white);
-            letter-spacing: -0.03em;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            text-transform: uppercase;
-            font-family: var(--font-mono);
-        }
-
-        .logo-icon {
-            height: 24px;
-            width: auto;
-        }
-
-        .nav-links {
-            display: flex;
-            gap: 32px;
-            list-style: none;
-            align-items: center;
-        }
-
-        .nav-link {
-            text-decoration: none;
-            color: var(--ac-gray-40);
-            font-size: 10px;
-            text-transform: uppercase;
-            letter-spacing: 0.25em;
-            font-weight: 500;
-            transition: color var(--transition);
-        }
-
-        .nav-link:hover { 
-            color: var(--ac-white); 
-        }
-
-        /* Hero */
-        .hero {
-            padding: 120px 0 80px;
-            border-bottom: 1px solid var(--ac-gray-10);
-            margin-bottom: 80px;
-        }
-
-        .hero-label {
-            font-size: 9px;
-            text-transform: uppercase;
-            letter-spacing: 0.5em;
-            font-weight: 600;
-            color: var(--ac-gray-40);
-            margin-bottom: 32px;
-            display: block;
-        }
-
-        .hero-title {
-            font-size: clamp(2rem, 5vw, 3.5rem);
-            line-height: 1.1;
-            letter-spacing: -0.05em;
-            margin-bottom: 40px;
-            font-weight: 500;
-            max-width: 800px;
-        }
-
-        .hero-title span {
-            color: var(--ac-gray-30);
-        }
-
-        .hero-subtitle {
-            font-size: 1.1rem;
-            color: var(--ac-gray-50);
-            max-width: 700px;
-            line-height: 1.6;
-        }
-
-        /* Content Sections */
-        .section {
-            margin-bottom: 120px;
-        }
-
-        .section-title {
-            font-size: 10px;
-            text-transform: uppercase;
-            letter-spacing: 0.2em;
-            color: var(--ac-gray-30);
-            margin-bottom: 48px;
-            font-family: var(--font-mono);
-            display: flex;
-            align-items: center;
-            gap: 16px;
-        }
-
-        .section-title::after {
-            content: '';
-            flex: 1;
-            height: 1px;
-            background: var(--ac-gray-10);
-        }
-
-        .mission-text {
-            font-size: 1.25rem;
-            line-height: 1.8;
-            color: var(--ac-white);
-            font-weight: 400;
-        }
-
-        /* Contacts Grid */
-        .contacts-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 48px;
-        }
-
-        .contact-item {
-            padding-bottom: 32px;
-            border-bottom: 1px solid var(--ac-gray-05);
-        }
-
-        .contact-label {
-            font-size: 10px;
-            color: var(--ac-gray-40);
-            text-transform: uppercase;
-            letter-spacing: 0.1em;
-            margin-bottom: 16px;
-            display: block;
-            font-family: var(--font-mono);
-        }
-
-        .contact-email {
-            font-size: 1.2rem;
-            color: var(--ac-white);
-            text-decoration: none;
-            display: block;
-            margin-bottom: 12px;
-            transition: opacity var(--transition);
-        }
-
-        .contact-email:hover {
-            opacity: 0.7;
-        }
-
-        .contact-desc {
-            font-size: 0.9rem;
-            color: var(--ac-gray-40);
-            line-height: 1.6;
-        }
-
-        /* Footer */
-        .footer {
-            padding: 120px 0 60px;
-            border-top: 1px solid var(--ac-gray-10);
-            background: #000;
-        }
-
-        .footer-content {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 80px;
-        }
-
-        .footer-links {
-            display: flex;
-            gap: 80px;
-        }
-
-        .footer-col {
-            display: flex;
-            flex-direction: column;
-            gap: 16px;
-        }
-
-        .footer-label {
-            font-size: 10px;
-            text-transform: uppercase;
-            letter-spacing: 0.1em;
-            color: var(--ac-gray-30);
-            margin-bottom: 8px;
-            font-family: var(--font-mono);
-        }
-
-        .footer-col a {
-            color: var(--ac-gray-40);
-            text-decoration: none;
-            font-size: 14px;
-            transition: color var(--transition);
-        }
-
-        .footer-col a:hover {
-            color: var(--ac-white);
-        }
-
-        .footer-bottom {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-end;
-            padding-top: 40px;
-            border-top: 1px solid rgba(255, 255, 255, 0.03);
-        }
-
-        .footer-copy {
-            font-size: 11px;
-            color: var(--ac-gray-30);
-            font-family: var(--font-mono);
-        }
-
-        .footer-cat {
-            font-family: var(--font-mono);
-            white-space: pre;
-            font-size: 10px;
-            color: var(--ac-gray-30);
-            user-select: none;
-            pointer-events: none;
-            line-height: 1.2;
-        }
-
-        /* Animations */
-        .reveal {
-            opacity: 0;
-            transform: translateY(10px);
-            transition: all 0.8s ease-out;
-        }
-
-        .reveal.visible {
-            opacity: 1;
-            transform: translateY(0);
-        }
-
-        @media (max-width: 900px) {
-            .navbar { padding: 32px 24px; }
-            .container { padding: 0 24px; }
-            .hero { padding: 80px 0 40px; }
-            .contacts-grid { grid-template-columns: 1fr; gap: 32px; }
-        }
-    </style>
+    <link rel="stylesheet" href="/css/global.css">
 </head>
 <body>
+
+<div class="stub-overlay" id="stub-page">
+    <div class="stub-content">
+        <h2 class="stub-title">Личный кабинет</h2>
+        <p class="stub-text">
+            Мы завершаем работу над единой системой авторизации.<br>
+            Пока что приглашаем вас в наш Git-сервис.
+        </p>
+        <a href="https://commit.arlist.tech" class="stub-link" target="_blank">Перейти в Commit</a>
+        <span class="stub-close" id="stub-close">Вернуться назад</span>
+    </div>
+</div>
 
 <nav class="navbar">
     <a href="/" class="logo">
         <img src="/icon.svg" alt="" class="logo-icon">
-        Арлист ГР
+        Арлист
     </a>
     <ul class="nav-links">
-        <li><a href="/" class="nav-link">Главная</a></li>
         <li><a href="/roadmap" class="nav-link">Роадмап</a></li>
+        <li><a href="/gr" class="nav-link">ГР</a></li>
         <li><a href="/forEdu" class="nav-link">Образование</a></li>
+        <li><a href="/contacts" class="nav-link">Контакты</a></li>
+        <li><button class="nav-link login-btn-trigger">Вход</button></li>
     </ul>
 </nav>
 
@@ -394,10 +119,12 @@
             <div class="footer-links">
                 <div class="footer-col">
                     <span class="footer-label">Сервисы</span>
+                    <a href="https://commit.arlist.tech">Commit</a>
                     <a href="https://leetcot.ru">ЛитКот</a>
                 </div>
                 <div class="footer-col">
                     <span class="footer-label">Компания</span>
+                    <a href="/roadmap">Роадмап</a>
                     <a href="/gr">ГР</a>
                     <a href="/forEdu">Образование</a>
                     <a href="/contacts">Контакты</a>
@@ -405,6 +132,7 @@
                 <div class="footer-col">
                     <span class="footer-label">Право</span>
                     <a href="/legal">Документы</a>
+                    <a href="/legal/commit-privacy">Приватность</a>
                 </div>
             </div>
         </div>
@@ -420,17 +148,7 @@
     </div>
 </footer>
 
-<script>
-    const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                entry.target.classList.add('visible');
-            }
-        });
-    }, { threshold: 0.1 });
-
-    document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
-</script>
+<script src="/js/global.js"></script>
 
 </body>
 </html>

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>Промо | Арлист</title>
+    <title>Лэндинги продуктов | Арлист</title>
     
     <!-- Geist Font -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/geist@1.3.0/dist/fonts/geist-sans/style.css">
@@ -21,62 +21,64 @@
             background-color: var(--ac-black);
             color: var(--ac-white);
             font-family: var(--font-sans);
-            line-height: 1.6;
+            line-height: 1.5;
             -webkit-font-smoothing: antialiased;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
+            overflow-x: hidden;
         }
 
         body::before {
             content: '';
             position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: radial-gradient(circle at 50% 50%, #111 0%, #000 80%);
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 50% -20%, #151515 0%, #000 80%);
             z-index: -1;
         }
 
-        main {
-            flex: 1;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-            padding: 80px 20px;
-        }
-
-        .promo-content {
-            max-width: 600px;
+        .hero {
+            padding: 100px 0 60px;
         }
 
         h1 {
-            font-size: clamp(2.5rem, 8vw, 4rem);
+            font-size: clamp(2.5rem, 8vw, 4.5rem);
             line-height: 1.1;
-            margin-bottom: 24px;
             letter-spacing: -0.05em;
-        }
-
-        p {
-            font-size: 1.1rem;
-            color: var(--ac-gray-40);
             margin-bottom: 40px;
+            font-weight: 400;
         }
 
-        .btn-back {
-            display: inline-block;
-            padding: 16px 48px;
-            border: 1px solid var(--ac-white);
-            color: var(--ac-white);
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 24px;
+            padding-bottom: 120px;
+        }
+
+        .landing-card {
+            background: #050505;
+            border: 1px solid var(--ac-gray-10);
+            padding: 40px;
             text-decoration: none;
-            font-size: 10px;
-            text-transform: uppercase;
-            letter-spacing: 0.2em;
+            color: inherit;
             transition: all var(--transition);
         }
 
-        .btn-back:hover {
-            background: var(--ac-white);
-            color: var(--ac-black);
+        .landing-card:hover {
+            border-color: var(--ac-white);
+            transform: translateY(-4px);
+        }
+
+        .landing-title {
+            font-size: 1.25rem;
+            margin-bottom: 12px;
+            font-weight: 500;
+        }
+
+        .landing-desc {
+            font-size: 0.9rem;
+            color: var(--ac-gray-40);
         }
     </style>
 </head>
@@ -108,13 +110,26 @@
     </ul>
 </nav>
 
-<main>
-    <div class="promo-content">
-        <h1 class="reveal">Промо-акции</h1>
-        <p class="reveal">Мы готовим нечто особенное. Совсем скоро здесь появятся предложения, которые вам понравятся.</p>
-        <a href="/" class="btn-back reveal">На главную</a>
-    </div>
-</main>
+<div class="container">
+    <section class="hero">
+        <h1 class="reveal">Предпросмотр лэндингов</h1>
+    </section>
+
+    <main class="grid">
+        <div class="landing-card reveal">
+            <h3 class="landing-title">Commit</h3>
+            <p class="landing-desc">Страница Git-сервиса (в разработке)</p>
+        </div>
+        <div class="landing-card reveal">
+            <h3 class="landing-title">АналитиКит</h3>
+            <p class="landing-desc">Страница аналитической платформы (в разработке)</p>
+        </div>
+        <div class="landing-card reveal">
+            <h3 class="landing-title">Arlist ID</h3>
+            <p class="landing-desc">Страница системы идентификации (в разработке)</p>
+        </div>
+    </main>
+</div>
 
 <footer class="footer">
     <div class="container">
