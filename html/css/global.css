@@ -7,7 +7,7 @@
     --ac-gray-30: rgba(255,255,255,0.3);
     --ac-gray-40: rgba(255,255,255,0.4);
     --ac-gray-50: rgba(255,255,255,0.5);
-    --font-sans: 'Geist Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    --font-sans: 'Geist', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     --font-mono: 'Geist Mono', monospace;
     --transition: 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 }
