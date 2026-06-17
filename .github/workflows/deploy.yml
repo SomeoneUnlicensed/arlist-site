@@ -1,18 +1,1 @@
-name: Deploy to Server
-
-on:
-  push:
-    branches:
-      - master
-
-jobs:
-  deploy:
-    runs-on: self-hosted
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Update files
-        run: |
-          rsync -av --exclude='.git*' ./ ~/services/arlist-site/
-          cd ~/services/arlist-site && docker compose up -d --force-recreate
+\
