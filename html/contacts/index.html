@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Контакты | Арлист</title>
+    
+    <!-- Geist Font -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/geist@1.3.0/dist/fonts/geist-sans/style.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/geist@1.3.0/dist/fonts/geist-mono/style.css">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="/icon.svg">
+    <meta name="theme-color" content="#000000">
+
+    <link rel="stylesheet" href="/css/global.css">
+    <style>
+        .hero { padding: 100px 0 60px; }
+        h1 { font-size: clamp(3rem, 10vw, 6rem); font-weight: 600; letter-spacing: -0.05em; line-height: 0.9; margin-bottom: 40px; }
+        .contact-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1px; background: var(--ac-gray-10); border: 1px solid var(--ac-gray-10); margin-top: 60px; }
+        .contact-item { background: var(--ac-black); padding: 40px; display: flex; flex-direction: column; gap: 20px; }
+        .contact-label { font-family: var(--font-mono); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--ac-gray-40); }
+        .contact-value { font-size: 1.5rem; text-decoration: none; color: var(--ac-white); transition: var(--transition); }
+        .contact-value:hover { opacity: 0.7; }
+        .contact-desc { font-size: 0.9rem; color: var(--ac-gray-40); max-width: 250px; }
+        footer { margin-top: 100px; padding: 48px 0; border-top: 1px solid var(--ac-gray-05); color: var(--ac-gray-40); font-size: 0.9rem; display: flex; justify-content: space-between; }
+    </style>
+</head>
+<body>
+
+<div class="stub-overlay" id="stub-page">
+    <div class="stub-content">
+        <h2 class="stub-title">Личный кабинет</h2>
+        <p class="stub-text">
+            Мы завершаем работу над единой системой авторизации.<br>
+            Пока что приглашаем вас в наш Git-сервис.
+        </p>
+        <a href="https://commit.arlist.tech" class="stub-link" target="_blank">Перейти в Commit</a>
+        <span class="stub-close" id="stub-close">Вернуться назад</span>
+    </div>
+</div>
+
+<nav class="navbar">
+    <a href="/" class="logo">
+        <img src="/icon.svg" alt="" class="logo-icon">
+        Арлист
+    </a>
+    <ul class="nav-links">
+        <li><a href="/forEdu" class="nav-link">Образование</a></li>
+        <li><a href="/contacts" class="nav-link">Контакты</a></li>
+        <li><button class="nav-link login-btn-trigger">Вход</button></li>
+    </ul>
+</nav>
+
+<main>
+    <div class="container">
+        <header class="hero">
+            <h1 style="font-size: clamp(3rem, 10vw, 6rem); font-weight: 600; letter-spacing: -0.05em; line-height: 0.9; margin-bottom: 40px;">На связи.</h1>
+        </header>
+
+        <section class="contact-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1px; background: var(--ac-gray-10); border: 1px solid var(--ac-gray-10); margin-top: 60px;">
+            <div class="contact-item" style="background: var(--ac-black); padding: 40px; display: flex; flex-direction: column; gap: 20px;">
+                <span class="contact-label" style="font-family: var(--font-mono); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--ac-gray-40);">Почта</span>
+                <a href="mailto:hello@arlist.tech" class="contact-value" style="font-size: 1.5rem; text-decoration: none; color: var(--ac-white); transition: var(--transition);">hello@arlist.tech</a>
+                <p class="contact-desc" style="font-size: 0.9rem; color: var(--ac-gray-40); max-width: 250px;">Общие вопросы, предложения о сотрудничестве и приветы.</p>
+            </div>
+            <div class="contact-item" style="background: var(--ac-black); padding: 40px; display: flex; flex-direction: column; gap: 20px;">
+                <span class="contact-label" style="font-family: var(--font-mono); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--ac-gray-40);">Техподдержка</span>
+                <a href="mailto:support@arlist.tech" class="contact-value" style="font-size: 1.5rem; text-decoration: none; color: var(--ac-white); transition: var(--transition);">support@arlist.tech</a>
+                <p class="contact-desc" style="font-size: 0.9rem; color: var(--ac-gray-40); max-width: 250px;">Если что-то сломалось или работает не так, как ожидалось.</p>
+            </div>
+            <div class="contact-item" style="background: var(--ac-black); padding: 40px; display: flex; flex-direction: column; gap: 20px;">
+                <span class="contact-label" style="font-family: var(--font-mono); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--ac-gray-40);">GitHub</span>
+                <a href="https://github.com/arlist-tech" class="contact-value" style="font-size: 1.5rem; text-decoration: none; color: var(--ac-white); transition: var(--transition);">arlist-tech</a>
+                <p class="contact-desc" style="font-size: 0.9rem; color: var(--ac-gray-40); max-width: 250px;">Наш код, открытые проекты и контрибьюторы.</p>
+            </div>
+        </section>
+    </div>
+</main>
+
+<footer class="footer">
+    <div class="container">
+        <div class="footer-content">
+            <div class="footer-brand">
+                <a href="/" class="logo">
+                    <img src="/icon.svg" alt="" class="logo-icon">
+                    АРЛИСТ ТЕХ
+                </a>
+            </div>
+            <div class="footer-links">
+                <div class="footer-col">
+                    <span class="footer-label">Сервисы</span>
+                    <a href="https://commit.arlist.tech">Commit</a>
+                    <a href="https://leetcot.ru">ЛитКот</a>
+                </div>
+                <div class="footer-col">
+                    <span class="footer-label">Компания</span>
+                    <a href="/roadmap">Роадмап</a>
+                    <a href="/gr">ГР</a>
+                    <a href="/forEdu">Образование</a>
+                    <a href="/contacts">Контакты</a>
+                </div>
+                <div class="footer-col">
+                    <span class="footer-label">Право</span>
+                    <a href="/legal">Документы</a>
+                    <a href="/legal/commit-privacy">Приватность</a>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p class="footer-copy">© 2026 АРЛИСТ ТЕХ. Все права защищены.</p>
+            <div class="footer-cat">
+  _._     _,-'""`-._
+ (,-.`._,'(       |\`-/|
+     `-.-' \ )-`( , o o)
+           `-    \`_`"'-
+            </div>
+        </div>
+    </div>
+</footer>
+
+<script src="/js/global.js"></script>
+
+</body>
+</html>
