@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>АРЛИСТ ТЕХ | Юридическая информация</title>
+    
+    <!-- Geist Font -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/geist@1.3.0/dist/fonts/geist-sans/style.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/geist@1.3.0/dist/fonts/geist-mono/style.css">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="/icon.svg">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+    <link rel="manifest" href="/site.webmanifest">
+    <meta name="theme-color" content="#000000">
+
+    <link rel="stylesheet" href="/css/global.css">
+    <style>
+        .content { padding: 80px 0 120px; max-width: 800px; }
+        .label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.1em; font-weight: 500; color: var(--ac-gray-30); margin-bottom: 24px; display: block; font-family: var(--font-mono); }
+        h1 { font-size: clamp(2rem, 6vw, 4rem); line-height: 1.1; letter-spacing: -0.06em; margin-bottom: 60px; font-weight: 400; }
+        .doc-list { list-style: none; margin-top: 40px; }
+        .doc-item { margin-bottom: 32px; padding: 40px; border: 1px solid rgba(255,255,255,0.05); transition: all var(--transition); display: block; text-decoration: none; color: inherit; background: #050505; }
+        .doc-item:hover { background: #080808; transform: translateY(-4px); border-color: rgba(255,255,255,0.1); z-index: 10; box-shadow: 0 20px 40px rgba(0,0,0,0.4); }
+        .doc-link { color: var(--ac-white); font-size: 1.5rem; font-weight: 500; display: block; margin-bottom: 12px; letter-spacing: -0.02em; }
+        .doc-meta { font-size: 12px; color: var(--ac-gray-40); }
+        @media (max-width: 900px) { .doc-item { padding: 32px 24px; } }
+    </style>
+</head>
+<body>
+
+<div class="stub-overlay" id="stub-page">
+    <div class="stub-content">
+        <h2 class="stub-title">Личный кабинет</h2>
+        <p class="stub-text">
+            Мы завершаем работу над единой системой авторизации.<br>
+            Пока что приглашаем вас в наш Git-сервис.
+        </p>
+        <a href="https://commit.arlist.tech" class="stub-link" target="_blank">Перейти в Commit</a>
+        <span class="stub-close" id="stub-close">Вернуться назад</span>
+    </div>
+</div>
+
+<nav class="navbar">
+    <a href="/" class="logo">
+        <img src="/icon.svg" alt="" class="logo-icon">
+        Арлист
+    </a>
+    <ul class="nav-links">
+        <li><a href="/roadmap" class="nav-link">Роадмап</a></li>
+        <li><a href="/gr" class="nav-link">ГР</a></li>
+        <li><a href="/forEdu" class="nav-link">Образование</a></li>
+        <li><a href="/contacts" class="nav-link">Контакты</a></li>
+        <li><button class="nav-link login-btn-trigger">Вход</button></li>
+    </ul>
+</nav>
+
+<div class="container">
+    <main class="content">
+        <span class="label reveal" style="font-size: 10px; text-transform: uppercase; letter-spacing: 0.1em; font-weight: 500; color: var(--ac-gray-30); margin-bottom: 24px; display: block; font-family: var(--font-mono);">Юридический отдел</span>
+        <h1 class="reveal" style="font-size: clamp(2rem, 6vw, 4rem); line-height: 1.1; letter-spacing: -0.06em; margin-bottom: 60px; font-weight: 400;">Документация и соглашения</h1>
+        <ul id="doc-list" class="doc-list" style="list-style: none; margin-top: 40px;">
+            <!-- Will be populated by JS -->
+        </ul>
+    </main>
+</div>
+
+<footer class="footer">
+    <div class="container">
+        <div class="footer-content">
+            <div class="footer-brand">
+                <a href="/" class="logo">
+                    <img src="/icon.svg" alt="" class="logo-icon">
+                    АРЛИСТ ТЕХ
+                </a>
+            </div>
+            <div class="footer-links">
+                <div class="footer-col">
+                    <span class="footer-label">Сервисы</span>
+                    <a href="https://commit.arlist.tech">Commit</a>
+                    <a href="https://leetcot.ru">ЛитКот</a>
+                </div>
+                <div class="footer-col">
+                    <span class="footer-label">Компания</span>
+                    <a href="/roadmap">Роадмап</a>
+                    <a href="/gr">ГР</a>
+                    <a href="/forEdu">Образование</a>
+                    <a href="/contacts">Контакты</a>
+                </div>
+                <div class="footer-col">
+                    <span class="footer-label">Право</span>
+                    <a href="/legal">Документы</a>
+                    <a href="/legal/commit-privacy">Приватность</a>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p class="footer-copy">© 2026 АРЛИСТ ТЕХ. Все права защищены.</p>
+            <div class="footer-cat">
+  _._     _,-'""`-._
+ (,-.`._,'(       |\`-/|
+     `-.-' \ )-`( , o o)
+           `-    \`_`"'-
+            </div>
+        </div>
+    </div>
+</footer>
+
+<script src="/js/global.js"></script>
+<script>
+    fetch('./config.json')
+        .then(r => r.json())
+        .then(data => {
+            const list = document.getElementById('doc-list');
+            data.forEach(doc => {
+                const li = document.createElement('a');
+                li.href = `/legal/${doc.slug}`;
+                li.className = 'doc-item reveal';
+                li.style.cssText = 'margin-bottom: 32px; padding: 40px; border: 1px solid rgba(255, 255, 255, 0.05); transition: all var(--transition); position: relative; overflow: hidden; display: block; text-decoration: none; color: inherit; background: #050505;';
+                li.innerHTML = `
+                    <span class="doc-link" style="text-decoration: none; color: var(--ac-white); font-size: 1.5rem; font-weight: 500; display: block; margin-bottom: 12px; letter-spacing: -0.02em;">${doc.title}</span>
+                    <div class="doc-meta" style="font-size: 12px; color: var(--ac-gray-40); letter-spacing: 0.02em;">${doc.date} • ${doc.description}</div>
+                `;
+                list.appendChild(li);
+                
+                // Use a temporary observer to handle dynamic reveals if global one is not exported
+                const tempObserver = new IntersectionObserver((entries) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) {
+                            entry.target.classList.add('visible');
+                            tempObserver.unobserve(entry.target);
+                        }
+                    });
+                });
+                tempObserver.observe(li);
+            });
+        });
+</script>
+
+</body>
+</html>
