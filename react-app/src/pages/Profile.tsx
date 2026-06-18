@@ -249,41 +249,6 @@ const Profile = () => {
               </div>
             </div>
 
-            {/* Promo strip */}
-            <div className="px-10 pb-10">
-              <p className="text-xs uppercase tracking-widest text-muted-foreground mb-4">Скоро от Arlist Tech</p>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                {/* Искра */}
-                <div className="relative overflow-hidden rounded-xl border border-border/50 bg-card/40 px-5 py-5 flex items-start gap-4">
-                  <div className="absolute inset-0 bg-gradient-to-br from-amber-500/5 to-orange-500/5 pointer-events-none" />
-                  <div className="shrink-0 w-10 h-10 rounded-lg bg-amber-500/10 border border-amber-500/20 flex items-center justify-center">
-                    <span className="text-lg">⚡</span>
-                  </div>
-                  <div className="min-w-0">
-                    <div className="flex items-center gap-2 mb-1">
-                      <p className="text-sm font-semibold">Искра</p>
-                      <span className="text-[10px] px-1.5 py-0.5 rounded-full border border-amber-500/30 text-amber-400/80 bg-amber-500/10">Скоро</span>
-                    </div>
-                    <p className="text-xs text-muted-foreground leading-relaxed">CLI-агент от Arlist Tech. Автоматизирует рутину прямо из терминала.</p>
-                  </div>
-                </div>
-
-                {/* КИТ */}
-                <div className="relative overflow-hidden rounded-xl border border-border/50 bg-card/40 px-5 py-5 flex items-start gap-4">
-                  <div className="absolute inset-0 bg-gradient-to-br from-sky-500/5 to-blue-500/5 pointer-events-none" />
-                  <div className="shrink-0 w-10 h-10 rounded-lg bg-sky-500/10 border border-sky-500/20 flex items-center justify-center">
-                    <span className="font-display text-sm text-sky-300 leading-none">КИТ</span>
-                  </div>
-                  <div className="min-w-0">
-                    <div className="flex items-center gap-2 mb-1">
-                      <p className="text-sm font-semibold">АналитиКит</p>
-                      <span className="text-[10px] px-1.5 py-0.5 rounded-full border border-sky-500/30 text-sky-400/80 bg-sky-500/10">Скоро</span>
-                    </div>
-                    <p className="text-xs text-muted-foreground leading-relaxed">Сервис глубокой аналитики данных. Видит паттерны там, где другие видят шум.</p>
-                  </div>
-                </div>
-              </div>
-            </div>
           </div>
         )}
 
