@@ -1,5 +1,5 @@
 # Build React
-FROM node:20-alpine AS build-client
+FROM node:20-bookworm-slim AS build-client
 WORKDIR /app/react-app
 COPY react-app/package*.json ./
 RUN npm install
@@ -7,7 +7,7 @@ COPY react-app/ ./
 RUN npm run build
 
 # Build Backend
-FROM node:20-alpine AS build-server
+FROM node:20-bookworm-slim AS build-server
 WORKDIR /app
 COPY package*.json ./
 RUN npm install
@@ -17,7 +17,7 @@ COPY . .
 RUN npm run build
 
 # Final Stage
-FROM node:20-alpine
+FROM node:20-bookworm-slim
 WORKDIR /app
 COPY --from=build-server /app/dist ./dist
 COPY --from=build-server /app/node_modules ./node_modules
