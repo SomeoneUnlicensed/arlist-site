@@ -2,16 +2,28 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 
+const CopyButton = ({ text }: { text: string }) => {
+  const [copied, setCopied] = useState(false);
+  const handle = () => {
+    navigator.clipboard.writeText(text);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+  return (
+    <button type="button" className={`copy-btn${copied ? ' copied' : ''}`} onClick={handle}>
+      {copied ? 'скопировано' : 'копировать'}
+    </button>
+  );
+};
+
 const Admin = () => {
   const [clients, setClients] = useState<any[]>([]);
   const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
-  
-  // Form state
+  const [newSecret, setNewSecret] = useState('');
   const [name, setName] = useState('');
   const [redirectUris, setRedirectUris] = useState('');
   const [isTrusted, setIsTrusted] = useState(false);
-
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   const fetchClients = async () => {
@@ -27,73 +39,89 @@ const Admin = () => {
     }
   };
 
-  useEffect(() => {
-    fetchClients();
-  }, [navigate]);
+  useEffect(() => { fetchClients(); }, [navigate]);
 
   const handleCreateClient = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
-    setSuccess('');
+    setNewSecret('');
+    setLoading(true);
     try {
       const uris = redirectUris.split(',').map(u => u.trim()).filter(u => u);
-      const res = await axios.post('/api/admin/clients', {
-        name,
-        redirectUris: uris,
-        isTrusted
-      });
-      
-      const newClient = res.data;
-      setSuccess(`Приложение успешно создано! Сохраните Client Secret, он показывается только один раз: ${newClient.clientSecret}`);
+      const res = await axios.post('/api/admin/clients', { name, redirectUris: uris, isTrusted });
+      setNewSecret(res.data.clientSecret);
       setName('');
       setRedirectUris('');
       setIsTrusted(false);
       fetchClients();
     } catch (err: any) {
       setError(err.response?.data?.error || 'Ошибка при создании приложения');
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <div className="auth-container" style={{ maxWidth: '1000px', margin: '0 auto', display: 'block', padding: '40px 24px' }}>
-      <div className="mb-8">
-        <h1 className="auth-title">Админ-панель</h1>
-        <p className="auth-subtitle">Управление OIDC-приложениями (Arlist ID)</p>
-        <button onClick={() => navigate('/profile')} className="btn-auth" style={{ width: 'auto', background: 'transparent', color: 'var(--ac-white)', border: '1px solid var(--ac-gray-20)', padding: '8px 16px' }}>
-          ← Назад в профиль
+    <div className="admin-container">
+      {/* Header */}
+      <div style={{ marginBottom: '28px', display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px' }}>
+        <div>
+          <h1 style={{ fontSize: '1.2rem', fontWeight: 500, letterSpacing: '-0.04em', margin: '0 0 4px' }}>
+            Панель управления
+          </h1>
+          <p style={{ color: 'var(--ac-gray-40)', fontSize: '0.85rem', margin: 0 }}>
+            OIDC-приложения · Arlist ID
+          </p>
+        </div>
+        <button onClick={() => navigate('/profile')} className="btn-ghost" style={{ width: 'auto', padding: '8px 16px', fontSize: '0.8rem' }}>
+          ← Профиль
         </button>
       </div>
 
-      <div className="auth-card" style={{ maxWidth: 'none', marginBottom: '40px' }}>
-        <h2 className="text-xl font-semibold mb-4 border-b border-[var(--ac-gray-10)] pb-4">Зарегистрированные приложения</h2>
-        
+      {/* Clients table */}
+      <div className="admin-card">
+        <div className="admin-card-header">
+          Зарегистрированные приложения
+          <span style={{ marginLeft: '8px', color: 'var(--ac-gray-30)', fontSize: '0.8rem', fontWeight: 400 }}>
+            ({clients.length})
+          </span>
+        </div>
         {clients.length === 0 ? (
-          <p className="text-gray-400 my-4">Нет зарегистрированных приложений.</p>
+          <div style={{ padding: '40px 24px', textAlign: 'center', color: 'var(--ac-gray-30)', fontSize: '0.875rem' }}>
+            Нет зарегистрированных приложений
+          </div>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-left" style={{ borderCollapse: 'collapse' }}>
+          <div style={{ overflowX: 'auto' }}>
+            <table className="admin-table">
               <thead>
-                <tr style={{ borderBottom: '1px solid var(--ac-gray-10)', color: 'var(--ac-gray-40)', fontSize: '0.85rem' }}>
-                  <th className="py-3 px-4 font-mono font-normal">Название</th>
-                  <th className="py-3 px-4 font-mono font-normal">Client ID</th>
-                  <th className="py-3 px-4 font-mono font-normal">Redirect URIs</th>
-                  <th className="py-3 px-4 font-mono font-normal">Доверенное (isTrusted)</th>
+                <tr>
+                  <th>Название</th>
+                  <th>Client ID</th>
+                  <th>Redirect URIs</th>
+                  <th>Тип</th>
                 </tr>
               </thead>
               <tbody>
                 {clients.map(client => (
-                  <tr key={client.id} style={{ borderBottom: '1px solid var(--ac-gray-05)' }}>
-                    <td className="py-4 px-4 font-medium">{client.name}</td>
-                    <td className="py-4 px-4 font-mono text-sm text-[var(--ac-gray-50)]">{client.clientId}</td>
-                    <td className="py-4 px-4 text-sm text-[var(--ac-gray-40)]">
-                      {client.redirectUris.map((u: string) => <div key={u}>{u}</div>)}
+                  <tr key={client.id}>
+                    <td style={{ fontWeight: 500 }}>{client.name}</td>
+                    <td>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.78rem', color: 'var(--ac-gray-50)' }}>
+                          {client.clientId}
+                        </span>
+                        <CopyButton text={client.clientId} />
+                      </div>
                     </td>
-                    <td className="py-4 px-4">
-                      {client.isTrusted ? (
-                        <span style={{ color: '#88ffcc', background: 'rgba(136, 255, 204, 0.1)', padding: '4px 8px', borderRadius: '4px', fontSize: '0.8rem' }}>Да (расш. права)</span>
-                      ) : (
-                        <span style={{ color: 'var(--ac-gray-40)' }}>Нет</span>
-                      )}
+                    <td>
+                      {client.redirectUris.map((u: string) => (
+                        <div key={u} style={{ fontFamily: 'var(--font-mono)', fontSize: '0.78rem', color: 'var(--ac-gray-40)' }}>{u}</div>
+                      ))}
+                    </td>
+                    <td>
+                      {client.isTrusted
+                        ? <span className="badge badge-verified">Доверенное</span>
+                        : <span className="badge badge-user">Обычное</span>}
                     </td>
                   </tr>
                 ))}
@@ -103,53 +131,69 @@ const Admin = () => {
         )}
       </div>
 
-      <div className="auth-card" style={{ maxWidth: '600px' }}>
-        <h2 className="text-xl font-semibold mb-4">Добавить новое приложение</h2>
-        
-        {error && <div className="text-red-500 text-sm mb-4" style={{ color: '#ff8888', background: 'rgba(255, 136, 136, 0.1)', padding: '12px', borderRadius: '4px' }}>{error}</div>}
-        {success && <div className="text-green-500 text-sm mb-4" style={{ color: '#88ffcc', background: 'rgba(136, 255, 204, 0.1)', padding: '12px', borderRadius: '4px', wordBreak: 'break-all' }}>{success}</div>}
+      {/* Create form */}
+      <div className="admin-card" style={{ maxWidth: 560 }}>
+        <div className="admin-card-header">Добавить приложение</div>
+        <div className="admin-card-body">
+          {error && <div className="alert alert-error">{error}</div>}
+          {newSecret && (
+            <div className="alert alert-success">
+              <div style={{ marginBottom: '10px', fontWeight: 500 }}>
+                Приложение создано. Сохраните Client Secret — он больше не будет показан.
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', background: 'rgba(127,255,212,0.05)', padding: '10px 12px', borderRadius: '5px' }}>
+                <span style={{ flex: 1, fontFamily: 'var(--font-mono)', fontSize: '0.8rem', wordBreak: 'break-all' }}>
+                  {newSecret}
+                </span>
+                <CopyButton text={newSecret} />
+              </div>
+            </div>
+          )}
 
-        <form onSubmit={handleCreateClient}>
-          <div className="form-group">
-            <label className="form-label">Название приложения</label>
-            <input 
-              type="text" 
-              className="form-input" 
-              value={name} 
-              onChange={(e) => setName(e.target.value)}
-              placeholder="Например: Arlist Analytics"
-              required 
-            />
-          </div>
-          <div className="form-group">
-            <label className="form-label">Redirect URIs (через запятую)</label>
-            <input 
-              type="text" 
-              className="form-input" 
-              value={redirectUris} 
-              onChange={(e) => setRedirectUris(e.target.value)}
-              placeholder="https://example.com/callback, http://localhost:3000/callback"
-              required 
-            />
-          </div>
-          <div className="form-group" style={{ display: 'flex', alignItems: 'center', gap: '12px', cursor: 'pointer' }}>
-            <input 
-              type="checkbox" 
-              id="isTrusted"
-              checked={isTrusted} 
-              onChange={(e) => setIsTrusted(e.target.checked)}
-              style={{ width: '18px', height: '18px', accentColor: 'var(--ac-white)' }}
-            />
-            <label htmlFor="isTrusted" style={{ cursor: 'pointer', fontSize: '0.95rem' }}>
-              Доверенное внутреннее приложение
-            </label>
-          </div>
-          <p style={{ fontSize: '0.8rem', color: 'var(--ac-gray-40)', margin: '-16px 0 24px 30px' }}>
-            Включите эту опцию только для собственных проектов Arlist. Доверенные приложения получают расширенный доступ к данным пользователя (включая роль).
-          </p>
-
-          <button type="submit" className="btn-auth">Создать OIDC-клиента</button>
-        </form>
+          <form onSubmit={handleCreateClient}>
+            <div className="form-group">
+              <label className="form-label">Название</label>
+              <input
+                type="text"
+                className="form-input"
+                value={name}
+                onChange={e => setName(e.target.value)}
+                placeholder="Например: Arlist Analytics"
+                required
+              />
+            </div>
+            <div className="form-group">
+              <label className="form-label">Redirect URIs (через запятую)</label>
+              <input
+                type="text"
+                className="form-input"
+                value={redirectUris}
+                onChange={e => setRedirectUris(e.target.value)}
+                placeholder="https://app.example.com/callback"
+                required
+              />
+            </div>
+            <div className="form-group" style={{ display: 'flex', alignItems: 'flex-start', gap: '10px' }}>
+              <input
+                type="checkbox"
+                id="isTrusted"
+                checked={isTrusted}
+                onChange={e => setIsTrusted(e.target.checked)}
+                style={{ width: '15px', height: '15px', marginTop: '3px', accentColor: 'var(--ac-white)', flexShrink: 0, cursor: 'pointer' }}
+              />
+              <label htmlFor="isTrusted" style={{ cursor: 'pointer', fontSize: '0.875rem', lineHeight: 1.5 }}>
+                Доверенное внутреннее приложение
+                <span style={{ display: 'block', fontSize: '0.8rem', color: 'var(--ac-gray-30)', marginTop: '2px' }}>
+                  Получает расширенные данные пользователя: роль, статус подтверждения
+                </span>
+              </label>
+            </div>
+            <button type="submit" className="btn-auth" disabled={loading} style={{ marginTop: '8px' }}>
+              {loading && <span className="spinner" />}
+              {loading ? 'Создаём...' : 'Создать OIDC-клиента'}
+            </button>
+          </form>
+        </div>
       </div>
     </div>
   );

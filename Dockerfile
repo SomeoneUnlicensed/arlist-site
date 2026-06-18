@@ -25,7 +25,6 @@ COPY --from=build-server /app/package*.json ./
 COPY --from=build-server /app/prisma ./prisma
 COPY --from=build-server /app/html ./html
 COPY --from=build-client /app/dist-client ./dist-client
-COPY .env.example .env
 
 EXPOSE 8086
 CMD ["npm", "start"]

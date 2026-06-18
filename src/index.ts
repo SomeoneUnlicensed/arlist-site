@@ -35,21 +35,20 @@ app.get('/api/health', (req, res) => {
 // OIDC Provider
 app.use(oidcProvider.callback());
 
-// Serve React App for /auth, /profile, /admin
-// React build is in ../dist-client
-app.use(express.static(path.join(__dirname, '../dist-client')));
-
-// Serve static files from the 'html' directory for everything else
-app.use(express.static(path.join(__dirname, '../html')));
-
-// Fallback for SPA (React routes)
-app.get([/^\/auth\/.*/, '/profile', '/admin'], (req, res) => {
+// SPA fallback BEFORE OIDC-conflicting static routes
+// /login, /register, /verify are React routes — must not be intercepted by oidc-provider's /auth endpoint
+app.get(['/login', '/register', '/verify', '/profile', '/admin'], (req, res) => {
   res.sendFile(path.join(__dirname, '../dist-client/index.html'));
 });
 
-// General fallback
+// Serve React SPA static assets (JS/CSS chunks)
+app.use(express.static(path.join(__dirname, '../dist-client')));
+
+// Serve static HTML landing pages
+app.use(express.static(path.join(__dirname, '../html')));
+
+// General fallback for landing pages
 app.get(/^(?!\/api|\/interaction|\/oidc).*/, (req, res) => {
-  // Check if it's a known static route, otherwise serve main index.html
   res.sendFile(path.join(__dirname, '../html/index.html'));
 });
 

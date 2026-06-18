@@ -28,7 +28,7 @@ router.get('/:uid', async (req: Request, res: Response) => {
       if (!userId) {
         // User not logged in, redirect to login page
         // We need to tell the login page where to return after successful login
-        return res.redirect(`/auth/login?return_to=${encodeURIComponent(`/interaction/${uid}`)}`);
+        return res.redirect(`/login?return_to=${encodeURIComponent(`/interaction/${uid}`)}`);
       }
 
       // User IS logged in, tell OIDC provider about the session
