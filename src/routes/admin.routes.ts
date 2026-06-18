@@ -1,14 +1,17 @@
 import { Router } from 'express';
-import { getClients, createClient } from '../controllers/admin.controller.js';
+import { getClients, createClient, getUsers, deleteUser, updateUser } from '../controllers/admin.controller.js';
 import { authenticate, authorize } from '../middleware/auth.middleware.js';
 
 const router = Router();
 
-// Only ADMIN role can access these routes
 router.use(authenticate);
 router.use(authorize(['ADMIN']));
 
 router.get('/clients', getClients);
 router.post('/clients', createClient);
+
+router.get('/users', getUsers);
+router.delete('/users/:id', deleteUser);
+router.patch('/users/:id', updateUser);
 
 export default router;

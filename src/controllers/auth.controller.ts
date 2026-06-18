@@ -91,6 +91,10 @@ export const login = async (req: Request, res: Response) => {
     const user = await prisma.user.findUnique({ where: { email } });
     if (!user) return res.status(400).json({ error: 'Invalid credentials' });
 
+    if (user.isBanned) {
+      return res.status(403).json({ error: 'Аккаунт заблокирован' });
+    }
+
     if (!user.isVerified) {
       return res.status(403).json({ error: 'Please verify your email first' });
     }
