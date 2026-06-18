@@ -225,13 +225,20 @@ const Admin = () => {
   const navigate = useNavigate();
 
   return (
-    <div className="admin-container">
-      <div style={{ marginBottom: 28, display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12 }}>
-        <div>
-          <h1 style={{ fontSize: '1.2rem', fontWeight: 500, letterSpacing: '-0.04em', margin: '0 0 4px' }}>Панель управления</h1>
-          <p style={{ color: 'var(--ac-gray-40)', fontSize: '0.85rem', margin: 0 }}>Arlist ID</p>
+    <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
+      <nav className="profile-nav">
+        <a href="/" className="profile-nav-brand">
+          <div className="auth-logo-mark">A</div>
+          Arlist ID
+        </a>
+        <div className="profile-nav-actions">
+          <button className="btn-sm" onClick={() => navigate('/profile')}>← Профиль</button>
         </div>
-        <button onClick={() => navigate('/profile')} className="btn-ghost" style={{ width: 'auto', padding: '8px 16px', fontSize: '0.8rem' }}>← Профиль</button>
+      </nav>
+    <div className="admin-container">
+      <div style={{ marginBottom: 28 }}>
+        <h1 style={{ fontSize: '1.2rem', fontWeight: 500, letterSpacing: '-0.04em', margin: '0 0 4px' }}>Панель управления</h1>
+        <p style={{ color: 'var(--ac-gray-40)', fontSize: '0.85rem', margin: 0 }}>Arlist ID</p>
       </div>
 
       <div className="admin-card">
@@ -252,6 +259,7 @@ const Admin = () => {
 
         {tab === 'Пользователи' ? <UsersTab /> : <ClientsTab />}
       </div>
+    </div>
     </div>
   );
 };
