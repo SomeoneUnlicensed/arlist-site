@@ -52,7 +52,7 @@ export const getUsers = async (req: Request, res: Response) => {
 
 export const deleteUser = async (req: Request, res: Response) => {
   try {
-    const { id } = req.params;
+    const { id } = req.params as { id: string };
     const self = (req as any).user?.userId;
     if (id === self) return res.status(400).json({ error: 'Нельзя удалить себя' });
     await prisma.user.delete({ where: { id } });
@@ -64,7 +64,7 @@ export const deleteUser = async (req: Request, res: Response) => {
 
 export const updateUser = async (req: Request, res: Response) => {
   try {
-    const { id } = req.params;
+    const { id } = req.params as { id: string };
     const self = (req as any).user?.userId;
     const { isBanned, role } = req.body;
     if (id === self && isBanned === true) return res.status(400).json({ error: 'Нельзя забанить себя' });
