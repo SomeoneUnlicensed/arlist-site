@@ -128,6 +128,7 @@ export const getProfile = async (req: any, res: Response) => {
       name: user.name,
       avatarUrl: user.avatarUrl,
       role: user.role,
+      isVerified: user.isVerified,
     });
   } catch (error) {
     res.status(500).json({ error: 'Internal server error' });

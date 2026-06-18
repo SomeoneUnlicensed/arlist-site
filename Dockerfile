@@ -28,4 +28,4 @@ COPY --from=build-server /app/html ./html
 COPY --from=build-client /app/dist-client ./dist-client
 
 EXPOSE 8086
-CMD ["npm", "start"]
+CMD ["sh", "-c", "npx prisma db push --schema=/app/prisma/schema.prisma && npm start"]
