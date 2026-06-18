@@ -11,7 +11,7 @@ services:
       - arlist-network
 
   db:
-    image: postgres:alpine
+    image: postgres:16-alpine
     container_name: arlist-db
     restart: always
     environment:
