@@ -65,12 +65,11 @@ const Verify = () => {
 
   return (
     <div className="auth-container">
+      <div className="auth-brand">
+        <h1 className="auth-brand-title">Arlist ID</h1>
+        <p className="auth-brand-subtitle">Arlist ID — единый ключ к вашим сервисам.</p>
+      </div>
       <div className="auth-card">
-        <div className="auth-logo">
-          <div className="auth-logo-mark">A</div>
-          <span className="auth-logo-text">Arlist ID</span>
-        </div>
-
         <h1 className="auth-title">Подтверждение</h1>
         <p className="auth-subtitle">
           {email
