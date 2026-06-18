@@ -59,6 +59,8 @@ const configuration: Configuration = {
   features: {
     devInteractions: { enabled: false },
   },
+  // Trust X-Forwarded-Proto from nginx so all discovery URLs use https://
+  proxy: true,
 };
 
 const oidcProvider = new Provider(process.env.ISSUER_URL || 'http://localhost:8086', configuration);
