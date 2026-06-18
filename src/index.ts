@@ -16,38 +16,34 @@ const __dirname = path.dirname(__filename);
 const app = express();
 const PORT = process.env.PORT || 8086;
 
-// Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
-// Interaction Routes
+// API and OIDC interaction routes
 app.use('/interaction', interactionRoutes);
-
-// API Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/admin', adminRoutes);
-
 app.get('/api/health', (req, res) => {
   res.json({ status: 'ok' });
 });
 
-// OIDC Provider
-app.use(oidcProvider.callback());
-
-// SPA fallback BEFORE OIDC-conflicting static routes
-// /login, /register, /verify are React routes — must not be intercepted by oidc-provider's /auth endpoint
+// React SPA routes must come BEFORE oidcProvider.callback() because
+// oidc-provider is a Koa app that returns 404 for unknown paths without calling next()
 app.get(['/login', '/register', '/verify', '/profile', '/admin'], (req, res) => {
   res.sendFile(path.join(__dirname, '../dist-client/index.html'));
 });
 
-// Serve React SPA static assets (JS/CSS chunks)
+// SPA static assets (JS/CSS chunks)
 app.use(express.static(path.join(__dirname, '../dist-client')));
 
-// Serve static HTML landing pages
+// OIDC Provider handles /auth, /token, /userinfo, /.well-known, etc.
+app.use(oidcProvider.callback());
+
+// Static HTML landing pages
 app.use(express.static(path.join(__dirname, '../html')));
 
-// General fallback for landing pages
+// Fallback for landing pages
 app.get(/^(?!\/api|\/interaction|\/oidc).*/, (req, res) => {
   res.sendFile(path.join(__dirname, '../html/index.html'));
 });
