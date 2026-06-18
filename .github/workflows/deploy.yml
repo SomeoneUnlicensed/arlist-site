@@ -29,4 +29,4 @@ jobs:
           script: |
             cd /var/www/arlist.ru/
             [ -f .env ] || cp .env.example .env
-            docker compose up -d
+            docker compose up -d --build
