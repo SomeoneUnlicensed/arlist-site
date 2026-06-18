@@ -46,10 +46,12 @@ const Login = () => {
         )}
         {error && <div className="alert alert-error">{error}</div>}
 
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit} autoComplete="on">
           <div className="form-group">
-            <label className="form-label">Email</label>
+            <label className="form-label" htmlFor="email">Email</label>
             <input
+              id="email"
+              name="email"
               type="email"
               className="form-input"
               value={email}
@@ -60,8 +62,10 @@ const Login = () => {
             />
           </div>
           <div className="form-group">
-            <label className="form-label">Пароль</label>
+            <label className="form-label" htmlFor="password">Пароль</label>
             <input
+              id="password"
+              name="password"
               type="password"
               className="form-input"
               value={password}
