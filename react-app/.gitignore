@@ -5,3 +5,9 @@ src/**/*.js.map
 src/**/*.d.ts
 src/**/*.d.ts.map
 !src/vite-env.d.ts
+
+# Root-level compiled config files
+*.js
+*.js.map
+*.d.ts
+*.d.ts.map
