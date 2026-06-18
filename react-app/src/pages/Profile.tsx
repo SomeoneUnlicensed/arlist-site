@@ -1,27 +1,34 @@
 import React, { useEffect, useState } from 'react'
 import axios from 'axios'
 import { useNavigate } from 'react-router-dom'
-import { LogOut, ShieldCheck, Check, Pencil, X, KeyRound } from 'lucide-react'
+import { LogOut, ShieldCheck, Check, Pencil, X, KeyRound, User, Home, Lock } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Badge } from '@/components/ui/badge'
 import { Alert, AlertDescription } from '@/components/ui/alert'
-import { Separator } from '@/components/ui/separator'
 import { cn } from '@/lib/utils'
 
-const PALETTES = [
-  'from-indigo-950 to-indigo-700',
-  'from-emerald-950 to-emerald-700',
-  'from-rose-950 to-rose-700',
-  'from-sky-950 to-sky-700',
-  'from-violet-950 to-violet-700',
+const GRADIENTS = [
+  'from-violet-600 via-purple-500 to-pink-500',
+  'from-blue-600 via-cyan-500 to-teal-400',
+  'from-emerald-500 via-green-400 to-lime-400',
+  'from-orange-500 via-rose-500 to-pink-600',
+  'from-sky-500 via-blue-500 to-indigo-600',
 ]
 function avatarGradient(seed: string) {
-  return PALETTES[(seed.charCodeAt(0) || 0) % PALETTES.length]
+  return GRADIENTS[(seed.charCodeAt(0) || 0) % GRADIENTS.length]
 }
 
-// ── Edit name inline ──────────────────────────────────────
+function greeting() {
+  const h = new Date().getHours()
+  if (h >= 5 && h < 12) return 'Доброе утро'
+  if (h >= 12 && h < 17) return 'Добрый день'
+  if (h >= 17 && h < 22) return 'Добрый вечер'
+  return 'Доброй ночи'
+}
+
+// ── Edit name ─────────────────────────────────────────────
 
 const EditName = ({ initial, onSaved }: { initial: string; onSaved: (n: string) => void }) => {
   const [editing, setEditing] = useState(false)
@@ -54,7 +61,8 @@ const EditName = ({ initial, onSaved }: { initial: string; onSaved: (n: string) 
     <div className="flex flex-col gap-1.5 w-full max-w-xs">
       {err && <p className="text-xs text-red-400">{err}</p>}
       <div className="flex gap-2">
-        <Input value={value} onChange={e => setValue(e.target.value)} className="h-8 text-sm" autoFocus onKeyDown={e => { if (e.key === 'Enter') save(); if (e.key === 'Escape') cancel() }} />
+        <Input value={value} onChange={e => setValue(e.target.value)} className="h-8 text-sm" autoFocus
+          onKeyDown={e => { if (e.key === 'Enter') save(); if (e.key === 'Escape') cancel() }} />
         <Button size="sm" onClick={save} disabled={loading} className="h-8 px-2"><Check size={14} /></Button>
         <Button size="sm" variant="ghost" onClick={cancel} className="h-8 px-2"><X size={14} /></Button>
       </div>
@@ -62,7 +70,7 @@ const EditName = ({ initial, onSaved }: { initial: string; onSaved: (n: string) 
   )
 }
 
-// ── Change password form ──────────────────────────────────
+// ── Change password ───────────────────────────────────────
 
 const ChangePassword = () => {
   const [open, setOpen] = useState(false)
@@ -77,25 +85,21 @@ const ChangePassword = () => {
       await axios.post('/api/auth/change-password', { currentPassword: current, newPassword: next })
       setMsg({ type: 'ok', text: 'Пароль изменён' })
       setCurrent(''); setNext('')
-      setTimeout(() => setOpen(false), 1500)
+      setTimeout(() => { setOpen(false); setMsg(null) }, 1500)
     } catch (e: any) { setMsg({ type: 'err', text: e.response?.data?.error || 'Ошибка' }) }
     finally { setLoading(false) }
   }
 
   if (!open) return (
-    <button onClick={() => setOpen(true)} className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors">
-      <KeyRound size={14} />
-      Сменить пароль
+    <button onClick={() => setOpen(true)}
+      className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors">
+      <KeyRound size={14} /> Сменить пароль
     </button>
   )
 
   return (
-    <form onSubmit={submit} className="space-y-3 py-1">
-      {msg && (
-        <Alert variant={msg.type === 'ok' ? 'success' : 'destructive'}>
-          <AlertDescription>{msg.text}</AlertDescription>
-        </Alert>
-      )}
+    <form onSubmit={submit} className="space-y-3">
+      {msg && <Alert variant={msg.type === 'ok' ? 'success' : 'destructive'}><AlertDescription>{msg.text}</AlertDescription></Alert>}
       <div className="grid grid-cols-2 gap-3">
         <div className="space-y-1.5">
           <Label htmlFor="cur-pw">Текущий пароль</Label>
@@ -114,10 +118,86 @@ const ChangePassword = () => {
   )
 }
 
+// ── Sidebar ───────────────────────────────────────────────
+
+type Section = 'profile' | 'security'
+
+const Sidebar = ({ user, active, setActive, onLogout, onAdmin }:
+  { user: any; active: Section; setActive: (s: Section) => void; onLogout: () => void; onAdmin: () => void }) => {
+  const initials = (user.name || user.email || '?').slice(0, 1).toUpperCase()
+  const grad = avatarGradient(initials)
+
+  const nav = [
+    { id: 'profile' as Section, icon: User, label: 'Профиль' },
+    { id: 'security' as Section, icon: Lock, label: 'Безопасность' },
+  ]
+
+  return (
+    <aside className="w-60 shrink-0 border-r border-border/60 flex flex-col bg-card/40">
+      {/* Logo */}
+      <div className="h-14 flex items-center px-5 border-b border-border/60">
+        <a href="/" className="font-display text-base tracking-tight hover:opacity-75 transition-opacity">Arlist ID</a>
+      </div>
+
+      {/* Avatar */}
+      <div className="px-5 py-6 border-b border-border/40">
+        <div className={cn('w-12 h-12 rounded-full bg-gradient-to-br flex items-center justify-center text-lg font-semibold text-white select-none mb-3', grad)}>
+          {initials}
+        </div>
+        <p className="text-sm font-medium truncate">{user.name || 'Без имени'}</p>
+        <p className="text-xs text-muted-foreground truncate mt-0.5">{user.email}</p>
+        <div className="flex gap-1.5 mt-2 flex-wrap">
+          <Badge variant={user.role === 'ADMIN' ? 'purple' : 'muted'} className="text-[10px] px-1.5 py-0">
+            {user.role === 'ADMIN' ? 'Админ' : 'Юзер'}
+          </Badge>
+          <Badge variant={user.isVerified ? 'success' : 'muted'} className="text-[10px] px-1.5 py-0">
+            {user.isVerified ? '✓ Верифицирован' : 'Не верифицирован'}
+          </Badge>
+        </div>
+      </div>
+
+      {/* Nav */}
+      <nav className="flex-1 px-3 py-4 space-y-0.5">
+        {nav.map(({ id, icon: Icon, label }) => (
+          <button key={id} onClick={() => setActive(id)}
+            className={cn(
+              'w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-colors',
+              active === id
+                ? 'bg-accent text-foreground font-medium'
+                : 'text-muted-foreground hover:text-foreground hover:bg-accent/50'
+            )}>
+            <Icon size={16} />
+            {label}
+          </button>
+        ))}
+      </nav>
+
+      {/* Bottom actions */}
+      <div className="px-3 py-4 border-t border-border/40 space-y-0.5">
+        {user.role === 'ADMIN' && (
+          <button onClick={onAdmin}
+            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-muted-foreground hover:text-violet-400 hover:bg-violet-500/10 transition-colors">
+            <ShieldCheck size={16} /> Управление
+          </button>
+        )}
+        <a href="/"
+          className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-muted-foreground hover:text-foreground hover:bg-accent/50 transition-colors">
+          <Home size={16} /> На главную
+        </a>
+        <button onClick={onLogout}
+          className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-muted-foreground hover:text-red-400 hover:bg-red-500/10 transition-colors">
+          <LogOut size={16} /> Выйти
+        </button>
+      </div>
+    </aside>
+  )
+}
+
 // ── Main ──────────────────────────────────────────────────
 
 const Profile = () => {
   const [user, setUser] = useState<any>(null)
+  const [active, setActive] = useState<Section>('profile')
   const navigate = useNavigate()
 
   useEffect(() => {
@@ -133,79 +213,88 @@ const Profile = () => {
   )
 
   const initials = (user.name || user.email || '?').slice(0, 1).toUpperCase()
+  const grad = avatarGradient(initials)
 
   return (
-    <div className="min-h-screen flex flex-col">
-      {/* Nav */}
-      <header className="h-14 sticky top-0 z-50 border-b border-border/60 bg-background/80 backdrop-blur-xl flex items-center justify-between px-6">
-        <a href="/" className="font-display text-base tracking-tight hover:opacity-75 transition-opacity">Arlist ID</a>
-        <div className="flex items-center gap-2">
-          {user.role === 'ADMIN' && (
-            <Button variant="secondary" size="sm" onClick={() => navigate('/admin')}>
-              <ShieldCheck size={14} />Управление
-            </Button>
-          )}
-          <Button variant="outline" size="sm" onClick={logout}>
-            <LogOut size={14} />Выйти
-          </Button>
-        </div>
-      </header>
+    <div className="h-screen flex overflow-hidden bg-background">
+      <Sidebar user={user} active={active} setActive={setActive} onLogout={logout} onAdmin={() => navigate('/admin')} />
 
-      <main className="flex-1 max-w-xl w-full mx-auto px-4 py-10 space-y-4 animate-fade-up">
+      {/* Content */}
+      <main className="flex-1 overflow-y-auto">
+        {active === 'profile' && (
+          <div className="min-h-full flex flex-col">
+            {/* Hero banner */}
+            <div className="relative overflow-hidden px-10 pt-14 pb-16">
+              {/* Background glow */}
+              <div className={cn('absolute -top-20 -left-20 w-96 h-96 rounded-full bg-gradient-to-br opacity-10 blur-3xl pointer-events-none', grad)} />
+              <div className={cn('absolute -bottom-10 right-10 w-64 h-64 rounded-full bg-gradient-to-br opacity-5 blur-3xl pointer-events-none', grad)} />
 
-        {/* Hero */}
-        <div className="rounded-xl border border-border/60 bg-card p-6 flex items-center gap-5" style={{ borderTopColor: 'rgba(255,255,255,0.1)' }}>
-          <div className={cn('w-16 h-16 rounded-full bg-gradient-to-br flex items-center justify-center text-2xl font-semibold shrink-0 text-white select-none', avatarGradient(initials))}>
-            {initials}
-          </div>
-          <div className="min-w-0">
-            <p className="text-lg font-semibold tracking-tight truncate">{user.name || 'Без имени'}</p>
-            <div className="flex gap-2 mt-2 flex-wrap">
-              <Badge variant={user.role === 'ADMIN' ? 'purple' : 'muted'}>{user.role === 'ADMIN' ? 'Администратор' : 'Пользователь'}</Badge>
-              <Badge variant={user.isVerified ? 'success' : 'muted'}>{user.isVerified ? '✓ Подтверждён' : 'Не подтверждён'}</Badge>
+              <p className="text-muted-foreground text-base mb-1">{greeting()},</p>
+              <h1 className={cn(
+                'text-5xl font-bold tracking-tight bg-gradient-to-r bg-clip-text text-transparent',
+                grad
+              )}>
+                {user.name || user.email.split('@')[0]}
+              </h1>
+              <p className="text-muted-foreground mt-3 text-sm">
+                Вы вошли как <span className="text-foreground">{user.email}</span>
+              </p>
+            </div>
+
+            {/* Info cards */}
+            <div className="px-10 pb-10 grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <InfoCard label="Email" value={user.email} />
+              <InfoCard label="Имя">
+                <EditName initial={user.name || ''} onSaved={name => setUser({ ...user, name })} />
+              </InfoCard>
+              <InfoCard label="ID" value={user.id} mono />
+            </div>
+
+            {/* Meta */}
+            <div className="px-10 pb-10">
+              <div className="rounded-xl border border-border/50 bg-card/60 divide-y divide-border/40">
+                <Row label="Роль" value={user.role === 'ADMIN' ? 'Администратор' : 'Пользователь'} />
+                <Row label="Статус" value={user.isVerified ? 'Подтверждён' : 'Не подтверждён'} />
+                <Row label="Зарегистрирован" value={new Date(user.createdAt || Date.now()).toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' })} />
+              </div>
             </div>
           </div>
-        </div>
+        )}
 
-        {/* Account info */}
-        <div className="rounded-xl border border-border/60 bg-card overflow-hidden">
-          <div className="px-5 py-3 border-b border-border/40">
-            <p className="text-xs font-medium uppercase tracking-widest text-muted-foreground">Аккаунт</p>
-          </div>
-          <div className="divide-y divide-border/40">
-            <Row label="Email" value={user.email} />
-            <div className="flex items-center justify-between gap-4 px-5 py-3.5">
-              <span className="text-sm text-muted-foreground shrink-0">Имя</span>
-              <EditName initial={user.name || ''} onSaved={name => setUser({ ...user, name })} />
+        {active === 'security' && (
+          <div className="px-10 pt-14 pb-10">
+            <h1 className="text-2xl font-semibold tracking-tight mb-1">Безопасность</h1>
+            <p className="text-muted-foreground text-sm mb-8">Управление паролем и доступом</p>
+
+            <div className="max-w-lg space-y-4">
+              <div className="rounded-xl border border-border/50 bg-card/60 p-5">
+                <p className="text-sm font-medium mb-4">Смена пароля</p>
+                <ChangePassword />
+              </div>
             </div>
-            <Row label="ID" value={user.id} mono />
           </div>
-        </div>
-
-        {/* Security */}
-        <div className="rounded-xl border border-border/60 bg-card overflow-hidden">
-          <div className="px-5 py-3 border-b border-border/40">
-            <p className="text-xs font-medium uppercase tracking-widest text-muted-foreground">Безопасность</p>
-          </div>
-          <div className="px-5 py-4">
-            <ChangePassword />
-          </div>
-        </div>
-
-        <div className="pt-1">
-          <Separator className="mb-4" />
-          <a href="/" className="text-sm text-muted-foreground hover:text-foreground transition-colors">← На главную</a>
-        </div>
+        )}
       </main>
     </div>
   )
 }
 
-function Row({ label, value, mono }: { label: string; value: string; mono?: boolean }) {
+function InfoCard({ label, value, mono, children }: { label: string; value?: string; mono?: boolean; children?: React.ReactNode }) {
+  return (
+    <div className="rounded-xl border border-border/50 bg-card/60 px-5 py-4">
+      <p className="text-xs uppercase tracking-widest text-muted-foreground mb-2">{label}</p>
+      {children ?? (
+        <p className={cn('text-sm font-medium truncate', mono && 'font-mono text-xs text-muted-foreground')}>{value}</p>
+      )}
+    </div>
+  )
+}
+
+function Row({ label, value }: { label: string; value: string }) {
   return (
     <div className="flex items-center justify-between gap-4 px-5 py-3.5">
-      <span className="text-sm text-muted-foreground shrink-0">{label}</span>
-      <span className={cn('text-sm text-right truncate', mono && 'font-mono text-xs text-muted-foreground')}>{value}</span>
+      <span className="text-sm text-muted-foreground">{label}</span>
+      <span className="text-sm">{value}</span>
     </div>
   )
 }
