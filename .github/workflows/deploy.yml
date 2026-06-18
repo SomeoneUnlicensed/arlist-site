@@ -13,9 +13,20 @@ jobs:
       - name: Deploy via rsync
         uses: burnett01/rsync-deployments@7.0.1
         with:
-          switches: -avz --delete
-          path: html/
-          remote_path: /var/www/arlist.ru/html/
+          switches: -avz --delete --exclude='.git*' --exclude='node_modules'
+          path: ./
+          remote_path: /var/www/arlist.ru/
           remote_host: ${{ secrets.SSH_HOST }}
           remote_user: ${{ secrets.SSH_USER }}
           remote_key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+      - name: Restart Docker containers
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            cd /var/www/arlist.ru/
+            [ -f .env ] || cp .env.example .env
+            docker compose up -d

@@ -3,37 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>Арлист | Сервисы для людей</title>
-    <meta name="description" content="Честные технологии без лишней бюрократии. Создаем ПО, которое уважает пользователя.">
+    <title>Наши Продукты | Арлист</title>
+    <meta name="description" content="Решения Arlist: образование, безопасность, аналитика.">
     
     <!-- Geist Font -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
     
-    <!-- Favicon -->
     <link rel="icon" type="image/svg+xml" href="/icon.svg">
-    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
-    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
-    <link rel="manifest" href="/site.webmanifest">
-    <meta name="theme-color" content="#000000">
-
     <link rel="stylesheet" href="/css/global.css">
 </head>
 <body>
-
-<div class="stub-overlay" id="stub-page">
-    <div class="stub-content">
-        <h2 class="stub-title">Личный кабинет</h2>
-        <p class="stub-text">
-            Мы завершаем работу над единой системой авторизации.<br>
-            Пока что приглашаем вас в наш Git-сервис.
-        </p>
-        <a href="https://commit.arlist.tech" class="stub-link" target="_blank">Перейти в Commit</a>
-        <span class="stub-close" id="stub-close">Вернуться назад</span>
-    </div>
-</div>
 
 <nav class="navbar">
     <a href="/" class="logo">
@@ -41,7 +22,7 @@
         Арлист
     </a>
     <ul class="nav-links">
-        <li><a href="/products" class="nav-link">Продукты</a></li>
+        <li><a href="/products" class="nav-link active">Продукты</a></li>
         <li><a href="/forEdu" class="nav-link">Образование</a></li>
         <li><a href="/contacts" class="nav-link">Контакты</a></li>
         <li><button class="nav-link login-btn-trigger">Вход</button></li>
@@ -49,21 +30,14 @@
 </nav>
 
 <main>
-    <section class="hero">
+    <section class="hero" style="min-height: auto; padding: 120px 0 60px;">
         <div class="container">
-            <span class="hero-label reveal">Честные технологии</span>
-            <h1 class="hero-title reveal">
-                Сервисы для людей, <span>а не ради лозунгов.</span>
-            </h1>
-            <p class="hero-subtitle reveal">
-                Мы создаем программное обеспечение, которое уважает пользователя. 
-                Без лишней бюрократии и навязанных шаблонов. Только чистота кода и удобство для человека.
-            </p>
-            <a href="#products" class="btn-primary reveal">Наши решения</a>
+            <h1 class="hero-title reveal">Наши <span>Решения</span></h1>
+            <p class="hero-subtitle reveal">Мы создаем экосистему сервисов, которые работают для вас.</p>
         </div>
     </section>
 
-    <section id="products" class="products-section">
+    <section class="products-section">
         <div class="container">
             <div class="products-grid">
                 <!-- LeetKot -->
@@ -78,8 +52,8 @@
   > ^ <
                     </div>
                     <h3 class="product-title">ЛитКот</h3>
-                    <p class="product-desc">Разминай лапки и мозги! Платформа для тех, кто хочет щелкать алгоритмы как рыбку и готовиться к интервью с кошачьей грацией.</p>
-                    <span class="product-arrow">Зайти за сметаной →</span>
+                    <p class="product-desc">Разминай лапки и мозги! Платформа для тех, кто хочет щелкать алгоритмы как рыбку.</p>
+                    <span class="product-arrow">Зайти →</span>
                 </a>
 
                 <!-- Arlist ID -->
@@ -96,7 +70,7 @@
                         </svg>
                     </div>
                     <h3 class="product-title">Arlist ID</h3>
-                    <p class="product-desc">Единый доступ ко всем инструментам. Безопасность, основанная на прозрачности и здравом смысле.</p>
+                    <p class="product-desc">Единый доступ ко всем инструментам. Безопасность и прозрачность.</p>
                 </div>
 
                 <!-- Gate -->
@@ -125,8 +99,8 @@
 _.( T   )  `  /     ___:____
  ((_ `^--' /_/    ,'        `.
                     </div>
-                    <h3 class="product-title">Аналити<span style="color: #88ccff;">Кит</span></h3>
-                    <p class="product-desc">Глубокая аналитика данных и котиков. Понимайте скрытые паттерны в огромных массивах информации.</p>
+                    <h3 class="product-title">АналитиКит</h3>
+                    <p class="product-desc">Глубокая аналитика данных и котиков. Понимайте скрытые паттерны.</p>
                 </div>
             </div>
         </div>
@@ -145,7 +119,7 @@ _.( T   )  `  /     ___:____
             <div class="footer-links">
                 <div class="footer-col">
                     <span class="footer-label">Сервисы</span>
-                    <a href="https://commit.arlist.tech">Commit</a>
+                    <a href="/products">Продукты</a>
                     <a href="https://leetcot.ru">ЛитКот</a>
                 </div>
                 <div class="footer-col">
@@ -156,18 +130,11 @@ _.( T   )  `  /     ___:____
                 <div class="footer-col">
                     <span class="footer-label">Право</span>
                     <a href="/legal">Документы</a>
-                    <a href="/legal/commit-privacy">Приватность</a>
                 </div>
             </div>
         </div>
         <div class="footer-bottom">
             <p class="footer-copy">© 2026 АРЛИСТ ТЕХ. Все права защищены.</p>
-            <div class="footer-cat">
-  _._     _,-'""`-._
- (,-.`._,'(       |\`-/|
-     `-.-' \ )-`( , o o)
-           `-    \`_`"'-
-            </div>
         </div>
     </div>
 </footer>

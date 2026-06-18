@@ -1,10 +1,44 @@
 services:
   web:
-    image: nginx:alpine
+    build: .
     container_name: arlist-main-site
     restart: always
-    volumes:
-      - ./html:/usr/share/nginx/html
-      - ./nginx.conf:/etc/nginx/conf.d/default.conf
     ports:
-      - "8086:80"
+      - "8086:8086"
+    depends_on:
+      - db
+    networks:
+      - arlist-network
+
+  db:
+    image: postgres:alpine
+    container_name: arlist-db
+    restart: always
+    environment:
+      POSTGRES_DB: ${DB_NAME:-arlist}
+      POSTGRES_USER: ${DB_USER:-admin}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-password}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - arlist-network
+
+  mail:
+    image: foxcpp/maddy:latest
+    container_name: arlist-mail
+    restart: always
+    ports:
+      - "25:25"     # SMTP
+      - "465:465"   # SMTPS
+      - "587:587"   # Submission
+    volumes:
+      - ./maddy:/data
+    networks:
+      - arlist-network
+
+volumes:
+  postgres_data:
+
+networks:
+  arlist-network:
+    driver: bridge

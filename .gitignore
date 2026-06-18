@@ -1,0 +1,12 @@
+.env
+.env.local
+postgres_data/
+maddy/
+*.log
+node_modules/
+dist/
+dist-client/
+react-app/dist/
+react-app/node_modules/
+
+/generated/prisma

@@ -1,0 +1,31 @@
+# Build React
+FROM node:20-alpine AS build-client
+WORKDIR /app/react-app
+COPY react-app/package*.json ./
+RUN npm install
+COPY react-app/ ./
+RUN npm run build
+
+# Build Backend
+FROM node:20-alpine AS build-server
+WORKDIR /app
+COPY package*.json ./
+RUN npm install
+COPY prisma ./prisma/
+RUN npx prisma generate
+COPY . .
+RUN npm run build
+
+# Final Stage
+FROM node:20-alpine
+WORKDIR /app
+COPY --from=build-server /app/dist ./dist
+COPY --from=build-server /app/node_modules ./node_modules
+COPY --from=build-server /app/package*.json ./
+COPY --from=build-server /app/prisma ./prisma
+COPY --from=build-server /app/html ./html
+COPY --from=build-client /app/dist-client ./dist-client
+COPY .env.example .env
+
+EXPOSE 8086
+CMD ["npm", "start"]
