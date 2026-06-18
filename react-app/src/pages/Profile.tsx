@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import axios from 'axios'
 import { useNavigate } from 'react-router-dom'
-import { LogOut, ShieldCheck, Check, Pencil, X, KeyRound, User, Home, Lock } from 'lucide-react'
+import { LogOut, ShieldCheck, Check, Pencil, X, KeyRound, User, Home, Lock, ChevronRight } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -124,8 +124,6 @@ type Section = 'profile' | 'security'
 
 const Sidebar = ({ user, active, setActive, onLogout, onAdmin }:
   { user: any; active: Section; setActive: (s: Section) => void; onLogout: () => void; onAdmin: () => void }) => {
-  const initials = (user.name || user.email || '?').slice(0, 1).toUpperCase()
-  const grad = avatarGradient(initials)
 
   const nav = [
     { id: 'profile' as Section, icon: User, label: 'Профиль' },
@@ -139,14 +137,11 @@ const Sidebar = ({ user, active, setActive, onLogout, onAdmin }:
         <a href="/" className="font-display text-base tracking-tight hover:opacity-75 transition-opacity">Arlist ID</a>
       </div>
 
-      {/* Avatar */}
-      <div className="px-5 py-6 border-b border-border/40">
-        <div className={cn('w-12 h-12 rounded-full bg-gradient-to-br flex items-center justify-center text-lg font-semibold text-white select-none mb-3', grad)}>
-          {initials}
-        </div>
+      {/* User info */}
+      <div className="px-5 py-5 border-b border-border/40">
         <p className="text-sm font-medium truncate">{user.name || 'Без имени'}</p>
         <p className="text-xs text-muted-foreground truncate mt-0.5">{user.email}</p>
-        <div className="flex gap-1.5 mt-2 flex-wrap">
+        <div className="flex gap-1.5 mt-3 flex-wrap">
           <Badge variant={user.role === 'ADMIN' ? 'purple' : 'muted'} className="text-[10px] px-1.5 py-0">
             {user.role === 'ADMIN' ? 'Админ' : 'Юзер'}
           </Badge>
@@ -212,8 +207,7 @@ const Profile = () => {
     </div>
   )
 
-  const initials = (user.name || user.email || '?').slice(0, 1).toUpperCase()
-  const grad = avatarGradient(initials)
+  const grad = avatarGradient((user.name || user.email || '?').slice(0, 1).toUpperCase())
 
   return (
     <div className="h-screen flex overflow-hidden bg-background">

@@ -21,7 +21,11 @@ export const register = async (req: Request, res: Response) => {
     await prisma.verificationToken.create({
       data: { token: code, userId: user.id, expires: new Date(Date.now() + 24 * 3600_000), type: 'EMAIL_VERIFICATION' },
     });
-    await sendVerificationEmail(email, code);
+    try {
+      await sendVerificationEmail(email, code);
+    } catch (mailErr) {
+      console.error('Mail send failed (registration):', mailErr);
+    }
     res.status(201).json({ message: 'Registered. Check your email for verification code.' });
   } catch (error) {
     console.error('Registration error:', error);
@@ -68,7 +72,11 @@ export const resendVerification = async (req: Request, res: Response) => {
     await prisma.verificationToken.create({
       data: { token: code, userId: user.id, expires: new Date(Date.now() + 24 * 3600_000), type: 'EMAIL_VERIFICATION' },
     });
-    await sendVerificationEmail(email, code);
+    try {
+      await sendVerificationEmail(email, code);
+    } catch (mailErr) {
+      console.error('Mail send failed (resend):', mailErr);
+    }
     res.json({ message: 'Verification code sent' });
   } catch {
     res.status(500).json({ error: 'Internal server error' });
