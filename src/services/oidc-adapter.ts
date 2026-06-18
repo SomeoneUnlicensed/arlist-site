@@ -1,13 +1,5 @@
 import prisma from './prisma.service.js';
 
-const grantable = new Set([
-  'AccessToken',
-  'AuthorizationCode',
-  'RefreshToken',
-  'DeviceCode',
-  'BackchannelAuthenticationRequest',
-]);
-
 export class PrismaAdapter {
   type: string;
 
@@ -16,6 +8,8 @@ export class PrismaAdapter {
   }
 
   async upsert(id: string, payload: any, expiresIn: number) {
+    // Clients are stored in OAuthClient table, not OidcModel
+    if (this.type === 'Client') return;
     const expiresAt = expiresIn
       ? new Date(Date.now() + expiresIn * 1000)
       : undefined;
@@ -42,6 +36,20 @@ export class PrismaAdapter {
   }
 
   async find(id: string) {
+    // Route Client lookups to OAuthClient table
+    if (this.type === 'Client') {
+      const c = await prisma.oAuthClient.findUnique({ where: { clientId: id } });
+      if (!c) return undefined;
+      return {
+        client_id: c.clientId,
+        client_secret: c.clientSecret,
+        redirect_uris: c.redirectUris,
+        grant_types: ['authorization_code'],
+        response_types: ['code'],
+        token_endpoint_auth_method: 'client_secret_basic',
+      };
+    }
+
     const record = await prisma.oidcModel.findUnique({
       where: { type_id: { type: this.type, id } },
     });

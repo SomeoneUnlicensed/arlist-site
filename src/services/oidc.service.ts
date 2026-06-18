@@ -2,6 +2,7 @@ import { Provider, Configuration } from 'oidc-provider';
 import prisma from './prisma.service.js';
 import { PrismaAdapter } from './oidc-adapter.js';
 
+
 const jwks = process.env.OIDC_JWKS
   ? JSON.parse(process.env.OIDC_JWKS)
   : undefined;
@@ -64,26 +65,5 @@ const configuration: Configuration = {
 const oidcProvider = new Provider(process.env.ISSUER_URL || 'http://localhost:8086', configuration);
 // Trust X-Forwarded-Proto from nginx so discovery URLs use https://
 oidcProvider.proxy = true;
-
-// Dynamically fetch clients from the database
-const originalFind = oidcProvider.Client.find.bind(oidcProvider.Client);
-oidcProvider.Client.find = async (id: string) => {
-  const dbClient = await prisma.oAuthClient.findUnique({ where: { clientId: id } });
-  if (dbClient) {
-    // Return a client instance
-    // Note: We use the existing class to construct it
-    const clientConf = {
-      client_id: dbClient.clientId,
-      client_secret: dbClient.clientSecret,
-      redirect_uris: dbClient.redirectUris,
-      grant_types: ['authorization_code'],
-      response_types: ['code'],
-    };
-    // Need to cast to any to instantiate because TypeScript might complain, 
-    // but oidcProvider.Client constructor expects metadata.
-    return new (oidcProvider.Client as any)(clientConf);
-  }
-  return originalFind(id);
-};
 
 export default oidcProvider;
