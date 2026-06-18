@@ -1,19 +1,8 @@
 import { Provider, Configuration } from 'oidc-provider';
 import prisma from './prisma.service.js';
 
-// Basic adapter for oidc-provider using Prisma
-// For simplicity in this demo, we can use a more robust adapter in production
-// This is a minimal implementation to show the concept
 const configuration: Configuration = {
-  clients: [
-    // We can seed a default client for testing
-    {
-      client_id: 'test_client',
-      client_secret: 'test_secret',
-      redirect_uris: ['http://localhost:3000/callback'],
-      grant_types: ['authorization_code'],
-    },
-  ],
+  clients: [], // Will be loaded dynamically via DB
   interactions: {
     url(ctx, interaction) {
       return `/interaction/${interaction.uid}`;
@@ -25,25 +14,67 @@ const configuration: Configuration = {
   findAccount: async (ctx, id) => {
     const user = await prisma.user.findUnique({ where: { id } });
     if (!user) return undefined;
+    
+    // Check if the client requesting authentication is an internal trusted app
+    const clientId = ctx.oidc.client?.clientId;
+    let isTrusted = false;
+    if (clientId) {
+      const client = await prisma.oAuthClient.findUnique({ where: { clientId } });
+      if (client && client.isTrusted) {
+        isTrusted = true;
+      }
+    }
+
     return {
       accountId: id,
-      claims: async (use, scope) => ({
-        sub: id,
-        email: user.email,
-        name: user.name,
-      }),
+      claims: async (use, scope) => {
+        const claims: any = {
+          sub: id,
+          email: user.email,
+          name: user.name,
+        };
+        // If the application is our internal trusted app, we pass extended data like role
+        if (isTrusted) {
+          claims.role = user.role;
+          claims.isVerified = user.isVerified;
+        }
+        return claims;
+      },
     };
   },
   claims: {
     openid: ['sub'],
     email: ['email'],
     profile: ['name'],
+    // Custom scope 'internal' for trusted apps to request extended data
+    internal: ['role', 'isVerified'],
   },
   features: {
-    devInteractions: { enabled: false }, // We use our own interactions
+    devInteractions: { enabled: false },
   },
 };
 
 const oidcProvider = new Provider(process.env.ISSUER_URL || 'http://localhost:8086', configuration);
+
+// Dynamically fetch clients from the database
+const originalFind = oidcProvider.Client.find.bind(oidcProvider.Client);
+oidcProvider.Client.find = async (id: string) => {
+  const dbClient = await prisma.oAuthClient.findUnique({ where: { clientId: id } });
+  if (dbClient) {
+    // Return a client instance
+    // Note: We use the existing class to construct it
+    const clientConf = {
+      client_id: dbClient.clientId,
+      client_secret: dbClient.clientSecret,
+      redirect_uris: dbClient.redirectUris,
+      grant_types: ['authorization_code'],
+      response_types: ['code'],
+    };
+    // Need to cast to any to instantiate because TypeScript might complain, 
+    // but oidcProvider.Client constructor expects metadata.
+    return new (oidcProvider.Client as any)(clientConf);
+  }
+  return originalFind(id);
+};
 
 export default oidcProvider;

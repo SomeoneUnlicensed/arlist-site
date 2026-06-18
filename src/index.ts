@@ -4,6 +4,7 @@ import { fileURLToPath } from 'url';
 import dotenv from 'dotenv';
 import cookieParser from 'cookie-parser';
 import authRoutes from './routes/auth.routes.js';
+import adminRoutes from './routes/admin.routes.js';
 import interactionRoutes from './routes/interaction.routes.js';
 import oidcProvider from './services/oidc.service.js';
 
@@ -23,8 +24,9 @@ app.use(cookieParser());
 // Interaction Routes
 app.use('/interaction', interactionRoutes);
 
-// Auth API Routes
+// API Routes
 app.use('/api/auth', authRoutes);
+app.use('/api/admin', adminRoutes);
 
 app.get('/api/health', (req, res) => {
   res.json({ status: 'ok' });
