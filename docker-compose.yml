@@ -23,19 +23,6 @@ services:
     networks:
       - arlist-network
 
-  mail:
-    image: foxcpp/maddy:latest
-    container_name: arlist-mail
-    restart: always
-    ports:
-      - "25:25"     # SMTP
-      - "465:465"   # SMTPS
-      - "587:587"   # Submission
-    volumes:
-      - ./maddy:/data
-    networks:
-      - arlist-network
-
 volumes:
   postgres_data:
 
