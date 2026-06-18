@@ -28,4 +28,4 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
             cd /var/www/arlist.ru/
-            docker compose up -d --build
+            docker compose up -d --build --force-recreate
