@@ -18,6 +18,7 @@ RUN npm run build
 
 # Final Stage
 FROM node:20-bookworm-slim
+RUN apt-get update -y && apt-get install -y openssl && rm -rf /var/lib/apt/lists/*
 WORKDIR /app
 COPY --from=build-server /app/dist ./dist
 COPY --from=build-server /app/node_modules ./node_modules
