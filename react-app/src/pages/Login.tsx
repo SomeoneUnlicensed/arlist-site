@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { useNavigate, useSearchParams, Link } from 'react-router-dom'
 import axios from 'axios'
 import { Loader2 } from 'lucide-react'
@@ -17,6 +17,13 @@ const Login = () => {
   const navigate = useNavigate()
 
   const verified = searchParams.get('verified')
+
+  useEffect(() => {
+    axios.get('/api/auth/profile').then(() => {
+      const returnTo = searchParams.get('return_to')
+      window.location.href = returnTo || '/profile'
+    }).catch(() => {})
+  }, [])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
