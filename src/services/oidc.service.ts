@@ -1,8 +1,10 @@
 import { Provider, Configuration } from 'oidc-provider';
 import prisma from './prisma.service.js';
+import { PrismaAdapter } from './oidc-adapter.js';
 
 const configuration: Configuration = {
-  clients: [], // Will be loaded dynamically via DB
+  adapter: PrismaAdapter,
+  clients: [],
   interactions: {
     url(ctx, interaction) {
       return `/interaction/${interaction.uid}`;

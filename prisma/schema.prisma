@@ -43,6 +43,23 @@ model VerificationToken {
   @@index([userId])
 }
 
+// Generic store for all oidc-provider state (sessions, codes, tokens, etc.)
+model OidcModel {
+  id         String   @id
+  type       String
+  payload    Json
+  grantId    String?
+  userCode   String?
+  uid        String?
+  expiresAt  DateTime?
+  consumedAt DateTime?
+
+  @@unique([type, id])
+  @@index([grantId])
+  @@index([userCode])
+  @@index([uid])
+}
+
 model OAuthClient {
   id           String   @id @default(cuid())
   clientId     String   @unique
