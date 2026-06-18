@@ -2,8 +2,13 @@ import { Provider, Configuration } from 'oidc-provider';
 import prisma from './prisma.service.js';
 import { PrismaAdapter } from './oidc-adapter.js';
 
+const jwks = process.env.OIDC_JWKS
+  ? JSON.parse(process.env.OIDC_JWKS)
+  : undefined;
+
 const configuration: Configuration = {
   adapter: PrismaAdapter,
+  ...(jwks ? { jwks } : {}),
   clients: [],
   interactions: {
     url(ctx, interaction) {
