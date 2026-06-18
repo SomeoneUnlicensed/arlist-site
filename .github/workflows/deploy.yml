@@ -13,7 +13,7 @@ jobs:
       - name: Deploy via rsync
         uses: burnett01/rsync-deployments@7.0.1
         with:
-          switches: -avz --delete --exclude='.git*' --exclude='node_modules'
+          switches: -avz --delete --exclude='.git*' --exclude='node_modules' --exclude='.env'
           path: ./
           remote_path: /var/www/arlist.ru/
           remote_host: ${{ secrets.SSH_HOST }}
@@ -28,5 +28,4 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
             cd /var/www/arlist.ru/
-            [ -f .env ] || cp .env.example .env
             docker compose up -d --build
