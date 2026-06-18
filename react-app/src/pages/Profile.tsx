@@ -218,16 +218,12 @@ const Profile = () => {
         {active === 'profile' && (
           <div className="min-h-full flex flex-col">
             {/* Hero banner */}
-            <div className="relative overflow-hidden px-10 pt-14 pb-16">
-              {/* Background glow */}
+            <div className="relative overflow-hidden px-10 pt-14 pb-16 border-b border-border/60" style={{ background: 'linear-gradient(to bottom, hsl(var(--background)), hsl(var(--background)) 70%, transparent)' }}>
               <div className={cn('absolute -top-20 -left-20 w-96 h-96 rounded-full bg-gradient-to-br opacity-10 blur-3xl pointer-events-none', grad)} />
               <div className={cn('absolute -bottom-10 right-10 w-64 h-64 rounded-full bg-gradient-to-br opacity-5 blur-3xl pointer-events-none', grad)} />
 
               <p className="text-muted-foreground text-base mb-1">{greeting()},</p>
-              <h1 className={cn(
-                'text-5xl font-bold tracking-tight bg-gradient-to-r bg-clip-text text-transparent',
-                grad
-              )}>
+              <h1 className={cn('text-5xl font-bold tracking-tight bg-gradient-to-r bg-clip-text text-transparent', grad)}>
                 {user.name || user.email.split('@')[0]}
               </h1>
               <p className="text-muted-foreground mt-3 text-sm">
@@ -236,7 +232,7 @@ const Profile = () => {
             </div>
 
             {/* Info cards */}
-            <div className="px-10 pb-10 grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div className="px-10 pt-8 pb-6 grid grid-cols-1 sm:grid-cols-3 gap-4">
               <InfoCard label="Email" value={user.email} />
               <InfoCard label="Имя">
                 <EditName initial={user.name || ''} onSaved={name => setUser({ ...user, name })} />
@@ -250,6 +246,42 @@ const Profile = () => {
                 <Row label="Роль" value={user.role === 'ADMIN' ? 'Администратор' : 'Пользователь'} />
                 <Row label="Статус" value={user.isVerified ? 'Подтверждён' : 'Не подтверждён'} />
                 <Row label="Зарегистрирован" value={new Date(user.createdAt || Date.now()).toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' })} />
+              </div>
+            </div>
+
+            {/* Promo strip */}
+            <div className="px-10 pb-10">
+              <p className="text-xs uppercase tracking-widest text-muted-foreground mb-4">Скоро от Arlist Tech</p>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                {/* Искра */}
+                <div className="relative overflow-hidden rounded-xl border border-border/50 bg-card/40 px-5 py-5 flex items-start gap-4">
+                  <div className="absolute inset-0 bg-gradient-to-br from-amber-500/5 to-orange-500/5 pointer-events-none" />
+                  <div className="shrink-0 w-10 h-10 rounded-lg bg-amber-500/10 border border-amber-500/20 flex items-center justify-center">
+                    <span className="text-lg">⚡</span>
+                  </div>
+                  <div className="min-w-0">
+                    <div className="flex items-center gap-2 mb-1">
+                      <p className="text-sm font-semibold">Искра</p>
+                      <span className="text-[10px] px-1.5 py-0.5 rounded-full border border-amber-500/30 text-amber-400/80 bg-amber-500/10">Скоро</span>
+                    </div>
+                    <p className="text-xs text-muted-foreground leading-relaxed">CLI-агент от Arlist Tech. Автоматизирует рутину прямо из терминала.</p>
+                  </div>
+                </div>
+
+                {/* КИТ */}
+                <div className="relative overflow-hidden rounded-xl border border-border/50 bg-card/40 px-5 py-5 flex items-start gap-4">
+                  <div className="absolute inset-0 bg-gradient-to-br from-sky-500/5 to-blue-500/5 pointer-events-none" />
+                  <div className="shrink-0 w-10 h-10 rounded-lg bg-sky-500/10 border border-sky-500/20 flex items-center justify-center">
+                    <span className="font-display text-sm text-sky-300 leading-none">КИТ</span>
+                  </div>
+                  <div className="min-w-0">
+                    <div className="flex items-center gap-2 mb-1">
+                      <p className="text-sm font-semibold">АналитиКит</p>
+                      <span className="text-[10px] px-1.5 py-0.5 rounded-full border border-sky-500/30 text-sky-400/80 bg-sky-500/10">Скоро</span>
+                    </div>
+                    <p className="text-xs text-muted-foreground leading-relaxed">Сервис глубокой аналитики данных. Видит паттерны там, где другие видят шум.</p>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
