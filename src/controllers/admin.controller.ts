@@ -2,6 +2,22 @@ import { Request, Response } from 'express';
 import prisma from '../services/prisma.service.js';
 import crypto from 'crypto';
 
+// ── Stats ─────────────────────────────────────────────────
+
+export const getStats = async (req: Request, res: Response) => {
+  try {
+    const [totalUsers, verifiedUsers, bannedUsers, totalClients] = await Promise.all([
+      prisma.user.count(),
+      prisma.user.count({ where: { isVerified: true } }),
+      prisma.user.count({ where: { isBanned: true } }),
+      prisma.oAuthClient.count(),
+    ]);
+    res.json({ totalUsers, verifiedUsers, bannedUsers, totalClients });
+  } catch {
+    res.status(500).json({ error: 'Internal server error' });
+  }
+};
+
 // ── OIDC Clients ──────────────────────────────────────────
 
 export const getClients = async (req: Request, res: Response) => {
@@ -18,9 +34,9 @@ export const getClients = async (req: Request, res: Response) => {
 export const createClient = async (req: Request, res: Response) => {
   try {
     const { name, redirectUris, isTrusted } = req.body;
-    if (!name || !redirectUris || !Array.isArray(redirectUris)) {
+    if (!name || !redirectUris || !Array.isArray(redirectUris))
       return res.status(400).json({ error: 'Invalid input' });
-    }
+
     const client = await prisma.oAuthClient.create({
       data: {
         name,
@@ -31,6 +47,16 @@ export const createClient = async (req: Request, res: Response) => {
       },
     });
     res.status(201).json(client);
+  } catch {
+    res.status(500).json({ error: 'Internal server error' });
+  }
+};
+
+export const deleteClient = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params as { id: string };
+    await prisma.oAuthClient.delete({ where: { id } });
+    res.json({ ok: true });
   } catch {
     res.status(500).json({ error: 'Internal server error' });
   }

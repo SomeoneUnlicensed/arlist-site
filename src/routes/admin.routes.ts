@@ -1,5 +1,8 @@
 import { Router } from 'express';
-import { getClients, createClient, getUsers, deleteUser, updateUser } from '../controllers/admin.controller.js';
+import {
+  getStats, getClients, createClient, deleteClient,
+  getUsers, deleteUser, updateUser,
+} from '../controllers/admin.controller.js';
 import { authenticate, authorize } from '../middleware/auth.middleware.js';
 
 const router = Router();
@@ -7,8 +10,11 @@ const router = Router();
 router.use(authenticate);
 router.use(authorize(['ADMIN']));
 
+router.get('/stats', getStats);
+
 router.get('/clients', getClients);
 router.post('/clients', createClient);
+router.delete('/clients/:id', deleteClient);
 
 router.get('/users', getUsers);
 router.delete('/users/:id', deleteUser);

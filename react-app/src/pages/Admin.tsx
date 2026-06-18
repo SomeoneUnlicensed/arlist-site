@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import axios from 'axios'
 import { useNavigate } from 'react-router-dom'
-import { Copy, Check, ArrowLeft, Loader2, ShieldCheck } from 'lucide-react'
+import { Copy, Check, ArrowLeft, Loader2, ShieldCheck, Users, Activity, Ban, AppWindow, Trash2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -9,7 +9,6 @@ import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs'
-import { Separator } from '@/components/ui/separator'
 import { cn } from '@/lib/utils'
 
 // ── Copy button ───────────────────────────────────────────
@@ -20,11 +19,43 @@ const CopyBtn = ({ text }: { text: string }) => {
     <button
       type="button"
       onClick={() => { navigator.clipboard.writeText(text); setCopied(true); setTimeout(() => setCopied(false), 2000) }}
-      className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors font-mono"
+      className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors"
     >
       {copied ? <Check size={12} className="text-emerald-400" /> : <Copy size={12} />}
-      {copied ? 'скопировано' : 'копировать'}
     </button>
+  )
+}
+
+// ── Stats bar ─────────────────────────────────────────────
+
+const StatsBar = () => {
+  const [stats, setStats] = useState<any>(null)
+
+  useEffect(() => {
+    axios.get('/api/admin/stats').then(r => setStats(r.data)).catch(() => {})
+  }, [])
+
+  if (!stats) return null
+
+  const tiles = [
+    { icon: Users, label: 'Всего пользователей', value: stats.totalUsers, color: 'text-blue-400' },
+    { icon: Activity, label: 'Подтверждено', value: stats.verifiedUsers, color: 'text-emerald-400' },
+    { icon: Ban, label: 'Заблокировано', value: stats.bannedUsers, color: 'text-red-400' },
+    { icon: AppWindow, label: 'OIDC-клиенты', value: stats.totalClients, color: 'text-violet-400' },
+  ]
+
+  return (
+    <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-8">
+      {tiles.map(({ icon: Icon, label, value, color }) => (
+        <div key={label} className="rounded-xl border border-border/60 bg-card px-4 py-3.5 flex items-center gap-3">
+          <Icon size={18} className={cn('shrink-0', color)} />
+          <div>
+            <p className="text-xl font-semibold tracking-tight">{value}</p>
+            <p className="text-xs text-muted-foreground mt-0.5 leading-tight">{label}</p>
+          </div>
+        </div>
+      ))}
+    </div>
   )
 }
 
@@ -37,10 +68,8 @@ const UsersTab = () => {
 
   const load = async () => {
     setLoading(true)
-    try {
-      const r = await axios.get('/api/admin/users')
-      setUsers(r.data)
-    } catch { setErr('Не удалось загрузить') }
+    try { const r = await axios.get('/api/admin/users'); setUsers(r.data) }
+    catch { setErr('Не удалось загрузить') }
     finally { setLoading(false) }
   }
 
@@ -69,7 +98,7 @@ const UsersTab = () => {
   )
 
   return (
-    <div className="p-0">
+    <div>
       {err && <div className="px-5 pt-4"><Alert variant="destructive"><AlertDescription>{err}</AlertDescription></Alert></div>}
       {users.length === 0 ? (
         <div className="text-center py-16 text-muted-foreground text-sm">Нет пользователей</div>
@@ -78,7 +107,7 @@ const UsersTab = () => {
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-border/40">
-                {['Пользователь', 'Роль', 'Статус', 'Дата', ''].map(h => (
+                {['Пользователь', 'Роль', 'Статус', 'Дата', 'Действия'].map(h => (
                   <th key={h} className="px-4 py-3 text-left text-xs uppercase tracking-widest text-muted-foreground font-normal">{h}</th>
                 ))}
               </tr>
@@ -114,7 +143,9 @@ const UsersTab = () => {
                         ? <Button size="sm" variant="outline" className="text-violet-400 border-violet-500/20 hover:bg-violet-500/10" onClick={() => promote(u.id, 'ADMIN')}>→ Админ</Button>
                         : <Button size="sm" variant="outline" onClick={() => promote(u.id, 'USER')}>→ Юзер</Button>
                       }
-                      <Button size="sm" variant="outline" className="text-red-400 border-red-500/20 hover:bg-red-500/10 hover:text-red-300" onClick={() => remove(u.id, u.email)}>Удалить</Button>
+                      <Button size="sm" variant="ghost" className="text-red-400 hover:bg-red-500/10 hover:text-red-300 px-2" onClick={() => remove(u.id, u.email)}>
+                        <Trash2 size={14} />
+                      </Button>
                     </div>
                   </td>
                 </tr>
@@ -146,8 +177,7 @@ const ClientsTab = () => {
   useEffect(() => { load() }, [])
 
   const create = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setErr(''); setNewSecret(''); setLoading(true)
+    e.preventDefault(); setErr(''); setNewSecret(''); setLoading(true)
     try {
       const uris = redirectUris.split(',').map(u => u.trim()).filter(Boolean)
       const r = await axios.post('/api/admin/clients', { name, redirectUris: uris, isTrusted })
@@ -156,6 +186,12 @@ const ClientsTab = () => {
       load()
     } catch (e: any) { setErr(e.response?.data?.error || 'Ошибка') }
     finally { setLoading(false) }
+  }
+
+  const remove = async (id: string, clientName: string) => {
+    if (!confirm(`Удалить приложение «${clientName}»?`)) return
+    try { await axios.delete(`/api/admin/clients/${id}`); load() }
+    catch { setErr('Ошибка удаления') }
   }
 
   return (
@@ -177,15 +213,13 @@ const ClientsTab = () => {
       {clients.length > 0 && (
         <Card>
           <CardHeader className="py-3 px-5 border-b border-border/40">
-            <p className="text-xs uppercase tracking-widest text-muted-foreground font-normal">
-              Приложения ({clients.length})
-            </p>
+            <p className="text-xs uppercase tracking-widest text-muted-foreground font-normal">Приложения ({clients.length})</p>
           </CardHeader>
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-border/40">
-                  {['Название', 'Client ID', 'Redirect URIs', 'Тип'].map(h => (
+                  {['Название', 'Client ID', 'Redirect URIs', 'Тип', ''].map(h => (
                     <th key={h} className="px-4 py-2.5 text-left text-xs uppercase tracking-widest text-muted-foreground font-normal">{h}</th>
                   ))}
                 </tr>
@@ -206,9 +240,12 @@ const ClientsTab = () => {
                       ))}
                     </td>
                     <td className="px-4 py-3">
-                      <Badge variant={c.isTrusted ? 'success' : 'muted'}>
-                        {c.isTrusted ? 'Доверенное' : 'Обычное'}
-                      </Badge>
+                      <Badge variant={c.isTrusted ? 'success' : 'muted'}>{c.isTrusted ? 'Доверенное' : 'Обычное'}</Badge>
+                    </td>
+                    <td className="px-4 py-3">
+                      <Button size="sm" variant="ghost" className="text-red-400 hover:bg-red-500/10 hover:text-red-300 px-2" onClick={() => remove(c.id, c.name)}>
+                        <Trash2 size={14} />
+                      </Button>
                     </td>
                   </tr>
                 ))}
@@ -233,13 +270,8 @@ const ClientsTab = () => {
               <Input id="redirect-uris" value={redirectUris} onChange={e => setRedirectUris(e.target.value)} placeholder="https://app.example.com/callback" required />
             </div>
             <div className="flex items-start gap-3">
-              <input
-                id="is-trusted"
-                type="checkbox"
-                checked={isTrusted}
-                onChange={e => setIsTrusted(e.target.checked)}
-                className="mt-0.5 h-4 w-4 rounded border-input bg-background accent-foreground cursor-pointer"
-              />
+              <input id="is-trusted" type="checkbox" checked={isTrusted} onChange={e => setIsTrusted(e.target.checked)}
+                className="mt-0.5 h-4 w-4 rounded border-input bg-background accent-foreground cursor-pointer" />
               <div>
                 <label htmlFor="is-trusted" className="text-sm font-medium cursor-pointer">Доверенное приложение</label>
                 <p className="text-xs text-muted-foreground mt-0.5">Получает роль и статус верификации пользователя</p>
@@ -263,20 +295,15 @@ const Admin = () => {
 
   return (
     <div className="min-h-screen flex flex-col">
-      {/* Nav */}
       <header className="h-14 sticky top-0 z-50 border-b border-border/60 bg-background/80 backdrop-blur-xl flex items-center justify-between px-6">
-        <a href="/" className="font-display text-base text-foreground tracking-tight hover:opacity-75 transition-opacity">
-          Arlist ID
-        </a>
+        <a href="/" className="font-display text-base tracking-tight hover:opacity-75 transition-opacity">Arlist ID</a>
         <Button variant="outline" size="sm" onClick={() => navigate('/profile')}>
-          <ArrowLeft size={14} />
-          Профиль
+          <ArrowLeft size={14} />Профиль
         </Button>
       </header>
 
-      {/* Body */}
       <main className="flex-1 max-w-5xl w-full mx-auto px-4 py-10 animate-fade-up">
-        <div className="mb-8 flex items-center gap-3">
+        <div className="mb-6 flex items-center gap-3">
           <div className="p-2 rounded-lg bg-violet-500/10 border border-violet-500/20">
             <ShieldCheck size={18} className="text-violet-400" />
           </div>
@@ -286,8 +313,10 @@ const Admin = () => {
           </div>
         </div>
 
+        <StatsBar />
+
         <Tabs defaultValue="users">
-          <Card className={cn("overflow-hidden")}>
+          <Card className="overflow-hidden">
             <TabsList className="rounded-none border-b border-border/60 bg-transparent px-2 gap-0">
               <TabsTrigger value="users">Пользователи</TabsTrigger>
               <TabsTrigger value="clients">OIDC-клиенты</TabsTrigger>
