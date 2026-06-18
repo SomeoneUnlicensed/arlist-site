@@ -1,0 +1,7 @@
+
+# TypeScript compiled output (should never be committed for Vite projects)
+src/**/*.js
+src/**/*.js.map
+src/**/*.d.ts
+src/**/*.d.ts.map
+!src/vite-env.d.ts
