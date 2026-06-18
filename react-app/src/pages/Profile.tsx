@@ -1,109 +1,130 @@
-import React, { useEffect, useState } from 'react';
-import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
+import React, { useEffect, useState } from 'react'
+import axios from 'axios'
+import { useNavigate } from 'react-router-dom'
+import { LogOut, ShieldCheck } from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import { Badge } from '@/components/ui/badge'
+import { Separator } from '@/components/ui/separator'
+import { cn } from '@/lib/utils'
 
 const PALETTES = [
-  { bg: 'linear-gradient(135deg, #1a1a3e, #3a3a8f)', border: 'rgba(100,100,200,0.3)' },
-  { bg: 'linear-gradient(135deg, #1a2e1a, #2a7a3a)', border: 'rgba(80,160,90,0.3)' },
-  { bg: 'linear-gradient(135deg, #2e1a1a, #8f3a3a)', border: 'rgba(160,80,80,0.3)' },
-  { bg: 'linear-gradient(135deg, #1a2a2e, #2a6a8f)', border: 'rgba(60,140,180,0.3)' },
-  { bg: 'linear-gradient(135deg, #2a1a2e, #7a3a9f)', border: 'rgba(140,80,200,0.3)' },
-];
+  'from-indigo-950 to-indigo-700',
+  'from-emerald-950 to-emerald-700',
+  'from-rose-950 to-rose-700',
+  'from-sky-950 to-sky-700',
+  'from-violet-950 to-violet-700',
+]
 
-function palette(seed: string) {
-  return PALETTES[(seed.charCodeAt(0) || 0) % PALETTES.length];
+function avatarGradient(seed: string) {
+  return PALETTES[(seed.charCodeAt(0) || 0) % PALETTES.length]
 }
 
 const Profile = () => {
-  const [user, setUser] = useState<any>(null);
-  const navigate = useNavigate();
+  const [user, setUser] = useState<any>(null)
+  const navigate = useNavigate()
 
   useEffect(() => {
     axios.get('/api/auth/profile')
       .then(r => setUser(r.data))
-      .catch(() => navigate('/login'));
-  }, [navigate]);
+      .catch(() => navigate('/login'))
+  }, [navigate])
 
   const logout = async () => {
-    await axios.post('/api/auth/logout');
-    navigate('/login');
-  };
+    await axios.post('/api/auth/logout')
+    navigate('/login')
+  }
 
   if (!user) {
     return (
-      <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <span style={{ color: 'var(--ac-gray-30)', fontSize: '0.875rem' }}>Загрузка...</span>
+      <div className="min-h-screen flex items-center justify-center">
+        <span className="text-muted-foreground text-sm">Загрузка...</span>
       </div>
-    );
+    )
   }
 
-  const initials = (user.name || user.email || '?').slice(0, 1).toUpperCase();
-  const pal = palette(initials);
+  const initials = (user.name || user.email || '?').slice(0, 1).toUpperCase()
+  const grad = avatarGradient(initials)
 
   return (
-    <div className="profile-page">
-      {/* Top navigation */}
-      <nav className="profile-nav">
-        <a href="/" className="profile-nav-brand">
-          <div className="auth-logo-mark">A</div>
+    <div className="min-h-screen flex flex-col">
+      {/* Nav */}
+      <header className="h-14 sticky top-0 z-50 border-b border-border/60 bg-background/80 backdrop-blur-xl flex items-center justify-between px-6">
+        <a href="/" className="font-display text-base text-foreground tracking-tight hover:opacity-75 transition-opacity">
           Arlist ID
         </a>
-        <div className="profile-nav-actions">
+        <div className="flex items-center gap-2">
           {user.role === 'ADMIN' && (
-            <button className="btn-sm btn-sm-primary" onClick={() => navigate('/admin')}>
+            <Button variant="secondary" size="sm" onClick={() => navigate('/admin')}>
+              <ShieldCheck size={14} />
               Управление
-            </button>
+            </Button>
           )}
-          <button className="btn-sm" onClick={logout}>Выйти</button>
+          <Button variant="outline" size="sm" onClick={logout}>
+            <LogOut size={14} />
+            Выйти
+          </Button>
         </div>
-      </nav>
+      </header>
 
-      {/* Page body */}
-      <div className="profile-body">
+      {/* Body */}
+      <main className="flex-1 max-w-xl w-full mx-auto px-4 py-10 space-y-4 animate-fade-up">
 
-        {/* Hero: avatar + name + badges */}
-        <div className="profile-hero">
-          <div
-            className="profile-avatar-lg"
-            style={{ background: pal.bg, border: `1px solid ${pal.border}` }}
-          >
+        {/* Hero */}
+        <div className="rounded-xl border border-border/60 bg-card p-6 flex items-center gap-5"
+             style={{ borderTopColor: 'rgba(255,255,255,0.1)' }}>
+          <div className={cn(
+            'w-16 h-16 rounded-full bg-gradient-to-br flex items-center justify-center text-2xl font-semibold shrink-0 text-white select-none',
+            grad
+          )}>
             {initials}
           </div>
-          <div className="profile-hero-info">
-            <h1 className="profile-hero-name">{user.name || 'Без имени'}</h1>
-            <div className="profile-hero-badges">
-              <span className={`badge ${user.role === 'ADMIN' ? 'badge-admin' : 'badge-user'}`}>
+          <div className="min-w-0">
+            <p className="text-lg font-semibold tracking-tight truncate">{user.name || 'Без имени'}</p>
+            <div className="flex gap-2 mt-2 flex-wrap">
+              <Badge variant={user.role === 'ADMIN' ? 'purple' : 'muted'}>
                 {user.role === 'ADMIN' ? 'Администратор' : 'Пользователь'}
-              </span>
-              <span className={`badge ${user.isVerified ? 'badge-verified' : 'badge-unverified'}`}>
+              </Badge>
+              <Badge variant={user.isVerified ? 'success' : 'muted'}>
                 {user.isVerified ? '✓ Подтверждён' : 'Не подтверждён'}
-              </span>
+              </Badge>
             </div>
           </div>
         </div>
 
-        {/* Account details */}
-        <div className="profile-section-card">
-          <div className="profile-section-header">Аккаунт</div>
-          <div className="profile-row">
-            <span className="profile-row-label">Email</span>
-            <span className="profile-row-value">{user.email}</span>
+        {/* Details */}
+        <div className="rounded-xl border border-border/60 bg-card overflow-hidden">
+          <div className="px-5 py-3 border-b border-border/40">
+            <p className="text-xs font-medium uppercase tracking-widest text-muted-foreground">Аккаунт</p>
           </div>
-          {user.name && (
-            <div className="profile-row">
-              <span className="profile-row-label">Имя</span>
-              <span className="profile-row-value">{user.name}</span>
-            </div>
-          )}
-          <div className="profile-row">
-            <span className="profile-row-label">ID</span>
-            <span className="profile-row-value mono">{user.id}</span>
+
+          <div className="divide-y divide-border/40">
+            <Row label="Email" value={user.email} />
+            {user.name && <Row label="Имя" value={user.name} />}
+            <Row label="ID" value={user.id} mono />
           </div>
         </div>
 
-      </div>
+        {/* Back to site */}
+        <div className="pt-1">
+          <Separator className="mb-4" />
+          <a href="/" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+            ← На главную
+          </a>
+        </div>
+      </main>
     </div>
-  );
-};
+  )
+}
 
-export default Profile;
+function Row({ label, value, mono }: { label: string; value: string; mono?: boolean }) {
+  return (
+    <div className="flex items-center justify-between gap-4 px-5 py-3.5">
+      <span className="text-sm text-muted-foreground shrink-0">{label}</span>
+      <span className={cn('text-sm text-right truncate', mono && 'font-mono text-xs text-muted-foreground')}>
+        {value}
+      </span>
+    </div>
+  )
+}
+
+export default Profile

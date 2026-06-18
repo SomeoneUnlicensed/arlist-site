@@ -1,107 +1,120 @@
-import React, { useEffect, useState } from 'react';
-import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
+import React, { useEffect, useState } from 'react'
+import axios from 'axios'
+import { useNavigate } from 'react-router-dom'
+import { Copy, Check, ArrowLeft, Loader2, ShieldCheck } from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Badge } from '@/components/ui/badge'
+import { Card, CardContent, CardHeader } from '@/components/ui/card'
+import { Alert, AlertDescription } from '@/components/ui/alert'
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs'
+import { Separator } from '@/components/ui/separator'
+import { cn } from '@/lib/utils'
 
-// ── helpers ───────────────────────────────────────────────
+// ── Copy button ───────────────────────────────────────────
 
-const CopyButton = ({ text }: { text: string }) => {
-  const [copied, setCopied] = useState(false);
+const CopyBtn = ({ text }: { text: string }) => {
+  const [copied, setCopied] = useState(false)
   return (
     <button
       type="button"
-      className={`copy-btn${copied ? ' copied' : ''}`}
-      onClick={() => { navigator.clipboard.writeText(text); setCopied(true); setTimeout(() => setCopied(false), 2000); }}
+      onClick={() => { navigator.clipboard.writeText(text); setCopied(true); setTimeout(() => setCopied(false), 2000) }}
+      className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors font-mono"
     >
+      {copied ? <Check size={12} className="text-emerald-400" /> : <Copy size={12} />}
       {copied ? 'скопировано' : 'копировать'}
     </button>
-  );
-};
+  )
+}
 
 // ── Users tab ─────────────────────────────────────────────
 
 const UsersTab = () => {
-  const [users, setUsers] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [err, setErr] = useState('');
+  const [users, setUsers] = useState<any[]>([])
+  const [loading, setLoading] = useState(true)
+  const [err, setErr] = useState('')
 
-  const fetch = async () => {
-    setLoading(true);
+  const load = async () => {
+    setLoading(true)
     try {
-      const r = await axios.get('/api/admin/users');
-      setUsers(r.data);
-    } catch { setErr('Не удалось загрузить'); }
-    finally { setLoading(false); }
-  };
+      const r = await axios.get('/api/admin/users')
+      setUsers(r.data)
+    } catch { setErr('Не удалось загрузить') }
+    finally { setLoading(false) }
+  }
 
-  useEffect(() => { fetch(); }, []);
+  useEffect(() => { load() }, [])
 
   const ban = async (id: string, isBanned: boolean) => {
-    try { await axios.patch(`/api/admin/users/${id}`, { isBanned }); fetch(); }
-    catch { setErr('Ошибка'); }
-  };
+    try { await axios.patch(`/api/admin/users/${id}`, { isBanned }); load() }
+    catch { setErr('Ошибка') }
+  }
 
   const promote = async (id: string, role: string) => {
-    try { await axios.patch(`/api/admin/users/${id}`, { role }); fetch(); }
-    catch { setErr('Ошибка'); }
-  };
+    try { await axios.patch(`/api/admin/users/${id}`, { role }); load() }
+    catch { setErr('Ошибка') }
+  }
 
   const remove = async (id: string, email: string) => {
-    if (!confirm(`Удалить ${email}?`)) return;
-    try { await axios.delete(`/api/admin/users/${id}`); fetch(); }
-    catch { setErr('Ошибка удаления'); }
-  };
+    if (!confirm(`Удалить ${email}?`)) return
+    try { await axios.delete(`/api/admin/users/${id}`); load() }
+    catch { setErr('Ошибка удаления') }
+  }
 
-  if (loading) return <div style={{ padding: '40px 24px', color: 'var(--ac-gray-30)', fontSize: '0.875rem' }}>Загрузка...</div>;
+  if (loading) return (
+    <div className="flex items-center justify-center py-16 text-muted-foreground gap-2 text-sm">
+      <Loader2 size={16} className="animate-spin" /> Загрузка...
+    </div>
+  )
 
   return (
-    <div>
-      {err && <div className="alert alert-error" style={{ margin: '16px 24px 0' }}>{err}</div>}
+    <div className="p-0">
+      {err && <div className="px-5 pt-4"><Alert variant="destructive"><AlertDescription>{err}</AlertDescription></Alert></div>}
       {users.length === 0 ? (
-        <div style={{ padding: '40px 24px', textAlign: 'center', color: 'var(--ac-gray-30)', fontSize: '0.875rem' }}>Нет пользователей</div>
+        <div className="text-center py-16 text-muted-foreground text-sm">Нет пользователей</div>
       ) : (
-        <div style={{ overflowX: 'auto' }}>
-          <table className="admin-table">
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm">
             <thead>
-              <tr>
-                <th>Пользователь</th>
-                <th>Роль</th>
-                <th>Статус</th>
-                <th>Дата</th>
-                <th>Действия</th>
+              <tr className="border-b border-border/40">
+                {['Пользователь', 'Роль', 'Статус', 'Дата', ''].map(h => (
+                  <th key={h} className="px-4 py-3 text-left text-xs uppercase tracking-widest text-muted-foreground font-normal">{h}</th>
+                ))}
               </tr>
             </thead>
-            <tbody>
+            <tbody className="divide-y divide-border/30">
               {users.map(u => (
-                <tr key={u.id}>
-                  <td>
-                    <div style={{ fontWeight: 500, marginBottom: 2 }}>{u.name || '—'}</div>
-                    <div style={{ fontSize: '0.78rem', color: 'var(--ac-gray-40)', fontFamily: 'var(--font-mono)' }}>{u.email}</div>
+                <tr key={u.id} className="hover:bg-accent/40 transition-colors">
+                  <td className="px-4 py-3">
+                    <p className="font-medium">{u.name || '—'}</p>
+                    <p className="text-xs text-muted-foreground font-mono mt-0.5">{u.email}</p>
                   </td>
-                  <td>
-                    <span className={`badge ${u.role === 'ADMIN' ? 'badge-admin' : 'badge-user'}`}>
+                  <td className="px-4 py-3">
+                    <Badge variant={u.role === 'ADMIN' ? 'purple' : 'muted'}>
                       {u.role === 'ADMIN' ? 'Админ' : 'Юзер'}
-                    </span>
+                    </Badge>
                   </td>
-                  <td>
+                  <td className="px-4 py-3">
                     {u.isBanned
-                      ? <span className="badge" style={{ color: '#ff8c8c', background: 'rgba(255,100,100,0.08)', border: '1px solid rgba(255,100,100,0.2)' }}>Забанен</span>
-                      : <span className={`badge ${u.isVerified ? 'badge-verified' : 'badge-unverified'}`}>{u.isVerified ? 'Активен' : 'Не верифицирован'}</span>
+                      ? <Badge variant="destructive">Забанен</Badge>
+                      : <Badge variant={u.isVerified ? 'success' : 'muted'}>{u.isVerified ? 'Активен' : 'Не верифицирован'}</Badge>
                     }
                   </td>
-                  <td style={{ color: 'var(--ac-gray-30)', fontSize: '0.78rem' }}>
+                  <td className="px-4 py-3 text-xs text-muted-foreground">
                     {new Date(u.createdAt).toLocaleDateString('ru-RU')}
                   </td>
-                  <td>
-                    <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+                  <td className="px-4 py-3">
+                    <div className="flex gap-1.5 flex-wrap">
                       {u.isBanned
-                        ? <button className="copy-btn" onClick={() => ban(u.id, false)}>разбанить</button>
-                        : <button className="copy-btn" style={{ color: '#ff8c8c', borderColor: 'rgba(255,100,100,0.25)' }} onClick={() => ban(u.id, true)}>бан</button>
+                        ? <Button size="sm" variant="outline" onClick={() => ban(u.id, false)}>Разбанить</Button>
+                        : <Button size="sm" variant="outline" className="text-red-400 border-red-500/20 hover:bg-red-500/10 hover:text-red-300" onClick={() => ban(u.id, true)}>Бан</Button>
                       }
                       {u.role === 'USER'
-                        ? <button className="copy-btn" style={{ color: '#c9aaff', borderColor: 'rgba(180,140,255,0.25)' }} onClick={() => promote(u.id, 'ADMIN')}>→ админ</button>
-                        : <button className="copy-btn" onClick={() => promote(u.id, 'USER')}>→ юзер</button>
+                        ? <Button size="sm" variant="outline" className="text-violet-400 border-violet-500/20 hover:bg-violet-500/10" onClick={() => promote(u.id, 'ADMIN')}>→ Админ</Button>
+                        : <Button size="sm" variant="outline" onClick={() => promote(u.id, 'USER')}>→ Юзер</Button>
                       }
-                      <button className="copy-btn" style={{ color: '#ff8c8c', borderColor: 'rgba(255,100,100,0.25)' }} onClick={() => remove(u.id, u.email)}>удалить</button>
+                      <Button size="sm" variant="outline" className="text-red-400 border-red-500/20 hover:bg-red-500/10 hover:text-red-300" onClick={() => remove(u.id, u.email)}>Удалить</Button>
                     </div>
                   </td>
                 </tr>
@@ -111,157 +124,181 @@ const UsersTab = () => {
         </div>
       )}
     </div>
-  );
-};
+  )
+}
 
 // ── Clients tab ───────────────────────────────────────────
 
 const ClientsTab = () => {
-  const [clients, setClients] = useState<any[]>([]);
-  const [name, setName] = useState('');
-  const [redirectUris, setRedirectUris] = useState('');
-  const [isTrusted, setIsTrusted] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [newSecret, setNewSecret] = useState('');
-  const [err, setErr] = useState('');
+  const [clients, setClients] = useState<any[]>([])
+  const [name, setName] = useState('')
+  const [redirectUris, setRedirectUris] = useState('')
+  const [isTrusted, setIsTrusted] = useState(false)
+  const [loading, setLoading] = useState(false)
+  const [newSecret, setNewSecret] = useState('')
+  const [err, setErr] = useState('')
 
-  const fetch = async () => {
-    try { const r = await axios.get('/api/admin/clients'); setClients(r.data); }
-    catch { setErr('Не удалось загрузить'); }
-  };
+  const load = async () => {
+    try { const r = await axios.get('/api/admin/clients'); setClients(r.data) }
+    catch { setErr('Не удалось загрузить') }
+  }
 
-  useEffect(() => { fetch(); }, []);
+  useEffect(() => { load() }, [])
 
   const create = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setErr(''); setNewSecret(''); setLoading(true);
+    e.preventDefault()
+    setErr(''); setNewSecret(''); setLoading(true)
     try {
-      const uris = redirectUris.split(',').map(u => u.trim()).filter(Boolean);
-      const r = await axios.post('/api/admin/clients', { name, redirectUris: uris, isTrusted });
-      setNewSecret(r.data.clientSecret);
-      setName(''); setRedirectUris(''); setIsTrusted(false);
-      fetch();
-    } catch (e: any) { setErr(e.response?.data?.error || 'Ошибка'); }
-    finally { setLoading(false); }
-  };
+      const uris = redirectUris.split(',').map(u => u.trim()).filter(Boolean)
+      const r = await axios.post('/api/admin/clients', { name, redirectUris: uris, isTrusted })
+      setNewSecret(r.data.clientSecret)
+      setName(''); setRedirectUris(''); setIsTrusted(false)
+      load()
+    } catch (e: any) { setErr(e.response?.data?.error || 'Ошибка') }
+    finally { setLoading(false) }
+  }
 
   return (
-    <div style={{ padding: '24px' }}>
-      {err && <div className="alert alert-error">{err}</div>}
+    <div className="p-5 space-y-5">
+      {err && <Alert variant="destructive"><AlertDescription>{err}</AlertDescription></Alert>}
+
       {newSecret && (
-        <div className="alert alert-success">
-          <div style={{ marginBottom: 8, fontWeight: 500 }}>Приложение создано. Сохраните Client Secret — показывается один раз.</div>
-          <div style={{ display: 'flex', gap: 8, background: 'rgba(127,255,212,0.05)', padding: '8px 10px', borderRadius: 4, fontFamily: 'var(--font-mono)', fontSize: '0.8rem', wordBreak: 'break-all' }}>
-            <span style={{ flex: 1 }}>{newSecret}</span>
-            <CopyButton text={newSecret} />
-          </div>
-        </div>
+        <Alert variant="success">
+          <AlertDescription>
+            <p className="font-medium mb-2">Приложение создано. Сохраните Client Secret — показывается один раз.</p>
+            <div className="flex items-center gap-2 bg-background/60 rounded px-3 py-2 font-mono text-xs break-all">
+              <span className="flex-1">{newSecret}</span>
+              <CopyBtn text={newSecret} />
+            </div>
+          </AlertDescription>
+        </Alert>
       )}
 
       {clients.length > 0 && (
-        <div className="admin-card" style={{ marginBottom: 24 }}>
-          <div className="admin-card-header">Зарегистрированные приложения ({clients.length})</div>
-          <div style={{ overflowX: 'auto' }}>
-            <table className="admin-table">
-              <thead><tr><th>Название</th><th>Client ID</th><th>Redirect URIs</th><th>Тип</th></tr></thead>
-              <tbody>
+        <Card>
+          <CardHeader className="py-3 px-5 border-b border-border/40">
+            <p className="text-xs uppercase tracking-widest text-muted-foreground font-normal">
+              Приложения ({clients.length})
+            </p>
+          </CardHeader>
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b border-border/40">
+                  {['Название', 'Client ID', 'Redirect URIs', 'Тип'].map(h => (
+                    <th key={h} className="px-4 py-2.5 text-left text-xs uppercase tracking-widest text-muted-foreground font-normal">{h}</th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-border/30">
                 {clients.map(c => (
-                  <tr key={c.id}>
-                    <td style={{ fontWeight: 500 }}>{c.name}</td>
-                    <td>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                        <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.78rem', color: 'var(--ac-gray-50)' }}>{c.clientId}</span>
-                        <CopyButton text={c.clientId} />
+                  <tr key={c.id} className="hover:bg-accent/40 transition-colors">
+                    <td className="px-4 py-3 font-medium">{c.name}</td>
+                    <td className="px-4 py-3">
+                      <div className="flex items-center gap-2">
+                        <span className="font-mono text-xs text-muted-foreground">{c.clientId}</span>
+                        <CopyBtn text={c.clientId} />
                       </div>
                     </td>
-                    <td>{c.redirectUris.map((u: string) => <div key={u} style={{ fontFamily: 'var(--font-mono)', fontSize: '0.78rem', color: 'var(--ac-gray-40)' }}>{u}</div>)}</td>
-                    <td>{c.isTrusted ? <span className="badge badge-verified">Доверенное</span> : <span className="badge badge-user">Обычное</span>}</td>
+                    <td className="px-4 py-3">
+                      {c.redirectUris.map((u: string) => (
+                        <p key={u} className="font-mono text-xs text-muted-foreground">{u}</p>
+                      ))}
+                    </td>
+                    <td className="px-4 py-3">
+                      <Badge variant={c.isTrusted ? 'success' : 'muted'}>
+                        {c.isTrusted ? 'Доверенное' : 'Обычное'}
+                      </Badge>
+                    </td>
                   </tr>
                 ))}
               </tbody>
             </table>
           </div>
-        </div>
+        </Card>
       )}
 
-      <div className="admin-card" style={{ maxWidth: 520 }}>
-        <div className="admin-card-header">Добавить приложение</div>
-        <div className="admin-card-body">
-          <form onSubmit={create}>
-            <div className="form-group">
-              <label className="form-label">Название</label>
-              <input type="text" className="form-input" value={name} onChange={e => setName(e.target.value)} placeholder="Например: Arlist Analytics" required />
+      <Card className="max-w-lg">
+        <CardHeader className="py-4 px-5 border-b border-border/40">
+          <p className="text-sm font-medium">Добавить приложение</p>
+        </CardHeader>
+        <CardContent className="p-5">
+          <form onSubmit={create} className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="app-name">Название</Label>
+              <Input id="app-name" value={name} onChange={e => setName(e.target.value)} placeholder="Arlist Analytics" required />
             </div>
-            <div className="form-group">
-              <label className="form-label">Redirect URIs (через запятую)</label>
-              <input type="text" className="form-input" value={redirectUris} onChange={e => setRedirectUris(e.target.value)} placeholder="https://app.example.com/callback" required />
+            <div className="space-y-2">
+              <Label htmlFor="redirect-uris">Redirect URIs (через запятую)</Label>
+              <Input id="redirect-uris" value={redirectUris} onChange={e => setRedirectUris(e.target.value)} placeholder="https://app.example.com/callback" required />
             </div>
-            <div className="form-group" style={{ display: 'flex', alignItems: 'flex-start', gap: 10 }}>
-              <input type="checkbox" id="isTrusted" checked={isTrusted} onChange={e => setIsTrusted(e.target.checked)}
-                style={{ width: 15, height: 15, marginTop: 3, accentColor: 'var(--ac-white)', flexShrink: 0, cursor: 'pointer' }} />
-              <label htmlFor="isTrusted" style={{ cursor: 'pointer', fontSize: '0.875rem', lineHeight: 1.5 }}>
-                Доверенное приложение
-                <span style={{ display: 'block', fontSize: '0.8rem', color: 'var(--ac-gray-30)', marginTop: 2 }}>Получает роль и статус верификации пользователя</span>
-              </label>
+            <div className="flex items-start gap-3">
+              <input
+                id="is-trusted"
+                type="checkbox"
+                checked={isTrusted}
+                onChange={e => setIsTrusted(e.target.checked)}
+                className="mt-0.5 h-4 w-4 rounded border-input bg-background accent-foreground cursor-pointer"
+              />
+              <div>
+                <label htmlFor="is-trusted" className="text-sm font-medium cursor-pointer">Доверенное приложение</label>
+                <p className="text-xs text-muted-foreground mt-0.5">Получает роль и статус верификации пользователя</p>
+              </div>
             </div>
-            <button type="submit" className="btn-auth" disabled={loading} style={{ marginTop: 8 }}>
-              {loading && <span className="spinner" />}
+            <Button type="submit" disabled={loading} className="w-full mt-2">
+              {loading && <Loader2 size={15} className="animate-spin" />}
               {loading ? 'Создаём...' : 'Создать OIDC-клиента'}
-            </button>
+            </Button>
           </form>
-        </div>
-      </div>
+        </CardContent>
+      </Card>
     </div>
-  );
-};
+  )
+}
 
-// ── Main Admin page ───────────────────────────────────────
-
-const TABS = ['Пользователи', 'OIDC-клиенты'] as const;
-type Tab = typeof TABS[number];
+// ── Main ──────────────────────────────────────────────────
 
 const Admin = () => {
-  const [tab, setTab] = useState<Tab>('Пользователи');
-  const navigate = useNavigate();
+  const navigate = useNavigate()
 
   return (
-    <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
-      <nav className="profile-nav">
-        <a href="/" className="profile-nav-brand">
-          <div className="auth-logo-mark">A</div>
+    <div className="min-h-screen flex flex-col">
+      {/* Nav */}
+      <header className="h-14 sticky top-0 z-50 border-b border-border/60 bg-background/80 backdrop-blur-xl flex items-center justify-between px-6">
+        <a href="/" className="font-display text-base text-foreground tracking-tight hover:opacity-75 transition-opacity">
           Arlist ID
         </a>
-        <div className="profile-nav-actions">
-          <button className="btn-sm" onClick={() => navigate('/profile')}>← Профиль</button>
-        </div>
-      </nav>
-    <div className="admin-container">
-      <div style={{ marginBottom: 28 }}>
-        <h1 style={{ fontSize: '1.2rem', fontWeight: 500, letterSpacing: '-0.04em', margin: '0 0 4px' }}>Панель управления</h1>
-        <p style={{ color: 'var(--ac-gray-40)', fontSize: '0.85rem', margin: 0 }}>Arlist ID</p>
-      </div>
+        <Button variant="outline" size="sm" onClick={() => navigate('/profile')}>
+          <ArrowLeft size={14} />
+          Профиль
+        </Button>
+      </header>
 
-      <div className="admin-card">
-        {/* Tab bar */}
-        <div style={{ display: 'flex', borderBottom: '1px solid var(--ac-gray-08)' }}>
-          {TABS.map(t => (
-            <button key={t} onClick={() => setTab(t)} style={{
-              background: 'none', border: 'none', padding: '14px 20px', cursor: 'pointer',
-              fontSize: '0.875rem', fontFamily: 'inherit',
-              color: tab === t ? 'var(--ac-white)' : 'var(--ac-gray-40)',
-              borderBottom: tab === t ? '1px solid var(--ac-white)' : '1px solid transparent',
-              marginBottom: -1, transition: 'color 0.2s',
-            }}>
-              {t}
-            </button>
-          ))}
+      {/* Body */}
+      <main className="flex-1 max-w-5xl w-full mx-auto px-4 py-10 animate-fade-up">
+        <div className="mb-8 flex items-center gap-3">
+          <div className="p-2 rounded-lg bg-violet-500/10 border border-violet-500/20">
+            <ShieldCheck size={18} className="text-violet-400" />
+          </div>
+          <div>
+            <h1 className="text-lg font-semibold tracking-tight">Панель управления</h1>
+            <p className="text-sm text-muted-foreground">Arlist ID</p>
+          </div>
         </div>
 
-        {tab === 'Пользователи' ? <UsersTab /> : <ClientsTab />}
-      </div>
+        <Tabs defaultValue="users">
+          <Card className={cn("overflow-hidden")}>
+            <TabsList className="rounded-none border-b border-border/60 bg-transparent px-2 gap-0">
+              <TabsTrigger value="users">Пользователи</TabsTrigger>
+              <TabsTrigger value="clients">OIDC-клиенты</TabsTrigger>
+            </TabsList>
+            <TabsContent value="users"><UsersTab /></TabsContent>
+            <TabsContent value="clients"><ClientsTab /></TabsContent>
+          </Card>
+        </Tabs>
+      </main>
     </div>
-    </div>
-  );
-};
+  )
+}
 
-export default Admin;
+export default Admin
