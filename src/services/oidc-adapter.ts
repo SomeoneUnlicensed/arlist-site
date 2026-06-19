@@ -1,4 +1,5 @@
 import prisma from './prisma.service.js';
+import type { AdapterPayload } from 'oidc-provider';
 
 export class PrismaAdapter {
   type: string;
@@ -35,7 +36,7 @@ export class PrismaAdapter {
     });
   }
 
-  async find(id: string) {
+  async find(id: string): Promise<AdapterPayload | undefined> {
     // Route Client lookups to OAuthClient table
     if (this.type === 'Client') {
       const c = await prisma.oAuthClient.findUnique({ where: { clientId: id } });
@@ -47,7 +48,7 @@ export class PrismaAdapter {
         grant_types: ['authorization_code'],
         response_types: ['code'],
         token_endpoint_auth_method: 'client_secret_basic',
-      };
+      } as AdapterPayload;
     }
 
     const record = await prisma.oidcModel.findUnique({
