@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Документация API | Арлист</title>
+
+    <!-- Geist Font -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/geist@1.3.0/dist/fonts/geist-sans/style.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/geist@1.3.0/dist/fonts/geist-mono/style.css">
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="/icon.svg">
+    <meta name="theme-color" content="#000000">
+
+    <link rel="stylesheet" href="/css/global.css">
+    <style>
+        .hero { padding: 100px 0 40px; }
+        h1 { font-size: clamp(2.5rem, 8vw, 4.5rem); font-weight: 600; letter-spacing: -0.05em; line-height: 1; margin-bottom: 24px; }
+        .hero p.lead { font-size: 1.15rem; color: var(--ac-gray-40); max-width: 600px; }
+
+        .docs-layout { display: grid; grid-template-columns: 220px 1fr; gap: 64px; padding-bottom: 140px; align-items: start; }
+
+        .docs-nav { position: sticky; top: 100px; display: flex; flex-direction: column; gap: 4px; }
+        .docs-nav a { color: var(--ac-gray-40); text-decoration: none; font-size: 0.85rem; padding: 6px 0; transition: var(--transition); border-left: 2px solid transparent; padding-left: 12px; }
+        .docs-nav a:hover { color: var(--ac-white); }
+        .docs-nav a.section-title { color: var(--ac-white); font-weight: 600; margin-top: 18px; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.1em; padding-left: 0; }
+        .docs-nav a.section-title:first-child { margin-top: 0; }
+
+        .docs-content section { margin-bottom: 72px; }
+        .docs-content h2 { font-size: 1.8rem; font-weight: 600; letter-spacing: -0.02em; margin-bottom: 16px; padding-top: 8px; border-top: 1px solid var(--ac-gray-10); padding-top: 40px; }
+        .docs-content section:first-child h2 { border-top: none; padding-top: 0; }
+        .docs-content h3 { font-size: 1.15rem; font-weight: 600; margin: 32px 0 12px; }
+        .docs-content p { color: var(--ac-gray-40); font-size: 1rem; line-height: 1.7; margin-bottom: 16px; max-width: 720px; }
+        .docs-content p strong, .docs-content li strong { color: var(--ac-white); font-weight: 600; }
+        .docs-content ul { margin: 0 0 20px 0; padding-left: 20px; color: var(--ac-gray-40); }
+        .docs-content li { margin-bottom: 8px; line-height: 1.6; }
+        .docs-content code { font-family: var(--font-mono); background: var(--ac-gray-10); padding: 2px 6px; border-radius: 4px; font-size: 0.88em; color: var(--ac-white); }
+
+        pre {
+            background: #0a0a0a;
+            border: 1px solid var(--ac-gray-10);
+            border-radius: 8px;
+            padding: 20px 24px;
+            overflow-x: auto;
+            margin: 16px 0 24px;
+            font-family: var(--font-mono);
+            font-size: 0.85rem;
+            line-height: 1.6;
+            color: #d8d8d8;
+        }
+        pre .c1 { color: #6a737d; }
+
+        table { width: 100%; border-collapse: collapse; margin: 16px 0 24px; font-size: 0.92rem; }
+        th, td { text-align: left; padding: 10px 14px; border-bottom: 1px solid var(--ac-gray-10); }
+        th { color: var(--ac-gray-40); font-weight: 500; font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.05em; }
+        td { color: var(--ac-gray-40); }
+        td:first-child, td code { color: var(--ac-white); }
+
+        .badge { display: inline-block; font-family: var(--font-mono); font-size: 0.75rem; font-weight: 600; padding: 2px 8px; border-radius: 4px; margin-right: 8px; }
+        .badge-get { background: rgba(80, 160, 255, 0.15); color: #6fb1ff; }
+        .badge-post { background: rgba(80, 220, 130, 0.15); color: #7be0a0; }
+        .endpoint-path { font-family: var(--font-mono); font-size: 0.95rem; }
+
+        .callout { border-left: 2px solid var(--ac-gray-30); padding: 14px 20px; background: var(--ac-gray-05); border-radius: 0 6px 6px 0; margin: 20px 0 24px; max-width: 720px; }
+        .callout p { margin: 0; color: var(--ac-gray-40); font-size: 0.92rem; }
+
+        @media (max-width: 900px) {
+            .docs-layout { grid-template-columns: 1fr; }
+            .docs-nav { position: static; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="stub-overlay" id="stub-page">
+    <div class="stub-content">
+        <h2 class="stub-title">Личный кабинет</h2>
+        <p class="stub-text">
+            Мы завершаем работу над единой системой авторизации.<br>
+            Пока что приглашаем вас в наш Git-сервис.
+        </p>
+        <a href="https://commit.arlist.tech" class="stub-link" target="_blank">Перейти в Commit</a>
+        <span class="stub-close" id="stub-close">Вернуться назад</span>
+    </div>
+</div>
+
+<nav class="navbar">
+    <a href="/" class="logo">
+        <img src="/icon.svg" alt="" class="logo-icon">
+        Арлист
+    </a>
+    <ul class="nav-links">
+        <li><a href="/products" class="nav-link">Продукты</a></li>
+        <li><a href="/forEdu" class="nav-link">Образование</a></li>
+        <li><a href="/contacts" class="nav-link">Контакты</a></li>
+        <li><a href="/login" class="nav-link">Вход</a></li>
+    </ul>
+</nav>
+
+<div class="container">
+    <header class="hero">
+        <h1 class="reveal">Arlist API</h1>
+        <p class="lead reveal">Документация по серверному API партнёрских сервисов и по авторизации через Arlist ID (OpenID Connect).</p>
+    </header>
+
+    <div class="docs-layout">
+        <aside class="docs-nav">
+            <a class="section-title">Arlist ID (OAuth/OIDC)</a>
+            <a href="#oidc-overview">Обзор</a>
+            <a href="#oidc-endpoints">Endpoints</a>
+            <a href="#oidc-flow">Authorization Code + PKCE</a>
+            <a href="#oidc-scopes">Scopes и claims</a>
+            <a href="#oidc-example">Пример (NextAuth)</a>
+
+            <a class="section-title">Arlist API</a>
+            <a href="#api-overview">Обзор</a>
+            <a href="#api-auth">Аутентификация</a>
+            <a href="#api-users-id">GET /users/:id</a>
+            <a href="#api-users-email">GET /users/by-email/:email</a>
+            <a href="#api-errors">Ошибки</a>
+        </aside>
+
+        <div class="docs-content">
+
+            <section id="oidc-overview">
+                <h2>Arlist ID — обзор</h2>
+                <p>
+                    Arlist ID — это единая система входа («Войти с Arlist ID») на базе протокола <strong>OpenID Connect</strong> (OAuth 2.0).
+                    Partner-сервисы (например, leetcot.ru) подключают её как стандартного OIDC-провайдера —
+                    через библиотеки типа <code>Auth.js</code> / <code>NextAuth</code>, <code>oidc-client</code> и им подобные.
+                </p>
+                <p>
+                    <strong>Issuer:</strong> <code>https://arlist.ru</code><br>
+                    <strong>Discovery document:</strong> <code>https://arlist.ru/.well-known/openid-configuration</code>
+                </p>
+                <div class="callout">
+                    <p>Discovery-документ всегда содержит актуальные адреса всех endpoint'ов — рекомендуем настраивать клиентов через <code>issuer</code>, а не хардкодить пути вручную.</p>
+                </div>
+            </section>
+
+            <section id="oidc-endpoints">
+                <h2>Endpoints</h2>
+                <table>
+                    <tr><th>Endpoint</th><th>Путь</th></tr>
+                    <tr><td>Authorization</td><td class="endpoint-path">/auth</td></tr>
+                    <tr><td>Token</td><td class="endpoint-path">/token</td></tr>
+                    <tr><td>Userinfo</td><td class="endpoint-path">/me</td></tr>
+                    <tr><td>JWKS</td><td class="endpoint-path">/jwks</td></tr>
+                    <tr><td>End session</td><td class="endpoint-path">/session/end</td></tr>
+                </table>
+                <p>Все пути — относительно <code>https://arlist.ru</code>.</p>
+            </section>
+
+            <section id="oidc-flow">
+                <h2>Authorization Code Flow + PKCE</h2>
+                <p>Arlist ID поддерживает только <code>response_type=code</code> с обязательным PKCE (<code>S256</code>). Implicit-флоу без code не рекомендуется.</p>
+
+                <h3>1. Редирект пользователя на authorization endpoint</h3>
+                <pre>GET https://arlist.ru/auth
+  ?client_id=&lt;ваш client_id&gt;
+  &amp;response_type=code
+  &amp;redirect_uri=https://ваш-сервис.ru/callback
+  &amp;scope=openid email profile
+  &amp;code_challenge=&lt;BASE64URL(SHA256(code_verifier))&gt;
+  &amp;code_challenge_method=S256
+  &amp;state=&lt;random-string&gt;</pre>
+
+                <p>Пользователь проходит логин на <code>arlist.ru</code> и (при первом входе) подтверждает запрашиваемые scope. После этого браузер редиректится на ваш <code>redirect_uri</code>:</p>
+                <pre>https://ваш-сервис.ru/callback?code=AbC123...&amp;state=&lt;тот же state&gt;&amp;iss=https://arlist.ru</pre>
+
+                <h3>2. Обмен code на токены (server-to-server)</h3>
+                <pre><span class="c1"># Authorization: Basic base64(client_id:client_secret)</span>
+POST https://arlist.ru/token
+Content-Type: application/x-www-form-urlencoded
+
+grant_type=authorization_code
+&amp;code=AbC123...
+&amp;redirect_uri=https://ваш-сервис.ru/callback
+&amp;code_verifier=&lt;исходный code_verifier&gt;</pre>
+
+                <p>Ответ:</p>
+                <pre>{
+  "access_token": "...",
+  "id_token": "eyJhbGciOiJSUzI1NiIs...",
+  "token_type": "Bearer",
+  "expires_in": 3600,
+  "scope": "openid email profile"
+}</pre>
+
+                <h3>3. Получение профиля пользователя</h3>
+                <pre>GET https://arlist.ru/me
+Authorization: Bearer &lt;access_token&gt;</pre>
+                <pre>{
+  "sub": "cuid...",
+  "email": "user@example.com",
+  "name": "Имя Пользователя"
+}</pre>
+            </section>
+
+            <section id="oidc-scopes">
+                <h2>Scopes и claims</h2>
+                <table>
+                    <tr><th>Scope</th><th>Claims</th><th>Доступ</th></tr>
+                    <tr><td><code>openid</code></td><td><code>sub</code></td><td>любой клиент</td></tr>
+                    <tr><td><code>email</code></td><td><code>email</code></td><td>любой клиент</td></tr>
+                    <tr><td><code>profile</code></td><td><code>name</code></td><td>любой клиент</td></tr>
+                    <tr><td><code>internal</code></td><td><code>role</code>, <code>isVerified</code></td><td>только доверенные внутренние клиенты (<code>isTrusted</code>)</td></tr>
+                </table>
+                <p>Scope <code>internal</code> предоставляется только клиентам, помеченным как доверенные (<code>isTrusted = true</code>) в реестре OAuth-клиентов Arlist — он не выдаётся сторонним партнёрам.</p>
+            </section>
+
+            <section id="oidc-example">
+                <h2>Пример подключения (Auth.js / NextAuth)</h2>
+                <pre><span class="c1">// auth.config.ts</span>
+{
+  id: "arlist",
+  name: "Arlist ID",
+  type: "oidc",
+  issuer: "https://arlist.ru",
+  clientId: process.env.ARLIST_CLIENT_ID,
+  clientSecret: process.env.ARLIST_CLIENT_SECRET,
+  authorization: { params: { scope: "openid email profile" } },
+}</pre>
+                <p>Auth.js сам подтянет все endpoint'ы из discovery-документа и сделает PKCE автоматически — никакой ручной сборки URL не требуется.</p>
+                <div class="callout">
+                    <p><strong>Важно:</strong> не конструируйте вручную редирект-ссылки вида <code>/auth/&lt;uid&gt;</code> — это внутренний служебный маршрут oidc-провайдера ("resume"), используемый только самим сервером Arlist после завершения логина. Партнёрским сервисам нужно работать исключительно с <code>/auth</code> (authorization endpoint) и <code>redirect_uri</code>, на который вернётся браузер.</p>
+                </div>
+            </section>
+
+            <section id="api-overview">
+                <h2>Arlist API — обзор</h2>
+                <p>
+                    Серверный (server-to-server) REST API для партнёрских сервисов — позволяет получить публичные данные
+                    пользователя Arlist по его <code>id</code> или email, без прохождения OAuth-флоу со стороны конечного пользователя.
+                </p>
+                <p><strong>Base URL:</strong> <code>https://arlist.ru/api/v1</code></p>
+            </section>
+
+            <section id="api-auth">
+                <h2>Аутентификация</h2>
+                <p>
+                    Все запросы к Arlist API требуют HTTP Basic Auth с вашими серверными учётными данными клиента:
+                </p>
+                <pre>Authorization: Basic base64(client_id:client_secret)</pre>
+                <p>
+                    Это те же <code>client_id</code> / <code>client_secret</code>, что выданы вам для OIDC-интеграции —
+                    отдельных ключей заводить не нужно. Передавайте их только с сервера, никогда из браузера или мобильного клиента.
+                </p>
+            </section>
+
+            <section id="api-users-id">
+                <h2><span class="badge badge-get">GET</span><span class="endpoint-path">/users/:id</span></h2>
+                <p>Возвращает публичные данные пользователя по его внутреннему ID.</p>
+                <pre>GET /api/v1/users/cuid123abc
+Authorization: Basic ...</pre>
+                <p>Ответ <code>200 OK</code>:</p>
+                <pre>{
+  "id": "cuid123abc",
+  "email": "user@example.com",
+  "name": "Имя Пользователя",
+  "role": "USER",
+  "isVerified": true,
+  "isBanned": false,
+  "createdAt": "2026-01-15T10:00:00.000Z"
+}</pre>
+                <p>Если запрос выполнен доверенным (<code>isTrusted</code>) клиентом, в ответе дополнительно присутствует поле <code>balanceKopecks</code> — баланс пользователя в копейках.</p>
+            </section>
+
+            <section id="api-users-email">
+                <h2><span class="badge badge-get">GET</span><span class="endpoint-path">/users/by-email/:email</span></h2>
+                <p>То же самое, но поиск по email вместо ID.</p>
+                <pre>GET /api/v1/users/by-email/user%40example.com
+Authorization: Basic ...</pre>
+                <p>Формат ответа идентичен <code>/users/:id</code>.</p>
+            </section>
+
+            <section id="api-errors">
+                <h2>Ошибки</h2>
+                <table>
+                    <tr><th>Код</th><th>Когда возникает</th></tr>
+                    <tr><td>401</td><td>Отсутствует/неверный заголовок <code>Authorization</code>, либо неверные <code>client_id</code>/<code>client_secret</code></td></tr>
+                    <tr><td>404</td><td>Пользователь с таким <code>id</code> или <code>email</code> не найден</td></tr>
+                    <tr><td>500</td><td>Внутренняя ошибка сервера</td></tr>
+                </table>
+                <p>Тело ошибки всегда в формате <code>{ "error": "..." }</code>.</p>
+            </section>
+
+        </div>
+    </div>
+</div>
+
+<footer class="footer">
+    <div class="container">
+        <div class="footer-content">
+            <div class="footer-brand">
+                <a href="/" class="logo">
+                    <img src="/icon.svg" alt="" class="logo-icon">
+                    АРЛИСТ ТЕХ
+                </a>
+            </div>
+            <div class="footer-links">
+                <div class="footer-col">
+                    <span class="footer-label">Сервисы</span>
+                    <a href="https://commit.arlist.tech">Commit</a>
+                    <a href="https://leetcot.ru">ЛитКот</a>
+                </div>
+                <div class="footer-col">
+                    <span class="footer-label">Компания</span>
+                    <a href="/forEdu">Образование</a>
+                    <a href="/contacts">Контакты</a>
+                    <a href="/docs">API</a>
+                </div>
+                <div class="footer-col">
+                    <span class="footer-label">Право</span>
+                    <a href="/legal">Документы</a>
+                    <a href="/legal/commit-privacy">Приватность</a>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p class="footer-copy">© 2026 АРЛИСТ ТЕХ. Все права защищены.</p>
+            <div class="footer-cat">
+  _._     _,-'""`-._
+ (,-.`._,'(       |\`-/|
+     `-.-' \ )-`( , o o)
+           `-    \`_`"'-
+            </div>
+        </div>
+    </div>
+</footer>
+
+<script src="/js/global.js"></script>
+
+</body>
+</html>
