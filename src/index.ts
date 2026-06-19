@@ -6,6 +6,7 @@ import cookieParser from 'cookie-parser';
 import authRoutes from './routes/auth.routes.js';
 import adminRoutes from './routes/admin.routes.js';
 import interactionRoutes from './routes/interaction.routes.js';
+import arlistApiRoutes from './routes/arlistApi.routes.js';
 import oidcProvider from './services/oidc.service.js';
 
 dotenv.config();
@@ -25,6 +26,7 @@ app.use(cookieParser());
 app.use('/interaction', interactionRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/api/v1', arlistApiRoutes);
 app.get('/api/health', (req, res) => {
   res.json({ status: 'ok' });
 });

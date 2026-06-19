@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import axios from 'axios'
 import { useNavigate } from 'react-router-dom'
-import { LogOut, ShieldCheck, Check, Pencil, X, KeyRound, User, Home, Lock, ChevronRight } from 'lucide-react'
+import { LogOut, ShieldCheck, Check, Pencil, X, KeyRound, User, Home, Lock, ChevronRight, Wallet, CreditCard, Smartphone, Bitcoin } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -120,7 +120,7 @@ const ChangePassword = () => {
 
 // ── Sidebar ───────────────────────────────────────────────
 
-type Section = 'profile' | 'security'
+type Section = 'profile' | 'security' | 'billing'
 
 const Sidebar = ({ user, active, setActive, onLogout, onAdmin }:
   { user: any; active: Section; setActive: (s: Section) => void; onLogout: () => void; onAdmin: () => void }) => {
@@ -128,6 +128,8 @@ const Sidebar = ({ user, active, setActive, onLogout, onAdmin }:
   const nav = [
     { id: 'profile' as Section, icon: User, label: 'Профиль' },
     { id: 'security' as Section, icon: Lock, label: 'Безопасность' },
+    // Тарификация скрыта от всех кроме админа — см. memory tarification-tab-admin-gate
+    ...(user.role === 'ADMIN' ? [{ id: 'billing' as Section, icon: Wallet, label: 'Тарификация' }] : []),
   ]
 
   return (
@@ -262,6 +264,47 @@ const Profile = () => {
                 <p className="text-sm font-medium mb-4">Смена пароля</p>
                 <ChangePassword />
               </div>
+            </div>
+          </div>
+        )}
+
+        {active === 'billing' && (
+          <div className="px-10 pt-14 pb-10">
+            <h1 className="text-2xl font-semibold tracking-tight mb-1">Тарификация</h1>
+            <p className="text-muted-foreground text-sm mb-8">Баланс и способы пополнения</p>
+
+            <div className="max-w-2xl space-y-6">
+              <div className="rounded-xl border border-border/50 bg-card/60 p-5 flex items-center justify-between">
+                <div>
+                  <p className="text-xs uppercase tracking-widest text-muted-foreground mb-2">Баланс</p>
+                  <p className="text-3xl font-bold tracking-tight">
+                    {((user.balanceKopecks ?? 0) / 100).toFixed(2)} ₽
+                  </p>
+                </div>
+                <Wallet size={32} className="text-muted-foreground/40" />
+              </div>
+
+              <div>
+                <p className="text-sm font-medium mb-3">Пополнение баланса</p>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  {[
+                    { icon: CreditCard, label: 'Банковская карта' },
+                    { icon: Smartphone, label: 'СБП' },
+                    { icon: Bitcoin, label: 'Криптовалюта' },
+                  ].map(({ icon: Icon, label }) => (
+                    <div key={label}
+                      className="relative rounded-xl border border-border/50 bg-card/40 p-5 flex flex-col items-center gap-2 opacity-50 cursor-not-allowed">
+                      <Badge variant="muted" className="absolute top-2 right-2 text-[10px] px-1.5 py-0">Скоро</Badge>
+                      <Icon size={22} className="text-muted-foreground" />
+                      <p className="text-sm text-center">{label}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <p className="text-xs text-muted-foreground">
+                Тарификация подключается к внешним сервисам Arlist Tech — оплата, списание и проверка лицензий появятся позже.
+              </p>
             </div>
           </div>
         )}
