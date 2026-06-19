@@ -39,17 +39,36 @@ router.get('/:uid', async (req: Request, res: Response) => {
     }
 
     if (prompt.name === 'consent') {
-      // Show consent screen (in a real app, this would be a React page)
-      // For now, we auto-consent for simplicity or redirect to a React consent page
-      
-      // Let's assume we redirect to a React consent page
-      // return res.redirect(`/auth/consent?uid=${uid}`);
-      
-      // OR just auto-accept for this demo:
+      // Auto-accept: grant whatever scopes/claims the client requested.
+      // Without persisting an actual Grant, oidc-provider's op_scopes_missing
+      // check never sees the scopes as "encountered" and re-prompts forever,
+      // producing an infinite /interaction <-> /auth redirect loop.
+      const grant = details.grantId
+        ? await oidcProvider.Grant.find(details.grantId)
+        : new oidcProvider.Grant({
+            accountId: userId!,
+            clientId: params.client_id as string,
+          });
+
+      if (params.scope) {
+        grant!.addOIDCScope(params.scope as string);
+      }
+      if (params.claims) {
+        const parsedClaims = JSON.parse(params.claims as string);
+        const claimNames = new Set([
+          ...Object.keys(parsedClaims.id_token || {}),
+          ...Object.keys(parsedClaims.userinfo || {}),
+        ]);
+        if (claimNames.size) {
+          grant!.addOIDCClaims([...claimNames]);
+        }
+      }
+
+      const grantId = await grant!.save();
+
       const result = {
         consent: {
-          rejectedScopes: [],
-          rejectedClaims: [],
+          grantId,
         },
       };
       return await oidcProvider.interactionFinished(req, res, result, { mergeWithLastSubmission: true });
