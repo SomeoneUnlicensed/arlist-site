@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { useNavigate, Link } from 'react-router-dom'
+import { useNavigate, useSearchParams, Link } from 'react-router-dom'
 import axios from 'axios'
 import { Loader2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -15,6 +15,8 @@ const Register = () => {
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
   const navigate = useNavigate()
+  const [searchParams] = useSearchParams()
+  const returnTo = searchParams.get('return_to')
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -22,7 +24,9 @@ const Register = () => {
     setLoading(true)
     try {
       await axios.post('/api/auth/register', { email, password, name })
-      navigate(`/verify?email=${encodeURIComponent(email)}`)
+      const params = new URLSearchParams({ email })
+      if (returnTo) params.set('return_to', returnTo)
+      navigate(`/verify?${params.toString()}`)
     } catch (err: any) {
       setError(err.response?.data?.error || 'Ошибка регистрации')
     } finally {
@@ -101,7 +105,10 @@ const Register = () => {
           </Button>
           <p className="text-center text-sm text-muted-foreground">
             Уже есть аккаунт?{' '}
-            <Link to="/login" className="text-foreground font-medium hover:opacity-70 transition-opacity">
+            <Link
+              to={returnTo ? `/login?return_to=${encodeURIComponent(returnTo)}` : '/login'}
+              className="text-foreground font-medium hover:opacity-70 transition-opacity"
+            >
               Войти
             </Link>
           </p>

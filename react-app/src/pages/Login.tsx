@@ -108,7 +108,10 @@ const Login = () => {
           </Button>
           <p className="text-center text-sm text-muted-foreground">
             Нет аккаунта?{' '}
-            <Link to="/register" className="text-foreground font-medium hover:opacity-70 transition-opacity">
+            <Link
+              to={searchParams.get('return_to') ? `/register?return_to=${encodeURIComponent(searchParams.get('return_to')!)}` : '/register'}
+              className="text-foreground font-medium hover:opacity-70 transition-opacity"
+            >
               Создать
             </Link>
           </p>

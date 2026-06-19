@@ -16,6 +16,7 @@ const Verify = () => {
   const [resendMsg, setResendMsg] = useState('')
   const [searchParams] = useSearchParams()
   const email = searchParams.get('email') || ''
+  const returnTo = searchParams.get('return_to')
   const navigate = useNavigate()
   const refs = useRef<(HTMLInputElement | null)[]>([])
 
@@ -54,7 +55,9 @@ const Verify = () => {
     setError(''); setLoading(true)
     try {
       await axios.post('/api/auth/verify', { email, code })
-      navigate('/login?verified=true')
+      const params = new URLSearchParams({ verified: 'true' })
+      if (returnTo) params.set('return_to', returnTo)
+      navigate(`/login?${params.toString()}`)
     } catch (err: any) {
       setError(err.response?.data?.error || 'Неверный или истёкший код')
       setDigits(Array(OTP_LENGTH).fill(''))
@@ -132,7 +135,10 @@ const Verify = () => {
             {resendCooldown > 0 ? `Отправить повторно через ${resendCooldown}с` : 'Отправить код повторно'}
           </button>
           <p className="text-center text-sm">
-            <Link to="/register" className="text-muted-foreground hover:text-foreground transition-colors">
+            <Link
+              to={returnTo ? `/register?return_to=${encodeURIComponent(returnTo)}` : '/register'}
+              className="text-muted-foreground hover:text-foreground transition-colors"
+            >
               ← Назад к регистрации
             </Link>
           </p>
