@@ -83,7 +83,7 @@ const PrivacyPolicy = () => {
               По всем вопросам, связанным с обработкой персональных данных:
             </p>
             <p className="text-muted-foreground mt-2">
-              <strong>Служба поддержки:</strong> safety@arlist.tech
+              <strong>Служба поддержки:</strong> letunovskiu2011@yandex.ru
             </p>
           </div>
 
