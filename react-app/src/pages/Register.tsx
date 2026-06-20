@@ -12,6 +12,7 @@ const Register = () => {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [name, setName] = useState('')
+  const [agreedToPolicy, setAgreedToPolicy] = useState(false)
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
   const navigate = useNavigate()
@@ -21,9 +22,15 @@ const Register = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError('')
+    
+    if (!agreedToPolicy) {
+      setError('Вы должны согласиться с политикой конфиденциальности')
+      return
+    }
+    
     setLoading(true)
     try {
-      await axios.post('/api/auth/register', { email, password, name })
+      await axios.post('/api/auth/register', { email, password, name, agreedToPolicy })
       const params = new URLSearchParams({ email })
       if (returnTo) params.set('return_to', returnTo)
       navigate(`/verify?${params.toString()}`)
@@ -94,6 +101,27 @@ const Register = () => {
                 autoComplete="new-password"
                 required
               />
+            </div>
+            
+            <div className="flex items-start space-x-2 pt-2">
+              <input
+                id="policy-agreement"
+                name="policy-agreement"
+                type="checkbox"
+                checked={agreedToPolicy}
+                onChange={e => setAgreedToPolicy(e.target.checked)}
+                className="mt-1 cursor-pointer"
+              />
+              <Label htmlFor="policy-agreement" className="cursor-pointer text-sm font-normal">
+                Я согласен с{' '}
+                <Link
+                  to="/privacy-policy"
+                  target="_blank"
+                  className="text-foreground font-medium hover:opacity-70 transition-opacity underline"
+                >
+                  политикой конфиденциальности
+                </Link>
+              </Label>
             </div>
           </form>
         </CardContent>

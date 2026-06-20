@@ -24,6 +24,7 @@ model User {
   avatarUrl     String?
   isVerified    Boolean  @default(false)
   isBanned      Boolean  @default(false)
+  agreedToPolicy Boolean  @default(false)
   role          Role     @default(USER)
   balanceKopecks Int     @default(0) // Баланс в копейках (тарификация выключена, поле зарезервировано)
   createdAt     DateTime @default(now())
