@@ -10,12 +10,13 @@ export const register = async (req: Request, res: Response) => {
   try {
     const { email, password, name, agreedToPolicy } = req.body;
     if (!email || !password) return res.status(400).json({ error: 'Email and password are required' });
+    if (agreedToPolicy !== true) return res.status(400).json({ error: 'You must agree to the privacy policy' });
 
     const existing = await prisma.user.findUnique({ where: { email } });
     if (existing) return res.status(400).json({ error: 'User already exists' });
 
     const passwordHash = await bcrypt.hash(password, 10);
-    const user = await prisma.user.create({ data: { email, passwordHash, name, isVerified: false, agreedToPolicy: agreedToPolicy === true } });
+    const user = await prisma.user.create({ data: { email, passwordHash, name, isVerified: false, agreedToPolicy: true } });
 
     const code = Math.floor(100000 + Math.random() * 900000).toString();
     await prisma.verificationToken.create({
