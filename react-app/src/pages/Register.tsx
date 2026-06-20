@@ -115,7 +115,7 @@ const Register = () => {
               <Label htmlFor="policy-agreement" className="cursor-pointer text-sm font-normal">
                 Я согласен с{' '}
                 <Link
-                  to="/privacy-policy"
+                  to="/legal/commit-privacy"
                   target="_blank"
                   className="text-foreground font-medium hover:opacity-70 transition-opacity underline"
                 >
