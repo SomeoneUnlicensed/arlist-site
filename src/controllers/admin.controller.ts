@@ -67,7 +67,7 @@ export const deleteClient = async (req: Request, res: Response) => {
 export const getUsers = async (req: Request, res: Response) => {
   try {
     const users = await prisma.user.findMany({
-      select: { id: true, email: true, name: true, role: true, isVerified: true, isBanned: true, createdAt: true },
+      select: { id: true, email: true, name: true, role: true, isVerified: true, isBanned: true, balanceKopecks: true, createdAt: true },
       orderBy: { createdAt: 'desc' },
     });
     res.json(users);
@@ -92,15 +92,17 @@ export const updateUser = async (req: Request, res: Response) => {
   try {
     const { id } = req.params as { id: string };
     const self = (req as any).user?.userId;
-    const { isBanned, role } = req.body;
+    const { isBanned, role, isVerified, balanceKopecks } = req.body;
     if (id === self && isBanned === true) return res.status(400).json({ error: 'Нельзя забанить себя' });
     const user = await prisma.user.update({
       where: { id },
       data: {
         ...(isBanned !== undefined ? { isBanned: Boolean(isBanned) } : {}),
         ...(role !== undefined ? { role } : {}),
+        ...(isVerified !== undefined ? { isVerified: Boolean(isVerified) } : {}),
+        ...(balanceKopecks !== undefined ? { balanceKopecks: Number(balanceKopecks) } : {}),
       },
-      select: { id: true, email: true, role: true, isBanned: true },
+      select: { id: true, email: true, role: true, isBanned: true, isVerified: true, balanceKopecks: true },
     });
     res.json(user);
   } catch {
