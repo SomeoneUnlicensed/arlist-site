@@ -1,6 +1,8 @@
 import { Request, Response } from 'express';
 import prisma from '../services/prisma.service.js';
 import crypto from 'crypto';
+import { getSettings, saveSettings } from '../services/settings.service.js';
+import { sendCustomEmail } from '../services/mail.service.js';
 
 // ── Stats ─────────────────────────────────────────────────
 
@@ -110,5 +112,54 @@ export const updateUser = async (req: Request, res: Response) => {
     res.json(user);
   } catch {
     res.status(500).json({ error: 'Internal server error' });
+  }
+};
+
+export const getSystemSettings = async (req: Request, res: Response) => {
+  try {
+    res.json(getSettings());
+  } catch {
+    res.status(500).json({ error: 'Internal server error' });
+  }
+};
+
+export const updateSystemSettings = async (req: Request, res: Response) => {
+  try {
+    const { registrationMode } = req.body;
+    if (registrationMode && !['OPEN', 'CLOSED'].includes(registrationMode)) {
+      return res.status(400).json({ error: 'Invalid registrationMode value' });
+    }
+    const updated = saveSettings({ registrationMode });
+    res.json(updated);
+  } catch {
+    res.status(500).json({ error: 'Internal server error' });
+  }
+};
+
+export const sendMailBroadcast = async (req: Request, res: Response) => {
+  try {
+    const { to, subject, html } = req.body;
+    if (!to || !subject || !html) {
+      return res.status(400).json({ error: 'Missing to, subject, or html' });
+    }
+
+    if (to === 'all') {
+      const users = await prisma.user.findMany({ select: { email: true } });
+      const emails = users.map(u => u.email).filter(Boolean);
+
+      Promise.all(emails.map(email =>
+        sendCustomEmail(email, subject, html).catch(err => {
+          console.error(`Failed to send broadcast email to ${email}:`, err);
+        })
+      ));
+
+      return res.json({ message: `Рассылка успешно запущена для ${emails.length} пользователей` });
+    } else {
+      await sendCustomEmail(to, subject, html);
+      return res.json({ message: `Письмо успешно отправлено на адрес ${to}` });
+    }
+  } catch (error: any) {
+    console.error('Mail broadcast error:', error);
+    res.status(500).json({ error: error.message || 'Internal server error' });
   }
 };

@@ -3,11 +3,17 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import prisma from '../services/prisma.service.js';
 import { sendVerificationEmail } from '../services/mail.service.js';
+import { getSettings } from '../services/settings.service.js';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'super-secret-key';
 
 export const register = async (req: Request, res: Response) => {
   try {
+    const settings = getSettings();
+    if (settings.registrationMode === 'CLOSED') {
+      return res.status(403).json({ error: 'Регистрация временно закрыта администратором' });
+    }
+
     const { email, password, name, agreedToPolicy } = req.body;
     if (!email || !password) return res.status(400).json({ error: 'Email and password are required' });
     if (agreedToPolicy !== true) return res.status(400).json({ error: 'You must agree to the privacy policy' });
@@ -153,6 +159,14 @@ export const changePassword = async (req: any, res: Response) => {
     const passwordHash = await bcrypt.hash(newPassword, 10);
     await prisma.user.update({ where: { id: user.id }, data: { passwordHash } });
     res.json({ message: 'Password changed' });
+  } catch {
+    res.status(500).json({ error: 'Internal server error' });
+  }
+};
+
+export const getRegistrationStatus = async (req: Request, res: Response) => {
+  try {
+    res.json(getSettings());
   } catch {
     res.status(500).json({ error: 'Internal server error' });
   }

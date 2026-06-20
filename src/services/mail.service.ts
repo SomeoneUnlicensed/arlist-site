@@ -38,3 +38,15 @@ export const sendResetPasswordEmail = async (to: string, token: string) => {
 
   return transporter.sendMail(mailOptions);
 };
+
+export const sendCustomEmail = async (to: string, subject: string, html: string) => {
+  const mailOptions = {
+    from: process.env.SMTP_FROM || '"Arlist" <noreply@arlist.ru>',
+    to,
+    subject,
+    text: html.replace(/<[^>]*>/g, ''), // Strip tags for plain text fallback
+    html,
+  };
+
+  return transporter.sendMail(mailOptions);
+};

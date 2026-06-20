@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { useNavigate, useSearchParams, Link } from 'react-router-dom'
 import axios from 'axios'
 import { Loader2 } from 'lucide-react'
@@ -15,9 +15,20 @@ const Register = () => {
   const [agreedToPolicy, setAgreedToPolicy] = useState(false)
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
+  const [isClosed, setIsClosed] = useState(false)
   const navigate = useNavigate()
   const [searchParams] = useSearchParams()
   const returnTo = searchParams.get('return_to')
+
+  useEffect(() => {
+    axios.get('/api/auth/registration-status')
+      .then(r => {
+        if (r.data.registrationMode === 'CLOSED') {
+          setIsClosed(true)
+        }
+      })
+      .catch(() => {})
+  }, [])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -39,6 +50,40 @@ const Register = () => {
     } finally {
       setLoading(false)
     }
+  }
+
+  if (isClosed) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center px-4 py-12 gap-8 animate-fade-up">
+        {/* Brand */}
+        <div className="text-center space-y-1">
+          <h1 className="font-display text-5xl text-foreground tracking-tight">Arlist ID</h1>
+          <p className="text-muted-foreground text-sm">Arlist ID — единый ключ к вашим сервисам.</p>
+        </div>
+
+        {/* Closed Card */}
+        <Card className="w-full max-w-sm shadow-2xl border-border/60" style={{ borderTopColor: 'rgba(255,255,255,0.12)' }}>
+          <CardHeader className="pb-4 text-center">
+            <div className="w-12 h-12 rounded-full bg-red-500/10 border border-red-500/20 flex items-center justify-center mx-auto mb-3">
+              <span className="text-red-400 font-bold text-lg">✕</span>
+            </div>
+            <CardTitle className="text-lg font-semibold tracking-tight text-red-400">Регистрация приостановлена</CardTitle>
+            <CardDescription>Регистрация новых аккаунтов временно закрыта администратором.</CardDescription>
+          </CardHeader>
+          <CardContent className="text-center text-sm text-muted-foreground py-2">
+            Если у вас уже есть аккаунт Arlist ID, вы можете войти в систему.
+          </CardContent>
+          <CardFooter className="flex flex-col gap-3 pt-4">
+            <Link
+              to={returnTo ? `/login?return_to=${encodeURIComponent(returnTo)}` : '/login'}
+              className="w-full text-center px-4 py-2 rounded-lg bg-accent hover:bg-accent/80 font-medium transition-colors text-sm text-foreground border border-border/40"
+            >
+              Перейти к авторизации
+            </Link>
+          </CardFooter>
+        </Card>
+      </div>
+    )
   }
 
   return (

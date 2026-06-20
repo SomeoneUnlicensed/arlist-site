@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import axios from 'axios'
 import { useNavigate } from 'react-router-dom'
-import { Copy, Check, ArrowLeft, Loader2, ShieldCheck, Users, Activity, Ban, AppWindow, Trash2, Search, Coins, Pencil, Plus, RefreshCw } from 'lucide-react'
+import { Copy, Check, ArrowLeft, Loader2, ShieldCheck, Users, Activity, Ban, AppWindow, Trash2, Search, Coins, Pencil, Plus, RefreshCw, Mail, Globe, Settings, AlertTriangle, Eye, FileText, Lock, Unlock } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -596,6 +596,365 @@ const LogsTab = () => {
   )
 }
 
+// ── Broadcast tab ─────────────────────────────────────────
+
+const standardEmailTemplate = (subject: string, content: string) => `
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <style>
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: #0c0a0f; color: #f4f4f5; margin: 0; padding: 40px 20px; }
+    .container { max-width: 600px; margin: 0 auto; background-color: #121016; border: 1px solid #27272a; border-radius: 12px; overflow: hidden; }
+    .header { background: linear-gradient(135deg, #8000FF, #6B23FF); padding: 35px 20px; text-align: center; }
+    .header h1 { color: #ffffff; margin: 0; font-size: 26px; font-weight: 800; letter-spacing: -0.05em; }
+    .content { padding: 40px 30px; line-height: 1.6; color: #d4d4d8; font-size: 15px; }
+    .content p { margin-top: 0; margin-bottom: 16px; }
+    .footer { text-align: center; padding: 20px; border-top: 1px solid #27272a; font-size: 12px; color: #71717a; background-color: #0c0a0f; }
+    .footer a { color: #A766FF; text-decoration: none; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>Arlist ID</h1>
+    </div>
+    <div class="content font-sans">
+      <h2 style="color: #ffffff; margin-top: 0; margin-bottom: 20px; font-size: 18px; font-weight: 600;">${subject}</h2>
+      ${content.replace(/\n/g, '<br>')}
+    </div>
+    <div class="footer">
+      Это системное уведомление от платформы <a href="https://arlist.ru">Arlist ID</a>.
+    </div>
+  </div>
+</body>
+</html>
+`;
+
+const BroadcastTab = () => {
+  const [to, setTo] = useState<'all' | 'single'>('all')
+  const [singleEmail, setSingleEmail] = useState('')
+  const [subject, setSubject] = useState('')
+  const [styleMode, setStyleMode] = useState<'standard' | 'html'>('standard')
+  const [content, setContent] = useState('')
+  const [htmlCode, setHtmlCode] = useState('')
+  
+  const [loading, setLoading] = useState(false)
+  const [message, setMessage] = useState<{ type: 'success' | 'error' | 'warning', text: string } | null>(null)
+  
+  // HTML Check warnings
+  const [htmlWarnings, setHtmlWarnings] = useState<string[]>([])
+  
+  const checkHtml = () => {
+    const warnings: string[] = []
+    if (!htmlCode.includes('<html')) warnings.push('Отсутствует тег <html>. Рекомендуется обернуть письмо в html-структуру для лучшей совместимости.')
+    if (!htmlCode.includes('<body')) warnings.push('Отсутствует тег <body>.')
+    if (htmlCode.includes('<script')) warnings.push('В письме обнаружен тег <script>. Большинство почтовых провайдеров заблокируют его по соображениям безопасности!')
+    if (htmlCode.includes('src="http://') || htmlCode.includes("src='http://")) warnings.push('Письмо содержит ссылки на картинки по незащищенному протоколу http://. Почтовые клиенты могут их скрыть.')
+    
+    setHtmlWarnings(warnings)
+    if (warnings.length === 0) {
+      setMessage({ type: 'success', text: 'HTML код успешно прошел базовые проверки почтовой совместимости.' })
+    } else {
+      setMessage({ type: 'warning', text: `Обнаружено ${warnings.length} предупреждений в HTML коде.` })
+    }
+  }
+
+  const handleSend = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setMessage(null)
+    setLoading(true)
+
+    const finalHtml = styleMode === 'standard' 
+      ? standardEmailTemplate(subject, content) 
+      : htmlCode;
+
+    const recipient = to === 'all' ? 'all' : singleEmail;
+
+    try {
+      const r = await axios.post('/api/admin/broadcast', {
+        to: recipient,
+        subject,
+        html: finalHtml
+      })
+      setMessage({ type: 'success', text: r.data.message })
+      if (to === 'single') setSingleEmail('')
+      setSubject('')
+      setContent('')
+      setHtmlCode('')
+      setHtmlWarnings([])
+    } catch (err: any) {
+      setMessage({ type: 'error', text: err.response?.data?.error || 'Ошибка отправки рассылки' })
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const previewHtml = styleMode === 'standard'
+    ? standardEmailTemplate(subject || 'Заголовок письма', content || 'Текст вашего сообщения появится здесь...')
+    : (htmlCode || '<div style="color: #a1a1aa; text-align: center; padding: 20px; font-family: sans-serif;">Введите HTML-код для предпросмотра</div>');
+
+  return (
+    <div className="p-5 grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="space-y-4">
+        <div>
+          <h2 className="text-sm font-semibold tracking-tight uppercase text-muted-foreground mb-4">Настройка рассылки</h2>
+        </div>
+
+        {message && (
+          <Alert variant={message.type === 'success' ? 'success' : message.type === 'warning' ? 'default' : 'destructive'}>
+            <AlertDescription className="text-xs">{message.text}</AlertDescription>
+          </Alert>
+        )}
+
+        <form onSubmit={handleSend} className="space-y-4">
+          <div className="space-y-2">
+            <Label className="text-xs">Получатели</Label>
+            <div className="flex gap-2">
+              <Button
+                type="button"
+                variant={to === 'all' ? 'default' : 'outline'}
+                onClick={() => setTo('all')}
+                className="h-8 text-xs px-3"
+              >
+                Все пользователи
+              </Button>
+              <Button
+                type="button"
+                variant={to === 'single' ? 'default' : 'outline'}
+                onClick={() => setTo('single')}
+                className="h-8 text-xs px-3"
+              >
+                Конкретный email
+              </Button>
+            </div>
+            {to === 'single' && (
+              <Input
+                type="email"
+                placeholder="developer@example.com"
+                value={singleEmail}
+                onChange={e => setSingleEmail(e.target.value)}
+                required
+                className="h-9 text-xs mt-1.5"
+              />
+            )}
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="email-subject" className="text-xs">Тема письма</Label>
+            <Input
+              id="email-subject"
+              placeholder="Важное обновление безопасности Arlist ID"
+              value={subject}
+              onChange={e => setSubject(e.target.value)}
+              required
+              className="h-9 text-xs"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label className="text-xs">Стиль письма</Label>
+            <div className="flex gap-2">
+              <Button
+                type="button"
+                variant={styleMode === 'standard' ? 'default' : 'outline'}
+                onClick={() => { setStyleMode('standard'); setMessage(null); }}
+                className="h-8 text-xs px-3"
+              >
+                Стандартный стиль Arlist ID
+              </Button>
+              <Button
+                type="button"
+                variant={styleMode === 'html' ? 'default' : 'outline'}
+                onClick={() => { setStyleMode('html'); setMessage(null); }}
+                className="h-8 text-xs px-3"
+              >
+                Собственный HTML
+              </Button>
+            </div>
+          </div>
+
+          {styleMode === 'standard' ? (
+            <div className="space-y-2">
+              <Label htmlFor="email-text" className="text-xs">Текст сообщения</Label>
+              <textarea
+                id="email-text"
+                rows={8}
+                placeholder="Приветствуем! Сообщаем вам, что..."
+                value={content}
+                onChange={e => setContent(e.target.value)}
+                required
+                className="w-full rounded-md border border-input bg-background px-3 py-2 text-xs ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              />
+            </div>
+          ) : (
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <Label htmlFor="email-html" className="text-xs">HTML код письма</Label>
+                <Button type="button" variant="outline" size="sm" onClick={checkHtml} className="h-7 text-[10px] px-2 gap-1 border-violet-500/20 text-violet-400 hover:bg-violet-500/10">
+                  <Check size={10} />Проверить разметку
+                </Button>
+              </div>
+              <textarea
+                id="email-html"
+                rows={8}
+                placeholder="<html><body><div style='color: red;'>Привет!</div></body></html>"
+                value={htmlCode}
+                onChange={e => setHtmlCode(e.target.value)}
+                required
+                className="w-full rounded-md border border-input bg-background px-3 py-2 text-xs font-mono ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              />
+              {htmlWarnings.length > 0 && (
+                <div className="p-3 bg-yellow-500/5 border border-yellow-500/20 rounded-md text-[11px] text-yellow-500 space-y-1">
+                  <p className="font-semibold flex items-center gap-1"><AlertTriangle size={12} /> Предупреждения почтового клиента:</p>
+                  <ul className="list-disc list-inside pl-1 space-y-0.5 font-sans leading-relaxed">
+                    {htmlWarnings.map((w, idx) => <li key={idx}>{w}</li>)}
+                  </ul>
+                </div>
+              )}
+            </div>
+          )}
+
+          <Button type="submit" disabled={loading} className="w-full h-9 bg-violet-600 hover:bg-violet-700 text-white font-semibold text-xs">
+            {loading ? <Loader2 size={14} className="animate-spin mr-1.5" /> : <Mail size={14} className="mr-1.5" />}
+            {loading ? 'Отправка писем...' : 'Запустить рассылку'}
+          </Button>
+        </form>
+      </div>
+
+      <div className="flex flex-col h-full border border-border/50 rounded-xl overflow-hidden bg-card/20 min-h-[450px]">
+        <div className="p-3 border-b border-border/50 bg-muted/20 flex items-center justify-between">
+          <span className="text-xs font-semibold text-muted-foreground flex items-center gap-1.5"><Eye size={13} /> Предпросмотр письма</span>
+          <Badge variant="outline" className="text-[10px] bg-background/50 border-border">Интерактивный вид</Badge>
+        </div>
+        <div className="flex-1 bg-white p-2">
+          <iframe
+            title="Email Preview"
+            srcDoc={previewHtml}
+            className="w-full h-full border-0 min-h-[400px] bg-white rounded"
+            sandbox="allow-same-origin"
+          />
+        </div>
+      </div>
+    </div>
+  )
+}
+
+// ── Settings (Registration Modes) tab ───────────────────────
+
+const SettingsTab = () => {
+  const [settings, setSettings] = useState<any>({ registrationMode: 'OPEN' })
+  const [loading, setLoading] = useState(true)
+  const [saving, setSaving] = useState(false)
+  const [msg, setMsg] = useState<string | null>(null)
+
+  const load = async () => {
+    setLoading(true)
+    try {
+      const r = await axios.get('/api/admin/settings')
+      setSettings(r.data)
+    } catch {
+      setMsg('Не удалось загрузить настройки')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  useEffect(() => { load() }, [])
+
+  const handleModeChange = async (mode: 'OPEN' | 'CLOSED') => {
+    setSaving(true)
+    setMsg(null)
+    try {
+      const r = await axios.post('/api/admin/settings', { registrationMode: mode })
+      setSettings(r.data)
+      setMsg('Режим регистрации изменен успешно!')
+      setTimeout(() => setMsg(null), 3000)
+    } catch {
+      setMsg('Ошибка сохранения настроек')
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  if (loading) return (
+    <div className="flex items-center justify-center py-20 text-muted-foreground gap-2 text-sm">
+      <Loader2 size={18} className="animate-spin text-violet-500" /> Загрузка настроек системы...
+    </div>
+  )
+
+  return (
+    <div className="p-5 max-w-2xl space-y-6">
+      <div>
+        <h2 className="text-sm font-semibold tracking-tight uppercase text-muted-foreground mb-1">Режимы регистрации пользователей</h2>
+        <p className="text-xs text-muted-foreground">Настройка доступа для новых аккаунтов на платформе Arlist ID</p>
+      </div>
+
+      {msg && (
+        <Alert variant={msg.includes('Ошибка') ? 'destructive' : 'success'}>
+          <AlertDescription className="text-xs font-medium">{msg}</AlertDescription>
+        </Alert>
+      )}
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div
+          onClick={() => !saving && settings.registrationMode !== 'OPEN' && handleModeChange('OPEN')}
+          className={cn(
+            "rounded-xl border p-5 flex flex-col gap-3 cursor-pointer transition-all duration-300",
+            settings.registrationMode === 'OPEN'
+              ? "border-emerald-500 bg-emerald-500/5 text-foreground shadow-sm shadow-emerald-500/10"
+              : "border-border/60 bg-card/40 text-muted-foreground hover:bg-accent/40"
+          )}
+        >
+          <div className="flex items-center justify-between">
+            <div className={cn("p-2 rounded-lg bg-background border border-border/40", settings.registrationMode === 'OPEN' ? "text-emerald-400" : "text-muted-foreground")}>
+              <Unlock size={18} />
+            </div>
+            {settings.registrationMode === 'OPEN' && (
+              <Badge variant="success" className="bg-emerald-500/10 text-emerald-400 border-emerald-500/20 text-[10px]">
+                Активен
+              </Badge>
+            )}
+          </div>
+          <div>
+            <h3 className="text-sm font-bold text-foreground">Открытая регистрация</h3>
+            <p className="text-xs text-muted-foreground mt-1 leading-normal">
+              Все новые пользователи могут свободно создавать аккаунты Arlist ID и проходить верификацию по почте.
+            </p>
+          </div>
+        </div>
+
+        <div
+          onClick={() => !saving && settings.registrationMode !== 'CLOSED' && handleModeChange('CLOSED')}
+          className={cn(
+            "rounded-xl border p-5 flex flex-col gap-3 cursor-pointer transition-all duration-300",
+            settings.registrationMode === 'CLOSED'
+              ? "border-red-500 bg-red-500/5 text-foreground shadow-sm shadow-red-500/10"
+              : "border-border/60 bg-card/40 text-muted-foreground hover:bg-accent/40"
+          )}
+        >
+          <div className="flex items-center justify-between">
+            <div className={cn("p-2 rounded-lg bg-background border border-border/40", settings.registrationMode === 'CLOSED' ? "text-red-400" : "text-muted-foreground")}>
+              <Lock size={18} />
+            </div>
+            {settings.registrationMode === 'CLOSED' && (
+              <Badge variant="destructive" className="bg-red-500/10 text-red-400 border-red-500/20 text-[10px]">
+                Активен
+              </Badge>
+            )}
+          </div>
+          <div>
+            <h3 className="text-sm font-bold text-foreground">Регистрация приостановлена</h3>
+            <p className="text-xs text-muted-foreground mt-1 leading-normal">
+              Вход новых участников в систему закрыт. Любые попытки зарегистрироваться будут заблокированы с показом предупреждения.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
 // ── Main ──────────────────────────────────────────────────
 
 const Admin = () => {
@@ -628,10 +987,14 @@ const Admin = () => {
             <TabsList className="rounded-none border-b border-border/60 bg-transparent px-2 gap-0">
               <TabsTrigger value="users">Пользователи</TabsTrigger>
               <TabsTrigger value="clients">OIDC-клиенты</TabsTrigger>
+              <TabsTrigger value="broadcast">Рассылка писем</TabsTrigger>
+              <TabsTrigger value="settings">Режимы регистрации</TabsTrigger>
               <TabsTrigger value="logs">Логи системы</TabsTrigger>
             </TabsList>
             <TabsContent value="users"><UsersTab /></TabsContent>
             <TabsContent value="clients"><ClientsTab /></TabsContent>
+            <TabsContent value="broadcast"><BroadcastTab /></TabsContent>
+            <TabsContent value="settings"><SettingsTab /></TabsContent>
             <TabsContent value="logs"><LogsTab /></TabsContent>
           </Card>
         </Tabs>
