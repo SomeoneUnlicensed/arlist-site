@@ -4,6 +4,7 @@ import Register from './pages/Register';
 import Verify from './pages/Verify';
 import Profile from './pages/Profile';
 import Admin from './pages/Admin';
+import PrivacyPolicy from './pages/PrivacyPolicy';
 
 function App() {
   return (
@@ -15,6 +16,7 @@ function App() {
           <Route path="/verify" element={<Verify />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="/admin" element={<Admin />} />
+          <Route path="/privacy-policy" element={<PrivacyPolicy />} />
           <Route path="*" element={<Navigate to="/login" />} />
         </Routes>
       </div>
