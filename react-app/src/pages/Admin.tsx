@@ -94,19 +94,21 @@ const UsersTab = () => {
 
   const ban = async (id: string, isBanned: boolean) => {
     try {
+      setErr('')
       await axios.patch(`/api/admin/users/${id}`, { isBanned })
       setUsers(prev => prev.map(u => u.id === id ? { ...u, isBanned } : u))
-    } catch {
-      setErr('Ошибка изменения статуса бана')
+    } catch (e: any) {
+      setErr(e.response?.data?.error || 'Ошибка изменения статуса бана')
     }
   }
 
   const promote = async (id: string, role: string) => {
     try {
+      setErr('')
       await axios.patch(`/api/admin/users/${id}`, { role })
       setUsers(prev => prev.map(u => u.id === id ? { ...u, role } : u))
-    } catch {
-      setErr('Ошибка смены роли')
+    } catch (e: any) {
+      setErr(e.response?.data?.error || 'Ошибка смены роли')
     }
   }
 

@@ -94,6 +94,9 @@ export const updateUser = async (req: Request, res: Response) => {
     const self = (req as any).user?.userId;
     const { isBanned, role, isVerified, balanceKopecks } = req.body;
     if (id === self && isBanned === true) return res.status(400).json({ error: 'Нельзя забанить себя' });
+    if (id === self && role !== undefined && role !== 'ADMIN') {
+      return res.status(400).json({ error: 'Нельзя снять с себя права администратора' });
+    }
     const user = await prisma.user.update({
       where: { id },
       data: {
