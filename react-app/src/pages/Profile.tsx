@@ -197,6 +197,11 @@ const Profile = () => {
   const [active, setActive] = useState<Section>('profile')
   const navigate = useNavigate()
 
+  // Billing states
+  const [billingMethod, setBillingMethod] = useState<'card' | 'sbp' | null>('card')
+  const [billingAmount, setBillingAmount] = useState<string>('500')
+  const [billingMessage, setBillingMessage] = useState<string | null>(null)
+
   useEffect(() => {
     axios.get('/api/auth/profile').then(r => setUser(r.data)).catch(() => navigate('/login'))
   }, [navigate])
@@ -285,22 +290,112 @@ const Profile = () => {
               </div>
 
               <div>
-                <p className="text-sm font-medium mb-3">Пополнение баланса</p>
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <p className="text-sm font-medium mb-3">Способ пополнения</p>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   {[
-                    { icon: CreditCard, label: 'Банковская карта' },
-                    { icon: Smartphone, label: 'СБП' },
-                    { icon: Bitcoin, label: 'Криптовалюта' },
-                  ].map(({ icon: Icon, label }) => (
-                    <div key={label}
-                      className="relative rounded-xl border border-border/50 bg-card/40 p-5 flex flex-col items-center gap-2 opacity-50 cursor-not-allowed">
-                      <Badge variant="muted" className="absolute top-2 right-2 text-[10px] px-1.5 py-0">Скоро</Badge>
-                      <Icon size={22} className="text-muted-foreground" />
-                      <p className="text-sm text-center">{label}</p>
-                    </div>
+                    { id: 'card' as const, icon: CreditCard, label: 'Банковская карта' },
+                    { id: 'sbp' as const, icon: Smartphone, label: 'СБП (Система быстрых платежей)' },
+                  ].map(({ id, icon: Icon, label }) => (
+                    <button
+                      key={id}
+                      type="button"
+                      onClick={() => { setBillingMethod(id); setBillingMessage(null); }}
+                      className={cn(
+                        'relative rounded-xl border p-5 flex flex-col items-center gap-2 transition-all text-left w-full hover:bg-accent/40',
+                        billingMethod === id
+                          ? 'border-violet-500 bg-violet-500/10 text-foreground shadow-sm shadow-violet-500/15'
+                          : 'border-border/50 bg-card/40 text-muted-foreground'
+                      )}
+                    >
+                      <Icon size={22} className={billingMethod === id ? 'text-violet-400' : 'text-muted-foreground'} />
+                      <p className="text-sm font-medium text-center">{label}</p>
+                    </button>
                   ))}
                 </div>
               </div>
+
+              <form
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  const amt = parseFloat(billingAmount);
+                  if (isNaN(amt) || amt <= 0) {
+                    setBillingMessage('Укажите корректную сумму пополнения');
+                    return;
+                  }
+                  const methodText = billingMethod === 'card' ? 'банковской карты' : 'СБП';
+                  setBillingMessage(`Переход к оплате на сумму ${amt.toFixed(2)} ₽ с помощью ${methodText} через платежную систему ЮKassa. (В рабочей версии здесь будет осуществлен редирект на защищенный шлюз оплаты).`);
+                }}
+                className="space-y-4 border border-border/40 bg-card/40 p-5 rounded-xl"
+              >
+                <div className="space-y-2">
+                  <Label htmlFor="topup-amount" className="text-sm font-medium text-muted-foreground">
+                    Сумма пополнения (₽)
+                  </Label>
+                  <div className="flex gap-2 flex-wrap">
+                    {['100', '500', '1000', '5000'].map((val) => (
+                      <Button
+                        key={val}
+                        type="button"
+                        variant={billingAmount === val ? 'default' : 'outline'}
+                        onClick={() => {
+                          setBillingAmount(val);
+                          setBillingMessage(null);
+                        }}
+                        className={cn(
+                          'h-9 px-4 text-sm font-medium transition-all',
+                          billingAmount === val ? 'bg-violet-600 hover:bg-violet-700 text-white' : ''
+                        )}
+                      >
+                        {val} ₽
+                      </Button>
+                    ))}
+                  </div>
+                  <div className="relative mt-2 max-w-xs">
+                    <Input
+                      id="topup-amount"
+                      type="number"
+                      value={billingAmount}
+                      onChange={(e) => {
+                        setBillingAmount(e.target.value);
+                        setBillingMessage(null);
+                      }}
+                      className="pr-8 text-base font-semibold"
+                      placeholder="Другая сумма"
+                      min="1"
+                      required
+                    />
+                    <span className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm font-medium">
+                      ₽
+                    </span>
+                  </div>
+                </div>
+
+                <Button type="submit" className="w-full sm:w-auto px-6 bg-violet-600 hover:bg-violet-700 text-white">
+                  Пополнить баланс
+                </Button>
+              </form>
+
+              {billingMessage && (
+                <div className="p-5 rounded-xl border border-violet-500/20 bg-violet-950/10 space-y-4 animate-in fade-in slide-in-from-bottom-2 duration-300">
+                  <div className="flex items-center gap-3">
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="shrink-0">
+                      <rect width="24" height="24" rx="6" fill="#8000FF" />
+                      <path d="M7 6v12M7 12h5" stroke="white" strokeWidth="2" strokeLinecap="round"/>
+                      <circle cx="15.5" cy="12" r="3.5" stroke="white" strokeWidth="2"/>
+                    </svg>
+                    <span className="font-display font-bold text-base tracking-tight">Ю<span className="text-[#A766FF]">Kassa</span></span>
+                    <Badge variant="success" className="ml-auto text-[10px] px-2 py-0 bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                      Шлюз готов
+                    </Badge>
+                  </div>
+                  <p className="text-sm text-foreground/90 leading-relaxed font-medium">
+                    {billingMessage}
+                  </p>
+                  <p className="text-xs text-muted-foreground leading-normal">
+                    Безопасность транзакций обеспечивается платежным шлюзом ЮKassa с использованием шифрования SSL/TLS и протоколов 3D-Secure.
+                  </p>
+                </div>
+              )}
 
               <p className="text-xs text-muted-foreground">
                 Тарификация подключается к внешним сервисам Arlist Tech — оплата, списание и проверка лицензий появятся позже.
