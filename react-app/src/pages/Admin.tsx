@@ -843,9 +843,10 @@ const BroadcastTab = () => {
 // ── Settings (Registration Modes) tab ───────────────────────
 
 const SettingsTab = () => {
-  const [settings, setSettings] = useState<any>({ registrationMode: 'OPEN' })
+  const [settings, setSettings] = useState<any>({ registrationMode: 'OPEN', email2faEnabled: false })
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
+  const [savingTfa, setSavingTfa] = useState(false)
   const [msg, setMsg] = useState<string | null>(null)
 
   const load = async () => {
@@ -874,6 +875,21 @@ const SettingsTab = () => {
       setMsg('Ошибка сохранения настроек')
     } finally {
       setSaving(false)
+    }
+  }
+
+  const handleTfaChange = async (enabled: boolean) => {
+    setSavingTfa(true)
+    setMsg(null)
+    try {
+      const r = await axios.post('/api/admin/settings', { email2faEnabled: enabled })
+      setSettings(r.data)
+      setMsg(enabled ? 'Email-2FA включена для всех пользователей' : 'Email-2FA отключена')
+      setTimeout(() => setMsg(null), 3000)
+    } catch {
+      setMsg('Ошибка сохранения настроек')
+    } finally {
+      setSavingTfa(false)
     }
   }
 
@@ -947,6 +963,67 @@ const SettingsTab = () => {
             <h3 className="text-sm font-bold text-foreground">Регистрация приостановлена</h3>
             <p className="text-xs text-muted-foreground mt-1 leading-normal">
               Вход новых участников в систему закрыт. Любые попытки зарегистрироваться будут заблокированы с показом предупреждения.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <h2 className="text-sm font-semibold tracking-tight uppercase text-muted-foreground mb-1">Двухфакторная аутентификация по email</h2>
+        <p className="text-xs text-muted-foreground">После ввода правильного пароля пользователю придёт одноразовый код на почту, без которого вход не завершится</p>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div
+          onClick={() => !savingTfa && !settings.email2faEnabled && handleTfaChange(true)}
+          className={cn(
+            "rounded-xl border p-5 flex flex-col gap-3 cursor-pointer transition-all duration-300",
+            settings.email2faEnabled
+              ? "border-emerald-500 bg-emerald-500/5 text-foreground shadow-sm shadow-emerald-500/10"
+              : "border-border/60 bg-card/40 text-muted-foreground hover:bg-accent/40"
+          )}
+        >
+          <div className="flex items-center justify-between">
+            <div className={cn("p-2 rounded-lg bg-background border border-border/40", settings.email2faEnabled ? "text-emerald-400" : "text-muted-foreground")}>
+              <Mail size={18} />
+            </div>
+            {settings.email2faEnabled && (
+              <Badge variant="success" className="bg-emerald-500/10 text-emerald-400 border-emerald-500/20 text-[10px]">
+                Активна
+              </Badge>
+            )}
+          </div>
+          <div>
+            <h3 className="text-sm font-bold text-foreground">Включена</h3>
+            <p className="text-xs text-muted-foreground mt-1 leading-normal">
+              Каждый вход требует подтверждения кодом из письма. Повышает безопасность аккаунтов.
+            </p>
+          </div>
+        </div>
+
+        <div
+          onClick={() => !savingTfa && settings.email2faEnabled && handleTfaChange(false)}
+          className={cn(
+            "rounded-xl border p-5 flex flex-col gap-3 cursor-pointer transition-all duration-300",
+            !settings.email2faEnabled
+              ? "border-red-500 bg-red-500/5 text-foreground shadow-sm shadow-red-500/10"
+              : "border-border/60 bg-card/40 text-muted-foreground hover:bg-accent/40"
+          )}
+        >
+          <div className="flex items-center justify-between">
+            <div className={cn("p-2 rounded-lg bg-background border border-border/40", !settings.email2faEnabled ? "text-red-400" : "text-muted-foreground")}>
+              <Lock size={18} />
+            </div>
+            {!settings.email2faEnabled && (
+              <Badge variant="destructive" className="bg-red-500/10 text-red-400 border-red-500/20 text-[10px]">
+                Активна
+              </Badge>
+            )}
+          </div>
+          <div>
+            <h3 className="text-sm font-bold text-foreground">Отключена</h3>
+            <p className="text-xs text-muted-foreground mt-1 leading-normal">
+              Вход завершается сразу после проверки пароля, без дополнительного кода.
             </p>
           </div>
         </div>

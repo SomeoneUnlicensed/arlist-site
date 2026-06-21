@@ -1,11 +1,22 @@
 import { Request, Response } from 'express';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
+import crypto from 'crypto';
 import prisma from '../services/prisma.service.js';
-import { sendVerificationEmail } from '../services/mail.service.js';
+import { sendVerificationEmail, sendResetPasswordEmail, sendLogin2faEmail } from '../services/mail.service.js';
 import { getSettings } from '../services/settings.service.js';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'super-secret-key';
+
+const issueAuthCookie = (res: Response, user: { id: string; role: string }) => {
+  const token = jwt.sign({ userId: user.id, role: user.role }, JWT_SECRET, { expiresIn: '30d' });
+  res.cookie('token', token, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'lax',
+    maxAge: 30 * 24 * 3600_000,
+  });
+};
 
 export const register = async (req: Request, res: Response) => {
   try {
@@ -101,14 +112,88 @@ export const login = async (req: Request, res: Response) => {
     const isMatch = await bcrypt.compare(password, user.passwordHash);
     if (!isMatch) return res.status(400).json({ error: 'Invalid credentials' });
 
-    const token = jwt.sign({ userId: user.id, role: user.role }, JWT_SECRET, { expiresIn: '30d' });
-    res.cookie('token', token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
-      maxAge: 30 * 24 * 3600_000,
-    });
+    if (getSettings().email2faEnabled) {
+      await prisma.verificationToken.deleteMany({ where: { userId: user.id, type: 'LOGIN_2FA' } });
+      const code = Math.floor(100000 + Math.random() * 900000).toString();
+      await prisma.verificationToken.create({
+        data: { token: code, userId: user.id, expires: new Date(Date.now() + 10 * 60_000), type: 'LOGIN_2FA' },
+      });
+      try {
+        await sendLogin2faEmail(email, code);
+      } catch (mailErr) {
+        console.error('Mail send failed (login 2fa):', mailErr);
+      }
+      return res.json({ requires2fa: true, email: user.email });
+    }
+
+    issueAuthCookie(res, user);
     res.json({ message: 'Logged in', user: { id: user.id, email: user.email, name: user.name, role: user.role } });
+  } catch {
+    res.status(500).json({ error: 'Internal server error' });
+  }
+};
+
+export const verifyLogin2fa = async (req: Request, res: Response) => {
+  try {
+    const { email, code } = req.body;
+    if (!email || !code) return res.status(400).json({ error: 'Email and code are required' });
+
+    const user = await prisma.user.findUnique({ where: { email } });
+    if (!user) return res.status(400).json({ error: 'Invalid code' });
+
+    const tokenRecord = await prisma.verificationToken.findFirst({
+      where: { token: code, userId: user.id, type: 'LOGIN_2FA', expires: { gt: new Date() } },
+    });
+    if (!tokenRecord) return res.status(400).json({ error: 'Неверный или истёкший код' });
+
+    await prisma.verificationToken.delete({ where: { id: tokenRecord.id } });
+    issueAuthCookie(res, user);
+    res.json({ message: 'Logged in', user: { id: user.id, email: user.email, name: user.name, role: user.role } });
+  } catch {
+    res.status(500).json({ error: 'Internal server error' });
+  }
+};
+
+export const forgotPassword = async (req: Request, res: Response) => {
+  try {
+    const { email } = req.body;
+    if (!email) return res.status(400).json({ error: 'Email required' });
+
+    const user = await prisma.user.findUnique({ where: { email } });
+    // Always respond with success to avoid leaking which emails are registered.
+    if (!user) return res.json({ message: 'Если такой email зарегистрирован, письмо со ссылкой отправлено' });
+
+    await prisma.verificationToken.deleteMany({ where: { userId: user.id, type: 'PASSWORD_RESET' } });
+    const token = crypto.randomBytes(32).toString('hex');
+    await prisma.verificationToken.create({
+      data: { token, userId: user.id, expires: new Date(Date.now() + 3600_000), type: 'PASSWORD_RESET' },
+    });
+    try {
+      await sendResetPasswordEmail(email, token);
+    } catch (mailErr) {
+      console.error('Mail send failed (forgot password):', mailErr);
+    }
+    res.json({ message: 'Если такой email зарегистрирован, письмо со ссылкой отправлено' });
+  } catch {
+    res.status(500).json({ error: 'Internal server error' });
+  }
+};
+
+export const resetPassword = async (req: Request, res: Response) => {
+  try {
+    const { token, newPassword } = req.body;
+    if (!token || !newPassword) return res.status(400).json({ error: 'Token and new password are required' });
+    if (newPassword.length < 8) return res.status(400).json({ error: 'Password must be at least 8 characters' });
+
+    const tokenRecord = await prisma.verificationToken.findFirst({
+      where: { token, type: 'PASSWORD_RESET', expires: { gt: new Date() } },
+    });
+    if (!tokenRecord) return res.status(400).json({ error: 'Ссылка для сброса пароля недействительна или истекла' });
+
+    const passwordHash = await bcrypt.hash(newPassword, 10);
+    await prisma.user.update({ where: { id: tokenRecord.userId }, data: { passwordHash } });
+    await prisma.verificationToken.delete({ where: { id: tokenRecord.id } });
+    res.json({ message: 'Пароль успешно изменён' });
   } catch {
     res.status(500).json({ error: 'Internal server error' });
   }

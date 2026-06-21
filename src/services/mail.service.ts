@@ -27,13 +27,25 @@ export const sendVerificationEmail = async (to: string, code: string) => {
 };
 
 export const sendResetPasswordEmail = async (to: string, token: string) => {
-  const resetUrl = `${process.env.APP_URL}/auth/reset-password?token=${token}`;
+  const resetUrl = `${process.env.APP_URL}/reset-password?token=${token}`;
   const mailOptions = {
     from: process.env.SMTP_FROM || '"Arlist" <noreply@arlist.ru>',
     to,
     subject: 'Сброс пароля Arlist',
     text: `Для сброса пароля перейдите по ссылке: ${resetUrl}`,
     html: `Для сброса пароля <a href="${resetUrl}">нажмите здесь</a>`,
+  };
+
+  return transporter.sendMail(mailOptions);
+};
+
+export const sendLogin2faEmail = async (to: string, code: string) => {
+  const mailOptions = {
+    from: process.env.SMTP_FROM || '"Arlist" <noreply@arlist.ru>',
+    to,
+    subject: 'Код входа Arlist ID',
+    text: `Ваш код для входа: ${code}. Если это были не вы — просто проигнорируйте это письмо.`,
+    html: `<b>Ваш код для входа: ${code}</b><br>Если это были не вы — просто проигнорируйте это письмо.`,
   };
 
   return transporter.sendMail(mailOptions);

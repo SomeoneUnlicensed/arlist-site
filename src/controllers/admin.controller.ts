@@ -125,11 +125,14 @@ export const getSystemSettings = async (req: Request, res: Response) => {
 
 export const updateSystemSettings = async (req: Request, res: Response) => {
   try {
-    const { registrationMode } = req.body;
+    const { registrationMode, email2faEnabled } = req.body;
     if (registrationMode && !['OPEN', 'CLOSED'].includes(registrationMode)) {
       return res.status(400).json({ error: 'Invalid registrationMode value' });
     }
-    const updated = saveSettings({ registrationMode });
+    const updated = saveSettings({
+      ...(registrationMode ? { registrationMode } : {}),
+      ...(email2faEnabled !== undefined ? { email2faEnabled: Boolean(email2faEnabled) } : {}),
+    });
     res.json(updated);
   } catch {
     res.status(500).json({ error: 'Internal server error' });

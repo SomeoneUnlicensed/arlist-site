@@ -75,7 +75,23 @@ router.get('/:uid', async (req: Request, res: Response) => {
     }
 
     res.status(500).send('Unsupported prompt');
-  } catch (err) {
+  } catch (err: any) {
+    // SessionNotFound happens when this interaction was already completed (e.g. the
+    // browser resubmitted an old /login page after going back, or the user double
+    // clicked "Войти"). The interaction record is gone, so we cannot resume the
+    // original OAuth flow — send the user back to start a fresh login instead of a
+    // bare 500.
+    if (err?.name === 'SessionNotFound') {
+      res.status(400).send(
+        '<!DOCTYPE html><html lang="ru"><head><meta charset="utf-8">' +
+        '<title>Сессия входа устарела — Arlist ID</title></head><body style="font-family:sans-serif;max-width:480px;margin:80px auto;text-align:center;color:#222">' +
+        '<h2>Сессия входа устарела</h2>' +
+        '<p>Похоже, эта попытка входа уже была завершена или истекла (например, из-за повторной отправки формы логина).</p>' +
+        '<p>Вернитесь на сайт сервиса, через который вы заходили, и попробуйте войти ещё раз.</p>' +
+        '</body></html>'
+      );
+      return;
+    }
     console.error(err);
     res.status(500).send('Internal Error');
   }

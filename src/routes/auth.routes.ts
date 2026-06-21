@@ -2,6 +2,7 @@ import { Router } from 'express';
 import {
   register, login, logout, verifyEmail, resendVerification,
   getProfile, updateProfile, changePassword, getRegistrationStatus,
+  verifyLogin2fa, forgotPassword, resetPassword,
 } from '../controllers/auth.controller.js';
 import { authenticate } from '../middleware/auth.middleware.js';
 
@@ -9,9 +10,12 @@ const router = Router();
 
 router.post('/register', register);
 router.post('/login', login);
+router.post('/verify-login-2fa', verifyLogin2fa);
 router.post('/logout', logout);
 router.post('/verify', verifyEmail);
 router.post('/resend-verification', resendVerification);
+router.post('/forgot-password', forgotPassword);
+router.post('/reset-password', resetPassword);
 router.get('/registration-status', getRegistrationStatus);
 
 router.get('/profile', authenticate, getProfile);

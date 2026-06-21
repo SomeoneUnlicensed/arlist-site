@@ -5,6 +5,8 @@ import Verify from './pages/Verify';
 import Profile from './pages/Profile';
 import Admin from './pages/Admin';
 import PrivacyPolicy from './pages/PrivacyPolicy';
+import ForgotPassword from './pages/ForgotPassword';
+import ResetPassword from './pages/ResetPassword';
 
 function App() {
   return (
@@ -17,6 +19,8 @@ function App() {
           <Route path="/profile" element={<Profile />} />
           <Route path="/admin" element={<Admin />} />
           <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/reset-password" element={<ResetPassword />} />
           <Route path="*" element={<Navigate to="/login" />} />
         </Routes>
       </div>

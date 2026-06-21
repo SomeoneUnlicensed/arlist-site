@@ -33,7 +33,7 @@ app.get('/api/health', (req, res) => {
 
 // React SPA routes must come BEFORE oidcProvider.callback() because
 // oidc-provider is a Koa app that returns 404 for unknown paths without calling next()
-app.get(['/login', '/register', '/verify', '/profile', '/admin', '/privacy-policy'], (req, res) => {
+app.get(['/login', '/register', '/verify', '/profile', '/admin', '/privacy-policy', '/forgot-password', '/reset-password'], (req, res) => {
   res.sendFile(path.join(__dirname, '../dist-client/index.html'));
 });
 

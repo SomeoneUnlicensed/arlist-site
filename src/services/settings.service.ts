@@ -8,10 +8,12 @@ const SETTINGS_FILE = path.join(__dirname, '../../data/settings.json');
 
 export interface SystemSettings {
   registrationMode: 'OPEN' | 'CLOSED';
+  email2faEnabled: boolean;
 }
 
 const defaultSettings: SystemSettings = {
   registrationMode: 'OPEN',
+  email2faEnabled: false,
 };
 
 // Ensure data directory exists
