@@ -1,31 +1,49 @@
-name: Deploy to arlist.ru
+name: Deploy Production
 
 on:
   push:
-    branches: [master]
+    branches: [master, main]
+  workflow_dispatch:
 
 jobs:
   deploy:
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, linux, production]
+
     steps:
-      - uses: actions/checkout@v4
+      - name: Free disk space
+        run: |
+          df -h /
+          docker image prune -a -f || true
+          docker builder prune -a -f || true
 
-      - name: Deploy via rsync
-        uses: burnett01/rsync-deployments@7.0.1
-        with:
-          switches: -avz --delete --exclude='.git*' --exclude='node_modules' --exclude='.env'
-          path: ./
-          remote_path: /var/www/arlist.ru/
-          remote_host: ${{ secrets.SSH_HOST }}
-          remote_user: ${{ secrets.SSH_USER }}
-          remote_key: ${{ secrets.SSH_PRIVATE_KEY }}
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-      - name: Restart Docker containers
-        uses: appleboy/ssh-action@master
-        with:
-          host: ${{ secrets.SSH_HOST }}
-          username: ${{ secrets.SSH_USER }}
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
-          script: |
-            cd /var/www/arlist.ru/
-            docker compose up -d --build --force-recreate
+      - name: Build image
+        run: docker build -t arlistru-web:latest .
+
+      - name: Import image into k3s containerd
+        run: |
+          docker save arlistru-web:latest -o /tmp/arlistru-web.tar
+          sudo k3s ctr -n k8s.io images import --all-platforms /tmp/arlistru-web.tar
+          rm -f /tmp/arlistru-web.tar
+
+      - name: Restart deployment (rolling update)
+        run: |
+          export KUBECONFIG=/etc/rancher/k3s/k3s.yaml
+          kubectl -n production rollout restart deploy/arlist-site
+          kubectl -n production rollout status deploy/arlist-site --timeout=300s
+
+      - name: Verify deployment
+        run: |
+          export KUBECONFIG=/etc/rancher/k3s/k3s.yaml
+          sleep 5
+          POD=$(kubectl -n production get pod -l app=arlist-site -o jsonpath='{.items[0].metadata.name}')
+          kubectl -n production exec "$POD" -- wget -qO- http://127.0.0.1:8086/api/health || echo "::warning::health check failed"
+
+      - name: Cleanup
+        if: always()
+        run: |
+          docker image prune -a -f || true
+          docker builder prune -a -f || true
+          df -h /
