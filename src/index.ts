@@ -41,11 +41,12 @@ app.get(['/login', '/register', '/verify', '/profile', '/admin', '/privacy-polic
 // the public landing page lives in ../html/index.html.
 app.use(express.static(path.join(__dirname, '../dist-client'), { index: false }));
 
+// Static HTML landing pages must be registered before oidcProvider.callback():
+// oidc-provider returns its own 404 for unknown paths and does not call next().
+app.use(express.static(path.join(__dirname, '../html')));
+
 // OIDC Provider handles /auth, /token, /userinfo, /.well-known, etc.
 app.use(oidcProvider.callback());
-
-// Static HTML landing pages
-app.use(express.static(path.join(__dirname, '../html')));
 
 // Fallback for landing pages
 app.get(/^(?!\/api|\/interaction|\/oidc).*/, (req, res) => {
