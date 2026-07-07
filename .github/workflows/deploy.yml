@@ -5,45 +5,82 @@ on:
     branches: [master, main]
   workflow_dispatch:
 
+permissions:
+  contents: read
+  packages: write
+
+concurrency:
+  group: arlist-production-deploy
+  cancel-in-progress: true
+
 jobs:
-  deploy:
-    runs-on: [self-hosted, linux, production]
+  build:
+    runs-on: ubuntu-latest
+
+    env:
+      IMAGE_REPOSITORY: ghcr.io/someoneunlicensed/arlist-site
+      IMAGE_TAG: ${{ github.sha }}
 
     steps:
-      - name: Free disk space
-        run: |
-          df -h /
-          docker image prune -a -f || true
-          docker builder prune -a -f || true
-
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Build image
-        run: docker build -t arlistru-web:latest .
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
 
-      - name: Import image into k3s containerd
+      - name: Login to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: true
+          tags: |
+            ${{ env.IMAGE_REPOSITORY }}:${{ env.IMAGE_TAG }}
+            ${{ env.IMAGE_REPOSITORY }}:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  deploy:
+    needs: build
+    runs-on: [self-hosted, linux, production]
+
+    env:
+      IMAGE_REPOSITORY: ghcr.io/someoneunlicensed/arlist-site
+      KUBECONFIG: /etc/rancher/k3s/k3s.yaml
+      GHCR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    steps:
+      - name: Pull image into k3s containerd
         run: |
-          docker save arlistru-web:latest -o /tmp/arlistru-web.tar
-          sudo k3s ctr -n k8s.io images import --all-platforms /tmp/arlistru-web.tar
-          rm -f /tmp/arlistru-web.tar
+          IMAGE="${IMAGE_REPOSITORY}:${GITHUB_SHA}"
+          echo "${GHCR_TOKEN}" | docker login ghcr.io -u "${GITHUB_ACTOR}" --password-stdin
+          docker pull "$IMAGE"
+          docker save "$IMAGE" | sudo k3s ctr -n k8s.io images import --all-platforms -
+          docker logout ghcr.io
 
       - name: Restart deployment (rolling update)
         run: |
-          export KUBECONFIG=/etc/rancher/k3s/k3s.yaml
-          kubectl -n production rollout restart deploy/arlist-site
-          kubectl -n production rollout status deploy/arlist-site --timeout=300s
+          IMAGE="${IMAGE_REPOSITORY}:${GITHUB_SHA}"
+
+          kubectl -n production set image deploy/arlist-site web="$IMAGE"
+          kubectl -n production set image deploy/arlist-site wait-for-postgres="$IMAGE"
+          kubectl -n production patch deploy/arlist-site --type='json' -p='[
+            {"op":"replace","path":"/spec/template/spec/containers/0/imagePullPolicy","value":"IfNotPresent"},
+            {"op":"replace","path":"/spec/template/spec/initContainers/0/imagePullPolicy","value":"IfNotPresent"}
+          ]'
+
+          if ! kubectl -n production rollout status deploy/arlist-site --timeout=300s; then
+            kubectl -n production rollout undo deploy/arlist-site
+            exit 1
+          fi
 
       - name: Verify deployment
         run: |
-          export KUBECONFIG=/etc/rancher/k3s/k3s.yaml
-          sleep 5
           POD=$(kubectl -n production get pod -l app=arlist-site -o jsonpath='{.items[0].metadata.name}')
-          kubectl -n production exec "$POD" -- wget -qO- http://127.0.0.1:8086/api/health || echo "::warning::health check failed"
-
-      - name: Cleanup
-        if: always()
-        run: |
-          docker image prune -a -f || true
-          docker builder prune -a -f || true
-          df -h /
+          kubectl -n production exec "$POD" -- wget -qO- http://127.0.0.1:8086/api/health
