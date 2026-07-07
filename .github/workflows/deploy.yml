@@ -83,4 +83,4 @@ jobs:
       - name: Verify deployment
         run: |
           POD=$(kubectl -n production get pod -l app=arlist-site -o jsonpath='{.items[0].metadata.name}')
-          kubectl -n production exec "$POD" -- wget -qO- http://127.0.0.1:8086/api/health
+          kubectl -n production exec "$POD" -- node -e "fetch('http://127.0.0.1:8086/api/health').then(async (res) => { const body = await res.text(); console.log(body); if (!res.ok) process.exit(1); }).catch((err) => { console.error(err); process.exit(1); })"
