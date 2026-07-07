@@ -99,7 +99,7 @@ const PrivacyPolicy = () => {
               По всем вопросам, связанным с обработкой персональных данных:
             </p>
             <div className="text-muted-foreground space-y-1 mt-2">
-              <div><strong>Email:</strong> letunovskiu2011@yandex.ru</div>
+              <div><strong>Email:</strong> hello@arlist.ru</div>
               <div><strong>Telegram:</strong> <a href="https://t.me/kompotomanya" target="_blank" rel="noopener noreferrer" className="underline hover:text-foreground">@kompotomanya</a></div>
             </div>
           </div>

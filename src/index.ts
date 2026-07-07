@@ -37,8 +37,9 @@ app.get(['/login', '/register', '/verify', '/profile', '/admin', '/privacy-polic
   res.sendFile(path.join(__dirname, '../dist-client/index.html'));
 });
 
-// SPA static assets (JS/CSS chunks)
-app.use(express.static(path.join(__dirname, '../dist-client')));
+// SPA static assets (JS/CSS chunks). Do not serve dist-client/index.html for "/":
+// the public landing page lives in ../html/index.html.
+app.use(express.static(path.join(__dirname, '../dist-client'), { index: false }));
 
 // OIDC Provider handles /auth, /token, /userinfo, /.well-known, etc.
 app.use(oidcProvider.callback());
