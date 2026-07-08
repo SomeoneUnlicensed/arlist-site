@@ -1,4 +1,9 @@
-<svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Арлист Тех">
-  <rect width="512" height="512" rx="112" fill="#f5f6fb"/>
-  <path d="M114 328 214 154h54L168 328h-54Zm121 0 100-174h54L289 328h-54Zm-34-58h147v48H201v-48Z" fill="#0b1736"/>
+<svg width="100" height="100" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+        <linearGradient id="a_grad" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" style="stop-color:#ffffff;stop-opacity:1" />
+            <stop offset="100%" style="stop-color:#3b82f6;stop-opacity:1" />
+        </linearGradient>
+    </defs>
+    <path d="M55 10 L25 90 L40 90 L46 72 L70 72 L76 90 L91 90 Z M52 35 L48 58 L66 58 Z" fill="url(#a_grad)" />
 </svg>
