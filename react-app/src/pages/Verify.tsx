@@ -5,6 +5,7 @@ import { Loader2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import { Alert, AlertDescription } from '@/components/ui/alert'
+import { InvisibleAltcha, useAltchaPayload } from '@/hooks/useAltchaPayload'
 
 const OTP_LENGTH = 6
 
@@ -19,6 +20,7 @@ const Verify = () => {
   const returnTo = searchParams.get('return_to')
   const navigate = useNavigate()
   const refs = useRef<(HTMLInputElement | null)[]>([])
+  const { getPayload: getCaptchaPayload, widgetRef: captchaWidgetRef } = useAltchaPayload()
 
   useEffect(() => { refs.current[0]?.focus() }, [])
 
@@ -69,7 +71,13 @@ const Verify = () => {
     if (!email || resendCooldown > 0) return
     setResendMsg(''); setError('')
     try {
-      await axios.post('/api/auth/resend-verification', { email })
+      const captcha = await getCaptchaPayload()
+      if (!captcha) {
+        setError('Не удалось пройти антибот-проверку. Обновите страницу и попробуйте снова.')
+        return
+      }
+
+      await axios.post('/api/auth/resend-verification', { email, captcha })
       setResendMsg('Новый код отправлен')
       setResendCooldown(60)
       setDigits(Array(OTP_LENGTH).fill(''))
@@ -83,6 +91,7 @@ const Verify = () => {
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center px-4 py-12 gap-8 animate-fade-up">
+      <InvisibleAltcha widgetRef={captchaWidgetRef} />
       <div className="text-center space-y-1">
         <h1 className="font-display text-5xl text-foreground tracking-tight">Arlist ID</h1>
         <p className="text-muted-foreground text-sm">Arlist ID — единый ключ к вашим сервисам.</p>

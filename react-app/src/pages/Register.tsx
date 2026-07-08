@@ -7,6 +7,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import { Alert, AlertDescription } from '@/components/ui/alert'
+import { InvisibleAltcha, useAltchaPayload } from '@/hooks/useAltchaPayload'
 
 const Register = () => {
   const [email, setEmail] = useState('')
@@ -19,6 +20,7 @@ const Register = () => {
   const navigate = useNavigate()
   const [searchParams] = useSearchParams()
   const returnTo = searchParams.get('return_to')
+  const { getPayload: getCaptchaPayload, widgetRef: captchaWidgetRef } = useAltchaPayload()
 
   useEffect(() => {
     axios.get('/api/auth/registration-status')
@@ -41,7 +43,13 @@ const Register = () => {
     
     setLoading(true)
     try {
-      await axios.post('/api/auth/register', { email, password, name, agreedToPolicy })
+      const captcha = await getCaptchaPayload()
+      if (!captcha) {
+        setError('Не удалось пройти антибот-проверку. Обновите страницу и попробуйте снова.')
+        return
+      }
+
+      await axios.post('/api/auth/register', { email, password, name, agreedToPolicy, captcha })
       const params = new URLSearchParams({ email })
       if (returnTo) params.set('return_to', returnTo)
       navigate(`/verify?${params.toString()}`)
@@ -55,6 +63,7 @@ const Register = () => {
   if (isClosed) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center px-4 py-12 gap-8 animate-fade-up">
+        <InvisibleAltcha widgetRef={captchaWidgetRef} />
         {/* Brand */}
         <div className="text-center space-y-1">
           <h1 className="font-display text-5xl text-foreground tracking-tight">Arlist ID</h1>
@@ -88,6 +97,7 @@ const Register = () => {
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center px-4 py-12 gap-8 animate-fade-up">
+      <InvisibleAltcha widgetRef={captchaWidgetRef} />
       {/* Brand */}
       <div className="text-center space-y-1">
         <h1 className="font-display text-5xl text-foreground tracking-tight">Arlist ID</h1>

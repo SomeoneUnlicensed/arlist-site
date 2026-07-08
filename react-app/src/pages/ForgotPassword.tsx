@@ -7,19 +7,27 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import { Alert, AlertDescription } from '@/components/ui/alert'
+import { InvisibleAltcha, useAltchaPayload } from '@/hooks/useAltchaPayload'
 
 const ForgotPassword = () => {
   const [email, setEmail] = useState('')
   const [error, setError] = useState('')
   const [sent, setSent] = useState(false)
   const [loading, setLoading] = useState(false)
+  const { getPayload: getCaptchaPayload, widgetRef: captchaWidgetRef } = useAltchaPayload()
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError('')
     setLoading(true)
     try {
-      await axios.post('/api/auth/forgot-password', { email })
+      const captcha = await getCaptchaPayload()
+      if (!captcha) {
+        setError('Не удалось пройти антибот-проверку. Обновите страницу и попробуйте снова.')
+        return
+      }
+
+      await axios.post('/api/auth/forgot-password', { email, captcha })
       setSent(true)
     } catch (err: any) {
       setError(err.response?.data?.error || 'Не удалось отправить письмо')
@@ -30,6 +38,7 @@ const ForgotPassword = () => {
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center px-4 py-12 gap-8 animate-fade-up">
+      <InvisibleAltcha widgetRef={captchaWidgetRef} />
       <div className="text-center space-y-1">
         <h1 className="font-display text-5xl text-foreground tracking-tight">Arlist ID</h1>
         <p className="text-muted-foreground text-sm">Arlist ID — единый ключ к вашим сервисам.</p>

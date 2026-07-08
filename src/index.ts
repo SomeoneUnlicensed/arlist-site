@@ -5,6 +5,7 @@ import dotenv from 'dotenv';
 import cookieParser from 'cookie-parser';
 import authRoutes from './routes/auth.routes.js';
 import adminRoutes from './routes/admin.routes.js';
+import captchaRoutes from './routes/captcha.routes.js';
 import interactionRoutes from './routes/interaction.routes.js';
 import arlistApiRoutes from './routes/arlistApi.routes.js';
 import oidcProvider from './services/oidc.service.js';
@@ -24,6 +25,7 @@ app.use(cookieParser());
 
 // API and OIDC interaction routes
 app.use('/interaction', interactionRoutes);
+app.use('/api/captcha', captchaRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/v1', arlistApiRoutes);

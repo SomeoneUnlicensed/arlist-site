@@ -7,6 +7,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import { Alert, AlertDescription } from '@/components/ui/alert'
+import { InvisibleAltcha, useAltchaPayload } from '@/hooks/useAltchaPayload'
 
 const Login = () => {
   const [email, setEmail] = useState('')
@@ -17,6 +18,7 @@ const Login = () => {
   const [code, setCode] = useState('')
   const [searchParams] = useSearchParams()
   const navigate = useNavigate()
+  const { getPayload: getCaptchaPayload, widgetRef: captchaWidgetRef } = useAltchaPayload()
 
   const verified = searchParams.get('verified')
 
@@ -41,7 +43,13 @@ const Login = () => {
     setError('')
     setLoading(true)
     try {
-      const r = await axios.post('/api/auth/login', { email, password })
+      const captcha = await getCaptchaPayload()
+      if (!captcha) {
+        setError('Не удалось пройти антибот-проверку. Обновите страницу и попробуйте снова.')
+        return
+      }
+
+      const r = await axios.post('/api/auth/login', { email, password, captcha })
       if (r.data?.requires2fa) {
         setNeeds2fa(true)
       } else {
@@ -70,6 +78,7 @@ const Login = () => {
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center px-4 py-12 gap-8 animate-fade-up">
+      <InvisibleAltcha widgetRef={captchaWidgetRef} />
       {/* Brand */}
       <div className="text-center space-y-1">
         <h1 className="font-display text-5xl text-foreground tracking-tight">Arlist ID</h1>
