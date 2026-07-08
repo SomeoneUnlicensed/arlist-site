@@ -1,15 +1,21 @@
 {
   "name": "Арлист",
   "short_name": "Арлист",
+  "description": "Спокойные цифровые сервисы для людей.",
+  "lang": "ru",
+  "dir": "ltr",
+  "id": "https://arlist.ru/",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
+  "orientation": "any",
   "background_color": "#09090b",
   "theme_color": "#09090b",
+  "categories": ["business", "productivity", "education"],
   "icons": [
     {
       "src": "/icon.svg",
-      "sizes": "100x100",
+      "sizes": "any",
       "type": "image/svg+xml",
       "purpose": "any"
     },
