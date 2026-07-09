@@ -62,6 +62,8 @@ jobs:
           echo "${GHCR_TOKEN}" | docker login ghcr.io -u "${GITHUB_ACTOR}" --password-stdin
           docker pull "$IMAGE"
           docker save "$IMAGE" | sudo k3s ctr -n k8s.io images import --all-platforms -
+          docker image prune -af --filter "until=24h"
+          docker builder prune -af --filter "until=24h"
           docker logout ghcr.io
 
       - name: Restart deployment (rolling update)
