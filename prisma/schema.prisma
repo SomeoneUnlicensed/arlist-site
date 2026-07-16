@@ -16,6 +16,12 @@ enum Role {
   ADMIN
 }
 
+enum TariffType {
+  FREE
+  BASIC
+  PRO
+}
+
 model User {
   id            String   @id @default(cuid())
   email         String   @unique
@@ -26,11 +32,16 @@ model User {
   isBanned      Boolean  @default(false)
   agreedToPolicy Boolean  @default(false)
   role          Role     @default(USER)
-  balanceKopecks Int     @default(0) // Баланс в копейках (тарификация выключена, поле зарезервировано)
+  balanceKopecks Int     @default(0) // Кошелёк для овердрафта сверх лимита тарифа
+  tariffId      String?
+  tariff        Tariff?  @relation(fields: [tariffId], references: [id])
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 
   tokens        VerificationToken[]
+  apiKeys       ApiKey[]
+  usageRecords  UsageRecord[]
+  deviceCodes   DeviceCode[]
 }
 
 model VerificationToken {
@@ -70,4 +81,68 @@ model OAuthClient {
   redirectUris String[] // Массив разрешенных редиректов
   isTrusted    Boolean  @default(false) // Внутреннее доверенное приложение (получает расширенные права/роли)
   createdAt    DateTime @default(now())
+}
+
+model Tariff {
+  id                  String     @id @default(cuid())
+  type                TariffType @unique
+  name                String
+  description         String?
+  priceMonth          Int      @default(0) // Абонплата в копейках
+  creditsPer5h        Int      @default(50000) // Кредиты = токены (prompt+output) за 5 часов
+  creditsPerWeek      Int      @default(300000) // Кредиты за неделю
+  models              String[] // Список доступных моделей, '*' — все
+  overrunEnabled      Boolean  @default(false) // Разрешён ли платный овердрафт сверх лимита
+  overrunPriceKopecks Int      @default(0) // Цена за 1000 кредитов сверх лимита, списывается с balanceKopecks
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+
+  users               User[]
+}
+
+model ApiKey {
+  id        String   @id @default(cuid())
+  key       String   @unique
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name      String   @default("default")
+  lastUsed  DateTime?
+  isRevoked Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  usageRecords UsageRecord[]
+
+  @@index([userId])
+  @@index([key])
+}
+
+model UsageRecord {
+  id           String   @id @default(cuid())
+  userId       String
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  apiKeyId     String?
+  apiKey       ApiKey?  @relation(fields: [apiKeyId], references: [id], onDelete: SetNull)
+  model        String
+  promptTokens Int      @default(0)
+  outputTokens Int      @default(0)
+  isOverrun    Boolean  @default(false) // true, если запрос был оплачен из кошелька сверх лимита тарифа
+  costKopecks  Int      @default(0) // Сколько списано с кошелька за этот запрос (0, если в рамках тарифа)
+  createdAt    DateTime @default(now())
+
+  @@index([userId, createdAt])
+  @@index([apiKeyId])
+}
+
+model DeviceCode {
+  id          String    @id @default(cuid())
+  deviceCode  String    @unique
+  userCode    String    @unique
+  userId      String?
+  user        User?     @relation(fields: [userId], references: [id], onDelete: SetNull)
+  isConfirmed Boolean   @default(false)
+  expiresAt   DateTime
+  createdAt   DateTime  @default(now())
+
+  @@index([deviceCode])
+  @@index([userCode])
 }

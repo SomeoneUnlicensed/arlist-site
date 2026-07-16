@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import axios from 'axios'
 import { useNavigate } from 'react-router-dom'
-import { LogOut, ShieldCheck, Check, Pencil, X, KeyRound, User, Home, Lock, ChevronRight, Wallet, CreditCard, Smartphone, Bitcoin } from 'lucide-react'
+import { LogOut, ShieldCheck, Check, Pencil, X, KeyRound, User, Home, Lock, ChevronRight, Wallet, CreditCard, Smartphone, Bitcoin, Terminal, BarChart3, AlertTriangle } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -27,8 +27,6 @@ function greeting() {
   if (h >= 17 && h < 22) return 'Добрый вечер'
   return 'Доброй ночи'
 }
-
-// ── Edit name ─────────────────────────────────────────────
 
 const EditName = ({ initial, onSaved }: { initial: string; onSaved: (n: string) => void }) => {
   const [editing, setEditing] = useState(false)
@@ -69,8 +67,6 @@ const EditName = ({ initial, onSaved }: { initial: string; onSaved: (n: string) 
     </div>
   )
 }
-
-// ── Change password ───────────────────────────────────────
 
 const ChangePassword = () => {
   const [open, setOpen] = useState(false)
@@ -118,9 +114,7 @@ const ChangePassword = () => {
   )
 }
 
-// ── Sidebar ───────────────────────────────────────────────
-
-type Section = 'profile' | 'security' | 'billing'
+type Section = 'profile' | 'security' | 'usage' | 'billing'
 
 const Sidebar = ({ user, active, setActive, onLogout, onAdmin }:
   { user: any; active: Section; setActive: (s: Section) => void; onLogout: () => void; onAdmin: () => void }) => {
@@ -128,18 +122,16 @@ const Sidebar = ({ user, active, setActive, onLogout, onAdmin }:
   const nav = [
     { id: 'profile' as Section, icon: User, label: 'Профиль' },
     { id: 'security' as Section, icon: Lock, label: 'Безопасность' },
-    // Тарификация скрыта от всех кроме админа — см. memory tarification-tab-admin-gate
+    { id: 'usage' as Section, icon: BarChart3, label: 'Использование' },
     ...(user.role === 'ADMIN' ? [{ id: 'billing' as Section, icon: Wallet, label: 'Тарификация' }] : []),
   ]
 
   return (
     <aside className="w-60 shrink-0 border-r border-border/60 flex flex-col bg-card/40">
-      {/* Logo */}
       <div className="h-14 flex items-center px-5 border-b border-border/60">
         <a href="/" className="font-display text-base tracking-tight hover:opacity-75 transition-opacity">Arlist ID</a>
       </div>
 
-      {/* User info */}
       <div className="px-5 py-5 border-b border-border/40">
         <p className="text-sm font-medium truncate">{user.name || 'Без имени'}</p>
         <p className="text-xs text-muted-foreground truncate mt-0.5">{user.email}</p>
@@ -153,7 +145,6 @@ const Sidebar = ({ user, active, setActive, onLogout, onAdmin }:
         </div>
       </div>
 
-      {/* Nav */}
       <nav className="flex-1 px-3 py-4 space-y-0.5">
         {nav.map(({ id, icon: Icon, label }) => (
           <button key={id} onClick={() => setActive(id)}
@@ -169,7 +160,6 @@ const Sidebar = ({ user, active, setActive, onLogout, onAdmin }:
         ))}
       </nav>
 
-      {/* Bottom actions */}
       <div className="px-3 py-4 border-t border-border/40 space-y-0.5">
         {user.role === 'ADMIN' && (
           <button onClick={onAdmin}
@@ -190,14 +180,101 @@ const Sidebar = ({ user, active, setActive, onLogout, onAdmin }:
   )
 }
 
-// ── Main ──────────────────────────────────────────────────
+const UsageGauge = ({ percent, label }: { percent: number; label: string }) => {
+  const pct = Math.min(100, Math.max(0, percent))
+  const color = pct >= 90 ? 'bg-red-500' : pct >= 70 ? 'bg-amber-500' : 'bg-violet-500'
+  return (
+    <div className="space-y-1.5">
+      <div className="flex justify-between text-sm">
+        <span className="text-muted-foreground">{label}</span>
+        <span className="font-medium">{pct}%</span>
+      </div>
+      <div className="h-2 bg-accent rounded-full overflow-hidden">
+        <div className={cn('h-full rounded-full transition-all duration-500', color)} style={{ width: `${pct}%` }} />
+      </div>
+    </div>
+  )
+}
+
+const UsageSection = () => {
+  const [stats, setStats] = useState<any>(null)
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    axios.get('/api/cli/auth/usage').then(r => setStats(r.data)).catch(() => {}).finally(() => setLoading(false))
+  }, [])
+
+  if (loading) return (
+    <div className="px-10 pt-14 pb-10">
+      <p className="text-sm text-muted-foreground">Загрузка...</p>
+    </div>
+  )
+
+  if (!stats) return (
+    <div className="px-10 pt-14 pb-10">
+      <p className="text-sm text-muted-foreground">Не удалось загрузить статистику</p>
+    </div>
+  )
+
+  return (
+    <div className="px-10 pt-14 pb-10">
+      <h1 className="text-2xl font-semibold tracking-tight mb-1">Использование</h1>
+      <p className="text-muted-foreground text-sm mb-8">Использование и лимиты тарифа</p>
+
+      <div className="max-w-2xl space-y-6">
+        <div className="rounded-xl border border-border/50 bg-card/60 p-5">
+          <div className="flex items-center justify-between mb-4">
+            <p className="text-sm font-medium">Тариф: {stats.tariff.name}</p>
+            <Badge variant="purple" className="text-[10px] px-2 py-0">{stats.tariff.type}</Badge>
+          </div>
+          <div className="space-y-4">
+            <UsageGauge percent={stats.usagePercent.per5h} label="За 5 часов" />
+            <UsageGauge percent={stats.usagePercent.week} label="За неделю" />
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="rounded-xl border border-border/50 bg-card/60 p-5">
+            <p className="text-xs uppercase tracking-widest text-muted-foreground mb-2">Всего токенов (вход)</p>
+            <p className="text-2xl font-bold tracking-tight">{stats.tokens.prompt.toLocaleString('ru-RU')}</p>
+          </div>
+          <div className="rounded-xl border border-border/50 bg-card/60 p-5">
+            <p className="text-xs uppercase tracking-widest text-muted-foreground mb-2">Всего токенов (выход)</p>
+            <p className="text-2xl font-bold tracking-tight">{stats.tokens.output.toLocaleString('ru-RU')}</p>
+          </div>
+        </div>
+
+        <div className="rounded-xl border border-border/50 bg-card/60 p-5 flex items-center justify-between">
+          <div>
+            <p className="text-xs uppercase tracking-widest text-muted-foreground mb-2">Кошелёк (оверран)</p>
+            <p className="text-2xl font-bold tracking-tight">{((stats.wallet.balanceKopecks ?? 0) / 100).toFixed(2)} ₽</p>
+            <p className="text-xs text-muted-foreground mt-1">
+              {stats.wallet.overrunEnabled
+                ? 'Включён — сверх лимита доплата списывается с баланса автоматически'
+                : 'Выключен на этом тарифе — по исчерпании лимита запросы блокируются'}
+            </p>
+          </div>
+          <Wallet size={32} className="text-muted-foreground/40" />
+        </div>
+
+        {stats.usagePercent.per5h >= 100 && !stats.wallet.overrunEnabled && (
+          <Alert variant="destructive">
+            <AlertTriangle size={16} />
+            <AlertDescription>
+              Лимит на 5 часов исчерпан. Попробуйте позже.
+            </AlertDescription>
+          </Alert>
+        )}
+      </div>
+    </div>
+  )
+}
 
 const Profile = () => {
   const [user, setUser] = useState<any>(null)
   const [active, setActive] = useState<Section>('profile')
   const navigate = useNavigate()
 
-  // Billing states
   const [billingMethod, setBillingMethod] = useState<'card' | 'sbp' | null>('card')
   const [billingAmount, setBillingAmount] = useState<string>('500')
   const [billingMessage, setBillingMessage] = useState<string | null>(null)
@@ -220,11 +297,9 @@ const Profile = () => {
     <div className="h-screen flex overflow-hidden bg-background">
       <Sidebar user={user} active={active} setActive={setActive} onLogout={logout} onAdmin={() => navigate('/admin')} />
 
-      {/* Content */}
       <main className="flex-1 overflow-y-auto">
         {active === 'profile' && (
           <div className="min-h-full flex flex-col">
-            {/* Hero banner */}
             <div className="relative overflow-hidden px-10 pt-14 pb-16 border-b border-border/60" style={{ background: 'linear-gradient(to bottom, hsl(var(--background)), hsl(var(--background)) 70%, transparent)' }}>
               <div className={cn('absolute -top-20 -left-20 w-96 h-96 rounded-full bg-gradient-to-br opacity-10 blur-3xl pointer-events-none', grad)} />
               <div className={cn('absolute -bottom-10 right-10 w-64 h-64 rounded-full bg-gradient-to-br opacity-5 blur-3xl pointer-events-none', grad)} />
@@ -238,7 +313,6 @@ const Profile = () => {
               </p>
             </div>
 
-            {/* Info cards */}
             <div className="px-10 pt-8 pb-6 grid grid-cols-1 sm:grid-cols-3 gap-4">
               <InfoCard label="Email" value={user.email} />
               <InfoCard label="Имя">
@@ -247,7 +321,6 @@ const Profile = () => {
               <InfoCard label="ID" value={user.id} mono />
             </div>
 
-            {/* Meta */}
             <div className="px-10 pb-10">
               <div className="rounded-xl border border-border/50 bg-card/60 divide-y divide-border/40">
                 <Row label="Роль" value={user.role === 'ADMIN' ? 'Администратор' : 'Пользователь'} />
@@ -255,7 +328,6 @@ const Profile = () => {
                 <Row label="Зарегистрирован" value={new Date(user.createdAt || Date.now()).toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' })} />
               </div>
             </div>
-
           </div>
         )}
 
@@ -263,8 +335,7 @@ const Profile = () => {
           <div className="px-10 pt-14 pb-10">
             <h1 className="text-2xl font-semibold tracking-tight mb-1">Безопасность</h1>
             <p className="text-muted-foreground text-sm mb-8">Управление паролем и доступом</p>
-
-            <div className="max-w-lg space-y-4">
+            <div className="max-w-lg">
               <div className="rounded-xl border border-border/50 bg-card/60 p-5">
                 <p className="text-sm font-medium mb-4">Смена пароля</p>
                 <ChangePassword />
@@ -272,6 +343,8 @@ const Profile = () => {
             </div>
           </div>
         )}
+
+        {active === 'usage' && <UsageSection />}
 
         {active === 'billing' && (
           <div className="px-10 pt-14 pb-10">
@@ -294,7 +367,7 @@ const Profile = () => {
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   {[
                     { id: 'card' as const, icon: CreditCard, label: 'Банковская карта' },
-                    { id: 'sbp' as const, icon: Smartphone, label: 'СБП (Система быстрых платежей)' },
+                    { id: 'sbp' as const, icon: Smartphone, label: 'СБП' },
                   ].map(({ id, icon: Icon, label }) => (
                     <button
                       key={id}
@@ -314,92 +387,40 @@ const Profile = () => {
                 </div>
               </div>
 
-              <form
-                onSubmit={(e) => {
-                  e.preventDefault();
-                  const amt = parseFloat(billingAmount);
-                  if (isNaN(amt) || amt <= 0) {
-                    setBillingMessage('Укажите корректную сумму пополнения');
-                    return;
-                  }
-                  const methodText = billingMethod === 'card' ? 'банковской карты' : 'СБП';
-                  setBillingMessage(`Переход к оплате на сумму ${amt.toFixed(2)} ₽ с помощью ${methodText} через платежную систему ЮKassa. (В рабочей версии здесь будет осуществлен редирект на защищенный шлюз оплаты).`);
-                }}
-                className="space-y-4 border border-border/40 bg-card/40 p-5 rounded-xl"
-              >
+              <form onSubmit={(e) => {
+                e.preventDefault();
+                const amt = parseFloat(billingAmount);
+                if (isNaN(amt) || amt <= 0) { setBillingMessage('Укажите корректную сумму'); return }
+                setBillingMessage(`Переход к оплате на сумму ${amt.toFixed(2)} ₽`);
+              }} className="space-y-4 border border-border/40 bg-card/40 p-5 rounded-xl">
                 <div className="space-y-2">
-                  <Label htmlFor="topup-amount" className="text-sm font-medium text-muted-foreground">
-                    Сумма пополнения (₽)
-                  </Label>
+                  <Label htmlFor="topup-amount" className="text-sm font-medium text-muted-foreground">Сумма пополнения (₽)</Label>
                   <div className="flex gap-2 flex-wrap">
                     {['100', '500', '1000', '5000'].map((val) => (
-                      <Button
-                        key={val}
-                        type="button"
-                        variant={billingAmount === val ? 'default' : 'outline'}
-                        onClick={() => {
-                          setBillingAmount(val);
-                          setBillingMessage(null);
-                        }}
-                        className={cn(
-                          'h-9 px-4 text-sm font-medium transition-all',
-                          billingAmount === val ? 'bg-violet-600 hover:bg-violet-700 text-white' : ''
-                        )}
-                      >
+                      <Button key={val} type="button" variant={billingAmount === val ? 'default' : 'outline'}
+                        onClick={() => { setBillingAmount(val); setBillingMessage(null) }}
+                        className={cn('h-9 px-4 text-sm font-medium', billingAmount === val ? 'bg-violet-600 hover:bg-violet-700 text-white' : '')}>
                         {val} ₽
                       </Button>
                     ))}
                   </div>
-                  <div className="relative mt-2 max-w-xs">
-                    <Input
-                      id="topup-amount"
-                      type="number"
-                      value={billingAmount}
-                      onChange={(e) => {
-                        setBillingAmount(e.target.value);
-                        setBillingMessage(null);
-                      }}
-                      className="pr-8 text-base font-semibold"
-                      placeholder="Другая сумма"
-                      min="1"
-                      required
-                    />
-                    <span className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm font-medium">
-                      ₽
-                    </span>
-                  </div>
+                  <Input id="topup-amount" type="number" value={billingAmount}
+                    onChange={(e) => { setBillingAmount(e.target.value); setBillingMessage(null) }}
+                    className="max-w-xs mt-2 pr-8 text-base font-semibold" placeholder="Другая сумма" min="1" required />
                 </div>
-
                 <Button type="submit" className="w-full sm:w-auto px-6 bg-violet-600 hover:bg-violet-700 text-white">
                   Пополнить баланс
                 </Button>
               </form>
 
               {billingMessage && (
-                <div className="p-5 rounded-xl border border-violet-500/20 bg-violet-950/10 space-y-4 animate-in fade-in slide-in-from-bottom-2 duration-300">
-                  <div className="flex items-center gap-3">
-                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="shrink-0">
-                      <rect width="24" height="24" rx="6" fill="#8000FF" />
-                      <path d="M7 6v12M7 12h5" stroke="white" strokeWidth="2" strokeLinecap="round"/>
-                      <circle cx="15.5" cy="12" r="3.5" stroke="white" strokeWidth="2"/>
-                    </svg>
-                    <span className="font-display font-bold text-base tracking-tight">Ю<span className="text-[#A766FF]">Kassa</span></span>
-                    <Badge variant="success" className="ml-auto text-[10px] px-2 py-0 bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
-                      Шлюз готов
-                    </Badge>
+                <div className="p-5 rounded-xl border border-violet-500/20 bg-violet-950/10 flex items-center gap-3">
+                  <div className="w-7 h-7 rounded-lg bg-violet-600 flex items-center justify-center shrink-0">
+                    <Wallet size={14} className="text-white" />
                   </div>
-                  <p className="text-sm text-foreground/90 leading-relaxed font-medium">
-                    {billingMessage}
-                  </p>
-                  <p className="text-xs text-muted-foreground leading-normal">
-                    Безопасность транзакций обеспечивается платежным шлюзом ЮKassa с использованием шифрования SSL/TLS и протоколов 3D-Secure.
-                  </p>
+                  <p className="text-sm text-foreground/90">{billingMessage}</p>
                 </div>
               )}
-
-              <p className="text-xs text-muted-foreground">
-                Тарификация подключается к внешним сервисам Arlist Tech — оплата, списание и проверка лицензий появятся позже.
-              </p>
             </div>
           </div>
         )}

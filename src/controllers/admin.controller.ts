@@ -166,3 +166,14 @@ export const sendMailBroadcast = async (req: Request, res: Response) => {
     res.status(500).json({ error: error.message || 'Internal server error' });
   }
 };
+
+// ── Tariffs ───────────────────────────────────────────────
+
+export const getTariffs = async (req: Request, res: Response) => {
+  try {
+    const tariffs = await prisma.tariff.findMany({ orderBy: { priceMonth: 'asc' } });
+    res.json(tariffs);
+  } catch {
+    res.status(500).json({ error: 'Internal server error' });
+  }
+};

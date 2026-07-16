@@ -7,6 +7,7 @@ import Admin from './pages/Admin';
 import PrivacyPolicy from './pages/PrivacyPolicy';
 import ForgotPassword from './pages/ForgotPassword';
 import ResetPassword from './pages/ResetPassword';
+import CliAuth from './pages/CliAuth';
 
 function App() {
   return (
@@ -21,6 +22,7 @@ function App() {
           <Route path="/privacy-policy" element={<PrivacyPolicy />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/reset-password" element={<ResetPassword />} />
+          <Route path="/cli/auth" element={<CliAuth />} />
           <Route path="*" element={<Navigate to="/login" />} />
         </Routes>
       </div>
