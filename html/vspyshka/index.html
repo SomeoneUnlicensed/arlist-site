@@ -29,25 +29,13 @@
             background-clip: text;
         }
 
-        .hero-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
+        .spark-mark {
             font-family: var(--font-mono);
-            font-size: 10px;
-            text-transform: uppercase;
-            letter-spacing: 0.2em;
-            color: var(--ac-gray-40);
-            border: 1px solid var(--ac-gray-10);
-            padding: 8px 14px;
-            border-radius: 999px;
-            margin-bottom: 32px;
-        }
-
-        .hero-badge .dot {
-            width: 6px; height: 6px; border-radius: 999px;
-            background: #ff9955;
-            box-shadow: 0 0 8px #ff9955;
+            white-space: pre;
+            font-size: 13px;
+            line-height: 1.15;
+            color: #ff9955;
+            margin-bottom: 28px;
         }
 
         .cta-row { display: flex; gap: 16px; flex-wrap: wrap; align-items: center; }
@@ -66,42 +54,23 @@
         }
         .btn-secondary:hover { color: var(--ac-white); }
 
-        /* Terminal mockup */
-        .terminal {
-            margin-top: 96px;
-            border-radius: 12px;
-            border: 1px solid var(--ac-gray-10);
-            background: #050505;
-            box-shadow: 0 60px 120px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.02);
-            overflow: hidden;
-            max-width: 780px;
+        /* How it works */
+        .steps-section { padding: 60px 0 40px; }
+        .steps-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 40px;
+            margin-top: 40px;
         }
-        .terminal-chrome {
-            display: flex; align-items: center; gap: 8px;
-            padding: 14px 18px;
-            border-bottom: 1px solid var(--ac-gray-05);
-            background: rgba(255,255,255,0.015);
-        }
-        .terminal-chrome .tdot { width: 10px; height: 10px; border-radius: 999px; background: var(--ac-gray-10); }
-        .terminal-label {
-            margin-left: 8px;
+        .step-num {
             font-family: var(--font-mono);
-            font-size: 10px;
-            color: var(--ac-gray-30);
-            letter-spacing: 0.1em;
+            font-size: 11px;
+            color: #ff9955;
+            margin-bottom: 16px;
+            display: block;
         }
-        .terminal-body {
-            padding: 28px 24px;
-            font-family: var(--font-mono);
-            font-size: 13px;
-            line-height: 1.9;
-            color: rgba(255,255,255,0.75);
-            white-space: pre-wrap;
-        }
-        .terminal-body .prompt { color: #ff9955; }
-        .terminal-body .muted { color: var(--ac-gray-30); }
-        .terminal-body .accent { color: #88ccff; }
-        .terminal-body .ok { color: #88ffcc; }
+        .step-title { font-size: 1rem; font-weight: 500; margin-bottom: 8px; letter-spacing: -0.01em; }
+        .step-desc { font-size: 0.85rem; color: var(--ac-gray-40); line-height: 1.7; }
 
         /* Feature grid */
         .features-section { padding: 40px 0 160px; }
@@ -131,16 +100,15 @@
             border: 1px solid var(--ac-gray-10);
             border-radius: 10px;
             padding: 24px 28px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 20px;
             max-width: 640px;
             font-family: var(--font-mono);
             font-size: 13px;
             background: rgba(255,255,255,0.015);
         }
+        .install-box .line { display: flex; align-items: center; gap: 12px; }
+        .install-box .line + .line { margin-top: 10px; }
         .install-box code { color: #88ffcc; }
+        .install-box .muted { color: var(--ac-gray-30); font-size: 12px; }
         .hidden-note {
             font-family: var(--font-mono);
             font-size: 10px;
@@ -169,36 +137,43 @@
 <main>
     <section class="hero">
         <div class="container">
+            <div class="spark-mark">   ⚡
+  ╱│╲
+ ╱ │ ╲</div>
             <h1 class="hero-title">
-                Первый в России ИИ-агент,
-                <span class="vsp">который живёт в терминале.</span>
+                Первый в России ИИ-агент
+                <span class="vsp">для терминала.</span>
             </h1>
             <p class="hero-subtitle">
-                Вспышка пишет и правит код, выполняет команды в песочнице и работает с MCP-инструментами —
-                прямо в терминале, на русском языке. Вход через Arlist ID, без своего API-ключа для старта.
+                Вспышка сама читает код, находит баги, пишет патчи и гоняет тесты — прямо в вашем терминале,
+                по-русски, без англоязычных прокладок. Вошёл через Arlist ID — и уже работаешь,
+                свой ключ провайдера не нужен.
             </p>
             <div class="cta-row">
                 <a href="#install" class="btn-primary">Установить</a>
-                <a href="#features" class="btn-secondary">Как это работает →</a>
+                <a href="#features" class="btn-secondary">Что внутри →</a>
             </div>
+        </div>
+    </section>
 
-            <div class="terminal">
-                <div class="terminal-chrome">
-                    <span class="tdot"></span><span class="tdot"></span><span class="tdot"></span>
-                    <span class="terminal-label">~ vspyshka</span>
+    <section class="steps-section">
+        <div class="container">
+            <div class="steps-grid">
+                <div>
+                    <span class="step-num">01</span>
+                    <h3 class="step-title">Ставишь Вспышку</h3>
+                    <p class="step-desc">Один бинарник, без десктоп-приложения и лишних зависимостей.</p>
                 </div>
-                <div class="terminal-body">$ vspyshka login --arlist
-<span class="muted">Вход через Arlist ID
-
-1. Откройте эту ссылку в браузере и войдите в свою учётную запись
-   https://arlist.ru/cli/auth?code=F2V5-W8SL
-
-2. Убедитесь, что показан этот код (срок действия ограничен)
-   F2V5-W8SL</span>
-<span class="ok">Вход выполнен.</span>
-
-<span class="prompt">›</span> почини баг в src/parser.rs, тесты падают на пустом вводе
-<span class="accent">Вспышка читает parser.rs, находит edge case, правит и гоняет тесты…</span></div>
+                <div>
+                    <span class="step-num">02</span>
+                    <h3 class="step-title">Входишь через Arlist ID</h3>
+                    <p class="step-desc">Код устройства в браузере — и всё, свой API-ключ провайдера не нужен для старта.</p>
+                </div>
+                <div>
+                    <span class="step-num">03</span>
+                    <h3 class="step-title">Ставишь задачу</h3>
+                    <p class="step-desc">Вспышка читает репозиторий, правит код и гоняет тесты в песочнице сама.</p>
+                </div>
             </div>
         </div>
     </section>
@@ -207,24 +182,24 @@
         <div class="container">
             <div class="features-grid">
                 <div class="feature-card">
-                    <span class="feature-icon">Auth</span>
-                    <h3 class="feature-title">Вход через Arlist ID</h3>
-                    <p class="feature-desc">Логин по коду устройства прямо в браузере — свой API-ключ провайдера не нужен, чтобы начать.</p>
+                    <span class="feature-icon">Вход</span>
+                    <h3 class="feature-title">Arlist ID вместо API-ключа</h3>
+                    <p class="feature-desc">Логин по коду устройства прямо в браузере. Начать можно без своего ключа провайдера.</p>
                 </div>
                 <div class="feature-card">
-                    <span class="feature-icon">Models</span>
+                    <span class="feature-icon">Модели</span>
                     <h3 class="feature-title">DeepSeek и GigaChat</h3>
-                    <p class="feature-desc">Работает на моделях, доступных из России, напрямую через собственные оплаченные ключи Arlist — без посредников.</p>
+                    <p class="feature-desc">Модели, доступные из России, напрямую через собственные оплаченные ключи Arlist — без обхода чужих лимитов и посредников.</p>
                 </div>
                 <div class="feature-card">
-                    <span class="feature-icon">Free</span>
-                    <h3 class="feature-title">Бесплатный тариф</h3>
-                    <p class="feature-desc">Лимиты считаются в процентах от квоты на 5 часов и на неделю — прозрачно, без скрытых расходов.</p>
+                    <span class="feature-icon">Тариф</span>
+                    <h3 class="feature-title">Бесплатный старт</h3>
+                    <p class="feature-desc">Лимиты — в процентах от квоты на 5 часов и на неделю. Видно сразу, сколько осталось, без сюрпризов в конце месяца.</p>
                 </div>
                 <div class="feature-card">
-                    <span class="feature-icon">Local</span>
+                    <span class="feature-icon">Локально</span>
                     <h3 class="feature-title">Полный контроль в терминале</h3>
-                    <p class="feature-desc">Песочница для команд, MCP-инструменты, история сессий — всё локально, без десктоп-приложения.</p>
+                    <p class="feature-desc">Песочница для команд, MCP-инструменты, история сессий — всё на вашей машине, без десктоп-приложения.</p>
                 </div>
             </div>
         </div>
@@ -234,10 +209,9 @@
         <div class="container">
             <h2 style="font-size: 1.6rem; font-weight: 500; letter-spacing: -0.02em; margin-bottom: 20px;">Установка</h2>
             <div class="install-box">
-                <code>vspyshka login --arlist</code>
-                <span style="color: var(--ac-gray-30); font-size: 11px;">после установки</span>
+                <div class="line"><code>vspyshka login --arlist</code><span class="muted">— вход через Arlist ID</span></div>
             </div>
-            <p class="hidden-note">Страница не проиндексирована и никуда не ведёт с сайта — только по прямой ссылке.</p>
+            <p class="hidden-note">Страница ещё не анонсирована и никуда не ведёт с сайта — только по прямой ссылке.</p>
         </div>
     </section>
 </main>
