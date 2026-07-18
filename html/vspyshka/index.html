@@ -137,19 +137,19 @@
 <main>
     <section class="hero">
         <div class="container">
-            <div class="spark-mark">   ⚡
+            <span class="hero-label reveal">ИИ-агент · Ранний доступ</span>
+            <div class="spark-mark reveal">   ⚡
   ╱│╲
  ╱ │ ╲</div>
-            <h1 class="hero-title">
-                Первый в России ИИ-агент
-                <span class="vsp">для терминала.</span>
+            <h1 class="hero-title reveal">
+                Первый в России ИИ-агент,
+                <span class="vsp">который сам пишет код.</span>
             </h1>
-            <p class="hero-subtitle">
-                Вспышка сама читает код, находит баги, пишет патчи и гоняет тесты — прямо в вашем терминале,
-                по-русски, без англоязычных прокладок. Вошёл через Arlist ID — и уже работаешь,
-                свой ключ провайдера не нужен.
+            <p class="hero-subtitle reveal">
+                Вспышка работает прямо в терминале: читает репозиторий, чинит баги и пишет патчи.
+                Входите через Arlist ID — свой ключ провайдера не нужен.
             </p>
-            <div class="cta-row">
+            <div class="cta-row reveal">
                 <a href="#install" class="btn-primary">Установить</a>
                 <a href="#features" class="btn-secondary">Что внутри →</a>
             </div>
@@ -159,20 +159,20 @@
     <section class="steps-section">
         <div class="container">
             <div class="steps-grid">
-                <div>
+                <div class="reveal">
                     <span class="step-num">01</span>
-                    <h3 class="step-title">Ставишь Вспышку</h3>
+                    <h3 class="step-title">Ставите Вспышку</h3>
                     <p class="step-desc">Один бинарник, без десктоп-приложения и лишних зависимостей.</p>
                 </div>
-                <div>
+                <div class="reveal">
                     <span class="step-num">02</span>
-                    <h3 class="step-title">Входишь через Arlist ID</h3>
+                    <h3 class="step-title">Входите через Arlist ID</h3>
                     <p class="step-desc">Код устройства в браузере — и всё, свой API-ключ провайдера не нужен для старта.</p>
                 </div>
-                <div>
+                <div class="reveal">
                     <span class="step-num">03</span>
-                    <h3 class="step-title">Ставишь задачу</h3>
-                    <p class="step-desc">Вспышка читает репозиторий, правит код и гоняет тесты в песочнице сама.</p>
+                    <h3 class="step-title">Ставите задачу</h3>
+                    <p class="step-desc">Вспышка сама читает репозиторий, правит код и гоняет тесты в песочнице.</p>
                 </div>
             </div>
         </div>
@@ -181,22 +181,22 @@
     <section id="features" class="features-section">
         <div class="container">
             <div class="features-grid">
-                <div class="feature-card">
+                <div class="feature-card reveal">
                     <span class="feature-icon">Вход</span>
                     <h3 class="feature-title">Arlist ID вместо API-ключа</h3>
                     <p class="feature-desc">Логин по коду устройства прямо в браузере. Начать можно без своего ключа провайдера.</p>
                 </div>
-                <div class="feature-card">
+                <div class="feature-card reveal">
                     <span class="feature-icon">Модели</span>
                     <h3 class="feature-title">DeepSeek и GigaChat</h3>
-                    <p class="feature-desc">Модели, доступные из России, напрямую через собственные оплаченные ключи Arlist — без обхода чужих лимитов и посредников.</p>
+                    <p class="feature-desc">Модели, доступные из России, напрямую через собственные оплаченные ключи Arlist — без посредников и обхода чужих лимитов.</p>
                 </div>
-                <div class="feature-card">
+                <div class="feature-card reveal">
                     <span class="feature-icon">Тариф</span>
                     <h3 class="feature-title">Бесплатный старт</h3>
                     <p class="feature-desc">Лимиты — в процентах от квоты на 5 часов и на неделю. Видно сразу, сколько осталось, без сюрпризов в конце месяца.</p>
                 </div>
-                <div class="feature-card">
+                <div class="feature-card reveal">
                     <span class="feature-icon">Локально</span>
                     <h3 class="feature-title">Полный контроль в терминале</h3>
                     <p class="feature-desc">Песочница для команд, MCP-инструменты, история сессий — всё на вашей машине, без десктоп-приложения.</p>
@@ -207,12 +207,12 @@
 
     <section id="install" class="install-section">
         <div class="container">
-            <h2 style="font-size: 1.6rem; font-weight: 500; letter-spacing: -0.02em; margin-bottom: 20px;">Установка</h2>
-            <div class="install-box">
+            <h2 class="reveal" style="font-size: 1.6rem; font-weight: 500; letter-spacing: -0.02em; margin-bottom: 20px;">Установка</h2>
+            <div class="install-box reveal">
                 <div class="line"><code>npm install -g @vspyshka/cli</code><span class="muted">— установить</span></div>
                 <div class="line"><code>vspyshka login --arlist</code><span class="muted">— войти через Arlist ID</span></div>
             </div>
-            <p class="hidden-note">Страница ещё не анонсирована и никуда не ведёт с сайта — только по прямой ссылке.</p>
+            <p class="hidden-note reveal">Страница ещё не анонсирована и никуда не ведёт с сайта — только по прямой ссылке.</p>
         </div>
     </section>
 </main>
