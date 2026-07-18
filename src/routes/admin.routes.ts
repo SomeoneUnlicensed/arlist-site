@@ -3,7 +3,7 @@ import {
   getStats, getClients, createClient, deleteClient,
   getUsers, deleteUser, updateUser,
   getSystemSettings, updateSystemSettings, sendMailBroadcast,
-  getTariffs,
+  getTariffs, updateTariff, getKnownModels,
 } from '../controllers/admin.controller.js';
 import { authenticate, authorize } from '../middleware/auth.middleware.js';
 
@@ -27,5 +27,7 @@ router.post('/settings', updateSystemSettings);
 router.post('/broadcast', sendMailBroadcast);
 
 router.get('/tariffs', getTariffs);
+router.patch('/tariffs/:id', updateTariff);
+router.get('/known-models', getKnownModels);
 
 export default router;
