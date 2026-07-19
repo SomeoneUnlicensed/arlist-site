@@ -64,7 +64,7 @@
         .step-desc { font-size: 0.85rem; color: var(--ac-gray-40); line-height: 1.7; }
 
         /* Feature grid */
-        .features-section { padding: 40px 0 160px; }
+        .features-section { padding: 40px 0 80px; }
         .features-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
@@ -134,9 +134,8 @@
                 <span class="vsp">который сам пишет код.</span>
             </h1>
             <p class="hero-subtitle reveal">
-                Читает репозиторий, выполняет команды в песочнице, применяет патчи через <code>git apply</code>,
-                продолжает прерванные сессии. Работает и без интерфейса — в скриптах и CI.
-                Вход через Arlist ID, свой ключ провайдера не нужен.
+                Читает код, находит и чинит баги, сама вносит изменения — прямо в вашем терминале.
+                Вход через Arlist ID: свой ключ ИИ-провайдера не нужен.
             </p>
             <div class="cta-row reveal">
                 <a href="#install" class="btn-primary">Установить</a>
@@ -151,17 +150,17 @@
                 <div class="reveal">
                     <span class="step-num">01</span>
                     <h3 class="step-title">Ставите Вспышку</h3>
-                    <p class="step-desc">Один бинарник, без десктоп-приложения и лишних зависимостей.</p>
+                    <p class="step-desc">Один файл, без лишних установок и десктоп-приложения.</p>
                 </div>
                 <div class="reveal">
                     <span class="step-num">02</span>
                     <h3 class="step-title">Входите через Arlist ID</h3>
-                    <p class="step-desc">Код устройства в браузере — и всё, свой API-ключ провайдера не нужен для старта.</p>
+                    <p class="step-desc">Код с телефона или браузера — и всё, свой ключ ИИ-провайдера не нужен.</p>
                 </div>
                 <div class="reveal">
                     <span class="step-num">03</span>
                     <h3 class="step-title">Ставите задачу</h3>
-                    <p class="step-desc">Вспышка читает репозиторий и выполняет команды в изолированной песочнице, подтверждая действия по выбранному вами режиму.</p>
+                    <p class="step-desc">Вспышка сама разбирается в коде и вносит изменения, спрашивая подтверждение там, где вы захотите.</p>
                 </div>
             </div>
         </div>
@@ -171,24 +170,24 @@
         <div class="container">
             <div class="features-grid">
                 <div class="feature-card reveal">
-                    <span class="feature-icon">Песочница</span>
-                    <h3 class="feature-title">Команды выполняются изолированно</h3>
-                    <p class="feature-desc">Каждая команда агента идёт через песочницу (bwrap на Linux, отдельный контур на Windows), а не напрямую в вашей системе. Режим подтверждения — от ручного до полностью автоматического — вы выбираете сами.</p>
+                    <span class="feature-icon">Безопасно</span>
+                    <h3 class="feature-title">Ничего не сломает без спроса</h3>
+                    <p class="feature-desc">Все действия происходят в изолированной, безопасной среде — не напрямую в вашей системе. Вы сами решаете, что подтверждать вручную, а что доверить агенту полностью.</p>
                 </div>
                 <div class="feature-card reveal">
                     <span class="feature-icon">Расширения</span>
-                    <h3 class="feature-title">MCP-серверы и плагины</h3>
-                    <p class="feature-desc">Вспышка подключается к внешним MCP-инструментам и сама умеет работать как MCP-сервер — можно встроить её в другой рабочий процесс, а не только использовать как самостоятельный CLI.</p>
+                    <h3 class="feature-title">Подключается к другим инструментам</h3>
+                    <p class="feature-desc">Вспышка умеет работать с внешними инструментами и сама может встроиться в другой рабочий процесс — не только как самостоятельный помощник.</p>
                 </div>
                 <div class="feature-card reveal">
                     <span class="feature-icon">Сессии</span>
-                    <h3 class="feature-title">Резюме, ветвления, патчи</h3>
-                    <p class="feature-desc">Прерванную сессию можно продолжить или разветвить, а последний патч агента — применить к рабочей копии через <code>git apply</code>. Есть и безынтерфейсный режим для задач в CI.</p>
+                    <h3 class="feature-title">Ничего не теряется</h3>
+                    <p class="feature-desc">Прерванную работу можно продолжить в любой момент или вернуться к прошлому варианту. Вспышку можно запускать и без интерфейса — для регулярных, повторяющихся задач.</p>
                 </div>
                 <div class="feature-card reveal">
                     <span class="feature-icon">Arlist ID</span>
                     <h3 class="feature-title">Модели без своего ключа</h3>
-                    <p class="feature-desc">Вход по коду устройства, без ключа провайдера. Модели — DeepSeek, GigaChat и YandexGPT через собственные оплаченные ключи Arlist. Лимиты — в процентах от квоты на 5 часов и на неделю.</p>
+                    <p class="feature-desc">Вход по коду с телефона, без ключа ИИ-провайдера. Модели — DeepSeek, GigaChat и YandexGPT за счёт Arlist. Лимиты — в процентах от квоты на 5 часов и на неделю.</p>
                 </div>
             </div>
         </div>
