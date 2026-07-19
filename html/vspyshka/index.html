@@ -29,15 +29,6 @@
             background-clip: text;
         }
 
-        .spark-mark {
-            font-family: var(--font-mono);
-            white-space: pre;
-            font-size: 13px;
-            line-height: 1.15;
-            color: #ff9955;
-            margin-bottom: 28px;
-        }
-
         .cta-row { display: flex; gap: 16px; flex-wrap: wrap; align-items: center; }
 
         .btn-secondary {
@@ -138,16 +129,14 @@
     <section class="hero">
         <div class="container">
             <span class="hero-label reveal">ИИ-агент · Ранний доступ</span>
-            <div class="spark-mark reveal">   ⚡
-  ╱│╲
- ╱ │ ╲</div>
             <h1 class="hero-title reveal">
                 Первый в России ИИ-агент,
                 <span class="vsp">который сам пишет код.</span>
             </h1>
             <p class="hero-subtitle reveal">
-                Вспышка работает прямо в терминале: читает репозиторий, чинит баги и пишет патчи.
-                Входите через Arlist ID — свой ключ провайдера не нужен.
+                Вспышка — не чат с моделью, а рабочий CLI-агент: выполняет команды в изолированной песочнице,
+                применяет патчи через <code>git apply</code> и продолжает прерванные сессии.
+                Работает и без интерфейса — в скриптах и CI. Вход — через Arlist ID, свой ключ провайдера не нужен.
             </p>
             <div class="cta-row reveal">
                 <a href="#install" class="btn-primary">Установить</a>
@@ -172,7 +161,7 @@
                 <div class="reveal">
                     <span class="step-num">03</span>
                     <h3 class="step-title">Ставите задачу</h3>
-                    <p class="step-desc">Вспышка сама читает репозиторий, правит код и гоняет тесты в песочнице.</p>
+                    <p class="step-desc">Вспышка читает репозиторий и выполняет команды в изолированной песочнице, подтверждая действия по выбранному вами режиму.</p>
                 </div>
             </div>
         </div>
@@ -182,24 +171,24 @@
         <div class="container">
             <div class="features-grid">
                 <div class="feature-card reveal">
-                    <span class="feature-icon">Вход</span>
-                    <h3 class="feature-title">Arlist ID вместо API-ключа</h3>
-                    <p class="feature-desc">Логин по коду устройства прямо в браузере. Начать можно без своего ключа провайдера.</p>
+                    <span class="feature-icon">Песочница</span>
+                    <h3 class="feature-title">Команды выполняются изолированно</h3>
+                    <p class="feature-desc">Каждая команда агента идёт через песочницу (bwrap на Linux, отдельный контур на Windows), а не напрямую в вашей системе. Режим подтверждения — от ручного до полностью автоматического — вы выбираете сами.</p>
                 </div>
                 <div class="feature-card reveal">
-                    <span class="feature-icon">Модели</span>
-                    <h3 class="feature-title">DeepSeek и GigaChat</h3>
-                    <p class="feature-desc">Модели, доступные из России, напрямую через собственные оплаченные ключи Arlist — без посредников и обхода чужих лимитов.</p>
+                    <span class="feature-icon">Расширения</span>
+                    <h3 class="feature-title">MCP-серверы и плагины</h3>
+                    <p class="feature-desc">Вспышка подключается к внешним MCP-инструментам и сама умеет работать как MCP-сервер — можно встроить её в другой рабочий процесс, а не только использовать как самостоятельный CLI.</p>
                 </div>
                 <div class="feature-card reveal">
-                    <span class="feature-icon">Тариф</span>
-                    <h3 class="feature-title">Бесплатный старт</h3>
-                    <p class="feature-desc">Лимиты — в процентах от квоты на 5 часов и на неделю. Видно сразу, сколько осталось, без сюрпризов в конце месяца.</p>
+                    <span class="feature-icon">Сессии</span>
+                    <h3 class="feature-title">Резюме, ветвления, патчи</h3>
+                    <p class="feature-desc">Прерванную сессию можно продолжить или разветвить, а последний патч агента — применить к рабочей копии через <code>git apply</code>. Есть и безынтерфейсный режим для задач в CI.</p>
                 </div>
                 <div class="feature-card reveal">
-                    <span class="feature-icon">Локально</span>
-                    <h3 class="feature-title">Полный контроль в терминале</h3>
-                    <p class="feature-desc">Песочница для команд, MCP-инструменты, история сессий — всё на вашей машине, без десктоп-приложения.</p>
+                    <span class="feature-icon">Arlist ID</span>
+                    <h3 class="feature-title">DeepSeek и GigaChat без своего ключа</h3>
+                    <p class="feature-desc">Вход по коду устройства, без ключа провайдера. Модели — DeepSeek и GigaChat через собственные оплаченные ключи Arlist. Лимиты — в процентах от квоты на 5 часов и на неделю.</p>
                 </div>
             </div>
         </div>
