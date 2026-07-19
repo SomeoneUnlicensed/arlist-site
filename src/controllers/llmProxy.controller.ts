@@ -5,7 +5,7 @@ import { getGigaChatAccessToken } from '../services/gigachat.service.js';
 // Direct pass-through to our own paid provider accounts — no third-party free-tier
 // pooling, no IP rotation, no hiding which provider answers a given model.
 
-type Provider = 'deepseek' | 'gigachat';
+type Provider = 'deepseek' | 'gigachat' | 'yandexgpt';
 
 interface ModelTarget {
   provider: Provider;
@@ -13,8 +13,8 @@ interface ModelTarget {
 }
 
 // Upstream model identifiers here are best-effort — verify each against the
-// provider's current API docs once real DEEPSEEK_API_KEY/GIGACHAT_AUTH_KEY are
-// wired in, before relying on this in production.
+// provider's current API docs once real DEEPSEEK_API_KEY/GIGACHAT_AUTH_KEY/
+// YANDEX_API_KEY are wired in, before relying on this in production.
 const MODEL_MAP: Record<string, ModelTarget> = {
   'deepseek-chat': { provider: 'deepseek', upstreamModel: 'deepseek-chat' },
   'deepseek-reasoner': { provider: 'deepseek', upstreamModel: 'deepseek-reasoner' },
@@ -22,30 +22,22 @@ const MODEL_MAP: Record<string, ModelTarget> = {
   'gigachat': { provider: 'gigachat', upstreamModel: 'GigaChat' },
   'gigachat-pro': { provider: 'gigachat', upstreamModel: 'GigaChat-Pro' },
   'gigachat-max': { provider: 'gigachat', upstreamModel: 'GigaChat-Max' },
+  'yandexgpt': { provider: 'yandexgpt', upstreamModel: 'yandexgpt/latest' },
+  'yandexgpt-lite': { provider: 'yandexgpt', upstreamModel: 'yandexgpt-lite/latest' },
+  'yandexgpt-pro': { provider: 'yandexgpt', upstreamModel: 'yandexgpt-pro/latest' },
 };
 
 const DEEPSEEK_API_URL = 'https://api.deepseek.com/chat/completions';
+// GigaChat's message format follows the OpenAI chat-completions shape (model,
+// messages, usage.prompt_tokens/completion_tokens) once you hold a Bearer
+// token — only the token acquisition (OAuth2 client-credentials) differs.
 const GIGACHAT_API_URL = 'https://gigachat.devices.sberbank.ru/api/v1/chat/completions';
+const YANDEX_COMPLETION_URL = 'https://llm.api.cloud.yandex.net/foundationModels/v1/completion';
 
-async function callDeepSeek(upstreamModel: string, body: Record<string, unknown>) {
-  const key = process.env.DEEPSEEK_API_KEY;
-  if (!key) throw new Error('DEEPSEEK_API_KEY not configured');
-
-  return fetch(DEEPSEEK_API_URL, {
-    method: 'POST',
-    headers: {
-      Authorization: `Bearer ${key}`,
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({ ...body, model: upstreamModel, stream: false }),
-    signal: AbortSignal.timeout(120_000),
-  });
-}
-
-async function callGigaChat(upstreamModel: string, body: Record<string, unknown>) {
-  const token = await getGigaChatAccessToken();
-
-  return fetch(GIGACHAT_API_URL, {
+// Shared caller for providers whose HTTP API is OpenAI-compatible (DeepSeek,
+// GigaChat): same request/response shape, only base URL and bearer token differ.
+async function callOpenAiCompatible(url: string, token: string, upstreamModel: string, body: Record<string, unknown>) {
+  return fetch(url, {
     method: 'POST',
     headers: {
       Authorization: `Bearer ${token}`,
@@ -54,6 +46,72 @@ async function callGigaChat(upstreamModel: string, body: Record<string, unknown>
     body: JSON.stringify({ ...body, model: upstreamModel, stream: false }),
     signal: AbortSignal.timeout(120_000),
   });
+}
+
+// Yandex Foundation Models API is not OpenAI-shaped: request uses
+// modelUri/completionOptions/messages[].text, response nests the answer under
+// result.alternatives[0].message and tokens under result.usage. We translate
+// both directions so the rest of the proxy can stay provider-agnostic.
+async function callYandexGpt(upstreamModel: string, body: Record<string, unknown>) {
+  const apiKey = process.env.YANDEX_API_KEY;
+  const folderId = process.env.YANDEX_FOLDER_ID;
+  if (!apiKey) throw new Error('YANDEX_API_KEY not configured');
+  if (!folderId) throw new Error('YANDEX_FOLDER_ID not configured');
+
+  const messages = (body.messages as Array<{ role: string; content: string }> | undefined) ?? [];
+  const maxTokens = (body.max_tokens as number | undefined) ?? 2000;
+  const temperature = (body.temperature as number | undefined) ?? 0.6;
+
+  const yandexRes = await fetch(YANDEX_COMPLETION_URL, {
+    method: 'POST',
+    headers: {
+      Authorization: `Api-Key ${apiKey}`,
+      'x-folder-id': folderId,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      modelUri: `gpt://${folderId}/${upstreamModel}`,
+      completionOptions: { stream: false, temperature, maxTokens: String(maxTokens) },
+      messages: messages.map((m) => ({ role: m.role, text: m.content })),
+    }),
+    signal: AbortSignal.timeout(120_000),
+  });
+
+  if (!yandexRes.ok) {
+    return yandexRes;
+  }
+
+  const yandexData: any = await yandexRes.json();
+  const alt = yandexData.result?.alternatives?.[0];
+  const usage = yandexData.result?.usage ?? {};
+
+  // Repackage into the OpenAI shape the rest of chatCompletions() expects.
+  const openAiShaped = {
+    choices: [{ message: { role: 'assistant', content: alt?.message?.text ?? '' }, finish_reason: 'stop', index: 0 }],
+    usage: {
+      prompt_tokens: Number(usage.inputTextTokens ?? 0),
+      completion_tokens: Number(usage.completionTokens ?? 0),
+      total_tokens: Number(usage.totalTokens ?? 0),
+    },
+  };
+
+  return new Response(JSON.stringify(openAiShaped), { status: 200 });
+}
+
+async function callUpstream(target: ModelTarget, body: Record<string, unknown>) {
+  switch (target.provider) {
+    case 'deepseek': {
+      const key = process.env.DEEPSEEK_API_KEY;
+      if (!key) throw new Error('DEEPSEEK_API_KEY not configured');
+      return callOpenAiCompatible(DEEPSEEK_API_URL, key, target.upstreamModel, body);
+    }
+    case 'gigachat': {
+      const token = await getGigaChatAccessToken();
+      return callOpenAiCompatible(GIGACHAT_API_URL, token, target.upstreamModel, body);
+    }
+    case 'yandexgpt':
+      return callYandexGpt(target.upstreamModel, body);
+  }
 }
 
 export const chatCompletions = async (req: any, res: Response) => {
@@ -79,10 +137,7 @@ export const chatCompletions = async (req: any, res: Response) => {
     }
 
     // Streaming pass-through isn't implemented yet — always request a full response.
-    const upstreamRes =
-      target.provider === 'deepseek'
-        ? await callDeepSeek(target.upstreamModel, body)
-        : await callGigaChat(target.upstreamModel, body);
+    const upstreamRes = await callUpstream(target, body);
 
     if (!upstreamRes.ok) {
       const detail = await upstreamRes.text();

@@ -178,7 +178,7 @@ export const getTariffs = async (req: Request, res: Response) => {
   }
 };
 
-const KNOWN_MODELS = ['deepseek-chat', 'deepseek-reasoner', 'deepseek-v4-flash', 'gigachat', 'gigachat-pro', 'gigachat-max'];
+const KNOWN_MODELS = ['deepseek-chat', 'deepseek-reasoner', 'deepseek-v4-flash', 'gigachat', 'gigachat-pro', 'gigachat-max', 'yandexgpt', 'yandexgpt-lite', 'yandexgpt-pro'];
 
 export const updateTariff = async (req: Request, res: Response) => {
   try {

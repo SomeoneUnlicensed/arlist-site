@@ -17,7 +17,7 @@ async function main() {
       priceMonth: 0,
       creditsPer5h: 50_000,
       creditsPerWeek: 300_000,
-      models: ['deepseek-chat', 'deepseek-reasoner', 'deepseek-v4-flash', 'gigachat', 'gigachat-pro', 'gigachat-max'],
+      models: ['deepseek-chat', 'deepseek-reasoner', 'deepseek-v4-flash', 'gigachat', 'gigachat-pro', 'gigachat-max', 'yandexgpt', 'yandexgpt-lite', 'yandexgpt-pro'],
       overrunEnabled: false,
       overrunPriceKopecks: 0,
     },
