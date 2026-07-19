@@ -9,35 +9,27 @@ export class PrismaAdapter {
   }
 
   async upsert(id: string, payload: any, expiresIn: number) {
-    // Clients are stored in OAuthClient table, not OidcModel
     if (this.type === 'Client') return;
     const expiresAt = expiresIn
       ? new Date(Date.now() + expiresIn * 1000)
       : undefined;
 
+    const data = {
+      payload,
+      grantId: payload.grantId,
+      userCode: payload.userCode,
+      uid: payload.uid,
+      expiresAt,
+    };
+
     await prisma.oidcModel.upsert({
       where: { type_id: { type: this.type, id } },
-      update: {
-        payload,
-        grantId: payload.grantId,
-        userCode: payload.userCode,
-        uid: payload.uid,
-        expiresAt,
-      },
-      create: {
-        id,
-        type: this.type,
-        payload,
-        grantId: payload.grantId,
-        userCode: payload.userCode,
-        uid: payload.uid,
-        expiresAt,
-      },
+      update: data,
+      create: { id, type: this.type, ...data },
     });
   }
 
   async find(id: string): Promise<AdapterPayload | undefined> {
-    // Route Client lookups to OAuthClient table
     if (this.type === 'Client') {
       const c = await prisma.oAuthClient.findUnique({ where: { clientId: id } });
       if (!c) return undefined;

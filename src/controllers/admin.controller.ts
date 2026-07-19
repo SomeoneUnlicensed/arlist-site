@@ -166,3 +166,55 @@ export const sendMailBroadcast = async (req: Request, res: Response) => {
     res.status(500).json({ error: error.message || 'Internal server error' });
   }
 };
+
+// ── Tariffs ───────────────────────────────────────────────
+
+export const getTariffs = async (req: Request, res: Response) => {
+  try {
+    const tariffs = await prisma.tariff.findMany({ orderBy: { priceMonth: 'asc' } });
+    res.json(tariffs);
+  } catch {
+    res.status(500).json({ error: 'Internal server error' });
+  }
+};
+
+const KNOWN_MODELS = ['deepseek-chat', 'deepseek-reasoner', 'deepseek-v4-flash', 'gigachat', 'gigachat-pro', 'gigachat-max', 'yandexgpt', 'yandexgpt-lite', 'yandexgpt-pro'];
+
+export const updateTariff = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params as { id: string };
+    const { name, description, models, creditsPer5h, creditsPerWeek, overrunEnabled, overrunPriceKopecks, priceMonth } = req.body;
+
+    if (models !== undefined) {
+      if (!Array.isArray(models) || !models.every((m) => typeof m === 'string')) {
+        return res.status(400).json({ error: 'models must be an array of strings' });
+      }
+      const unknown = models.filter((m: string) => m !== '*' && !KNOWN_MODELS.includes(m));
+      if (unknown.length > 0) {
+        return res.status(400).json({ error: `Unknown model(s): ${unknown.join(', ')}`, knownModels: KNOWN_MODELS });
+      }
+    }
+
+    const tariff = await prisma.tariff.update({
+      where: { id },
+      data: {
+        ...(name !== undefined ? { name } : {}),
+        ...(description !== undefined ? { description } : {}),
+        ...(models !== undefined ? { models } : {}),
+        ...(creditsPer5h !== undefined ? { creditsPer5h: Number(creditsPer5h) } : {}),
+        ...(creditsPerWeek !== undefined ? { creditsPerWeek: Number(creditsPerWeek) } : {}),
+        ...(overrunEnabled !== undefined ? { overrunEnabled: Boolean(overrunEnabled) } : {}),
+        ...(overrunPriceKopecks !== undefined ? { overrunPriceKopecks: Number(overrunPriceKopecks) } : {}),
+        ...(priceMonth !== undefined ? { priceMonth: Number(priceMonth) } : {}),
+      },
+    });
+    res.json(tariff);
+  } catch (error: any) {
+    if (error?.code === 'P2025') return res.status(404).json({ error: 'Tariff not found' });
+    res.status(500).json({ error: 'Internal server error' });
+  }
+};
+
+export const getKnownModels = async (req: Request, res: Response) => {
+  res.json({ models: KNOWN_MODELS });
+};

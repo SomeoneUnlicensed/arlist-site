@@ -1032,6 +1032,152 @@ const SettingsTab = () => {
   )
 }
 
+// ── Tariffs tab ───────────────────────────────────────────
+
+const TariffsTab = () => {
+  const [tariffs, setTariffs] = useState<any[]>([])
+  const [knownModels, setKnownModels] = useState<string[]>([])
+  const [editing, setEditing] = useState<string | null>(null)
+  const [form, setForm] = useState<any>({})
+  const [saving, setSaving] = useState(false)
+  const [err, setErr] = useState('')
+
+  const load = async () => {
+    try {
+      const [t, m] = await Promise.all([
+        axios.get('/api/admin/tariffs'),
+        axios.get('/api/admin/known-models'),
+      ])
+      setTariffs(t.data)
+      setKnownModels(m.data.models)
+    } catch { setErr('Не удалось загрузить') }
+  }
+
+  useEffect(() => { load() }, [])
+
+  const startEdit = (t: any) => {
+    setEditing(t.id)
+    setErr('')
+    setForm({
+      creditsPer5h: t.creditsPer5h,
+      creditsPerWeek: t.creditsPerWeek,
+      overrunEnabled: t.overrunEnabled,
+      overrunPriceKopecks: t.overrunPriceKopecks,
+      models: new Set<string>(t.models),
+    })
+  }
+
+  const toggleModel = (m: string) => {
+    setForm((f: any) => {
+      const models = new Set<string>(f.models)
+      models.has(m) ? models.delete(m) : models.add(m)
+      return { ...f, models }
+    })
+  }
+
+  const save = async (id: string) => {
+    setSaving(true); setErr('')
+    try {
+      await axios.patch(`/api/admin/tariffs/${id}`, {
+        creditsPer5h: Number(form.creditsPer5h),
+        creditsPerWeek: Number(form.creditsPerWeek),
+        overrunEnabled: form.overrunEnabled,
+        overrunPriceKopecks: Number(form.overrunPriceKopecks),
+        models: Array.from(form.models),
+      })
+      setEditing(null)
+      load()
+    } catch (e: any) { setErr(e.response?.data?.error || 'Ошибка сохранения') }
+    finally { setSaving(false) }
+  }
+
+  return (
+    <div className="p-5 space-y-5">
+      {err && <Alert variant="destructive"><AlertDescription>{err}</AlertDescription></Alert>}
+      <p className="text-xs text-muted-foreground">
+        Модели, кредиты (по токенам, за 5ч/неделю) и оверран для каждого тарифа Вспышки.
+      </p>
+
+      {tariffs.map(t => (
+        <Card key={t.id}>
+          <CardHeader className="py-3 px-5 border-b border-border/40 flex flex-row items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Coins size={14} className="text-muted-foreground" />
+              <p className="text-sm font-medium">{t.name}</p>
+              <Badge variant="muted" className="text-[10px]">{t.type}</Badge>
+            </div>
+            {editing !== t.id ? (
+              <Button size="sm" variant="outline" onClick={() => startEdit(t)}>
+                <Pencil size={13} />Изменить
+              </Button>
+            ) : (
+              <div className="flex gap-2">
+                <Button size="sm" variant="ghost" onClick={() => setEditing(null)}>Отмена</Button>
+                <Button size="sm" disabled={saving} onClick={() => save(t.id)}>
+                  {saving && <Loader2 size={13} className="animate-spin" />}Сохранить
+                </Button>
+              </div>
+            )}
+          </CardHeader>
+          <CardContent className="p-5">
+            {editing !== t.id ? (
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-sm">
+                <div><p className="text-xs text-muted-foreground mb-1">Кредиты / 5ч</p>{t.creditsPer5h.toLocaleString('ru-RU')}</div>
+                <div><p className="text-xs text-muted-foreground mb-1">Кредиты / неделя</p>{t.creditsPerWeek.toLocaleString('ru-RU')}</div>
+                <div><p className="text-xs text-muted-foreground mb-1">Оверран</p>{t.overrunEnabled ? 'Включён' : 'Выключен'}</div>
+                <div><p className="text-xs text-muted-foreground mb-1">Модели</p>{t.models.join(', ') || '—'}</div>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label>Кредиты / 5ч</Label>
+                    <Input type="number" value={form.creditsPer5h} onChange={e => setForm({ ...form, creditsPer5h: e.target.value })} />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Кредиты / неделя</Label>
+                    <Input type="number" value={form.creditsPerWeek} onChange={e => setForm({ ...form, creditsPerWeek: e.target.value })} />
+                  </div>
+                </div>
+                <div className="flex items-start gap-3">
+                  <input type="checkbox" checked={form.overrunEnabled} onChange={e => setForm({ ...form, overrunEnabled: e.target.checked })}
+                    className="mt-0.5 h-4 w-4 rounded border-input bg-background accent-foreground cursor-pointer" />
+                  <div>
+                    <label className="text-sm font-medium cursor-pointer">Оверран (платный овердрафт)</label>
+                    <p className="text-xs text-muted-foreground mt-0.5">Сверх лимита — списывать с баланса вместо блокировки</p>
+                  </div>
+                </div>
+                {form.overrunEnabled && (
+                  <div className="space-y-2 max-w-xs">
+                    <Label>Цена за 1000 кредитов сверх лимита (копейки)</Label>
+                    <Input type="number" value={form.overrunPriceKopecks} onChange={e => setForm({ ...form, overrunPriceKopecks: e.target.value })} />
+                  </div>
+                )}
+                <div className="space-y-2">
+                  <Label>Модели</Label>
+                  <div className="flex flex-wrap gap-2">
+                    {knownModels.map(m => (
+                      <button key={m} type="button" onClick={() => toggleModel(m)}
+                        className={cn(
+                          'text-xs font-mono px-3 py-1.5 rounded-full border transition-colors',
+                          form.models?.has(m)
+                            ? 'border-violet-500/40 bg-violet-500/10 text-violet-300'
+                            : 'border-border/40 text-muted-foreground hover:border-border'
+                        )}>
+                        {m}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      ))}
+    </div>
+  )
+}
+
 // ── Main ──────────────────────────────────────────────────
 
 const Admin = () => {
@@ -1065,12 +1211,14 @@ const Admin = () => {
               <TabsTrigger value="users">Пользователи</TabsTrigger>
               <TabsTrigger value="clients">OIDC-клиенты</TabsTrigger>
               <TabsTrigger value="broadcast">Рассылка писем</TabsTrigger>
+              <TabsTrigger value="tariffs">Тарифы Вспышки</TabsTrigger>
               <TabsTrigger value="settings">Режимы регистрации</TabsTrigger>
               <TabsTrigger value="logs">Логи системы</TabsTrigger>
             </TabsList>
             <TabsContent value="users"><UsersTab /></TabsContent>
             <TabsContent value="clients"><ClientsTab /></TabsContent>
             <TabsContent value="broadcast"><BroadcastTab /></TabsContent>
+            <TabsContent value="tariffs"><TariffsTab /></TabsContent>
             <TabsContent value="settings"><SettingsTab /></TabsContent>
             <TabsContent value="logs"><LogsTab /></TabsContent>
           </Card>

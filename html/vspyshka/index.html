@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Вспышка — ИИ-агент разработчика в терминале | Арлист Тех</title>
+
+    <!-- Geist Font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="/css/global.css">
+
+    <!-- Не индексировать и не публиковать в поиске: страница временно скрыта от всех, кроме прямой ссылки. -->
+    <meta name="robots" content="noindex, nofollow">
+    <meta name="theme-color" content="#09090b">
+    <meta name="color-scheme" content="dark light">
+    <link rel="icon" type="image/svg+xml" href="/icon.svg">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+
+    <style>
+        .hero-title span.vsp {
+            background: linear-gradient(90deg, #ffffff, #ffcc55, #ff6699);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .cta-row { display: flex; gap: 16px; flex-wrap: wrap; align-items: center; }
+
+        .btn-secondary {
+            display: inline-block;
+            padding: 16px 32px;
+            border: 1px solid transparent;
+            color: var(--ac-gray-40);
+            text-decoration: none;
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.3em;
+            font-weight: 600;
+            transition: all var(--transition);
+        }
+        .btn-secondary:hover { color: var(--ac-white); }
+
+        /* How it works */
+        .steps-section { padding: 60px 0 40px; }
+        .steps-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 40px;
+            margin-top: 40px;
+        }
+        .step-num {
+            font-family: var(--font-mono);
+            font-size: 11px;
+            color: #ff9955;
+            margin-bottom: 16px;
+            display: block;
+        }
+        .step-title { font-size: 1rem; font-weight: 500; margin-bottom: 8px; letter-spacing: -0.01em; }
+        .step-desc { font-size: 0.85rem; color: var(--ac-gray-40); line-height: 1.7; }
+
+        /* Feature grid */
+        .features-section { padding: 40px 0 80px; }
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 1px;
+            background: var(--ac-gray-05);
+            border: 1px solid var(--ac-gray-05);
+            margin-top: 24px;
+        }
+        .feature-card { background: #050505; padding: 40px 32px; }
+        .feature-icon {
+            font-family: var(--font-mono);
+            font-size: 11px;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            color: #ff9955;
+            margin-bottom: 20px;
+            display: block;
+        }
+        .feature-title { font-size: 1.05rem; font-weight: 500; letter-spacing: -0.01em; margin-bottom: 10px; }
+        .feature-desc { font-size: 0.85rem; color: var(--ac-gray-40); line-height: 1.7; }
+
+        .install-section { padding-bottom: 160px; }
+        .install-box {
+            border: 1px solid var(--ac-gray-10);
+            border-radius: 10px;
+            padding: 24px 28px;
+            max-width: 640px;
+            font-family: var(--font-mono);
+            font-size: 13px;
+            background: rgba(255,255,255,0.015);
+        }
+        .install-box .line { display: flex; align-items: center; gap: 12px; }
+        .install-box .line + .line { margin-top: 10px; }
+        .install-box code { color: #88ffcc; }
+        .install-box .muted { color: var(--ac-gray-30); font-size: 12px; }
+        .hidden-note {
+            font-family: var(--font-mono);
+            font-size: 10px;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            color: var(--ac-gray-30);
+            margin-top: 16px;
+        }
+    </style>
+</head>
+<body>
+
+<nav class="navbar">
+    <a href="/" class="logo">
+        <img src="/icon.svg" alt="" class="logo-icon">
+        Арлист
+    </a>
+    <ul class="nav-links">
+        <li><a href="/products" class="nav-link">Продукты</a></li>
+        <li><a href="/forEdu" class="nav-link">Образование</a></li>
+        <li><a href="/contacts" class="nav-link">Контакты</a></li>
+        <li><a href="/login" class="nav-link">Вход</a></li>
+    </ul>
+</nav>
+
+<main>
+    <section class="hero">
+        <div class="container">
+            <span class="hero-label reveal">ИИ-агент · Ранний доступ</span>
+            <h1 class="hero-title reveal">
+                Первый в России ИИ-агент,
+                <span class="vsp">который сам пишет код.</span>
+            </h1>
+            <p class="hero-subtitle reveal">
+                Читает код, находит и чинит баги, сама вносит изменения — прямо в вашем терминале.
+                Вход через Arlist ID: свой ключ ИИ-провайдера не нужен.
+            </p>
+            <div class="cta-row reveal">
+                <a href="#install" class="btn-primary">Установить</a>
+                <a href="#features" class="btn-secondary">Что внутри →</a>
+            </div>
+        </div>
+    </section>
+
+    <section class="steps-section">
+        <div class="container">
+            <div class="steps-grid">
+                <div class="reveal">
+                    <span class="step-num">01</span>
+                    <h3 class="step-title">Ставите Вспышку</h3>
+                    <p class="step-desc">Один файл, без лишних установок и десктоп-приложения.</p>
+                </div>
+                <div class="reveal">
+                    <span class="step-num">02</span>
+                    <h3 class="step-title">Входите через Arlist ID</h3>
+                    <p class="step-desc">Код с телефона или браузера — и всё, свой ключ ИИ-провайдера не нужен.</p>
+                </div>
+                <div class="reveal">
+                    <span class="step-num">03</span>
+                    <h3 class="step-title">Ставите задачу</h3>
+                    <p class="step-desc">Вспышка сама разбирается в коде и вносит изменения, спрашивая подтверждение там, где вы захотите.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="features" class="features-section">
+        <div class="container">
+            <div class="features-grid">
+                <div class="feature-card reveal">
+                    <span class="feature-icon">Безопасно</span>
+                    <h3 class="feature-title">Ничего не сломает без спроса</h3>
+                    <p class="feature-desc">Все действия происходят в изолированной, безопасной среде — не напрямую в вашей системе. Вы сами решаете, что подтверждать вручную, а что доверить агенту полностью.</p>
+                </div>
+                <div class="feature-card reveal">
+                    <span class="feature-icon">Расширения</span>
+                    <h3 class="feature-title">Работает с MCP-серверами</h3>
+                    <p class="feature-desc">Подключает внешние MCP-инструменты и сама может выступать MCP-сервером — можно встроить Вспышку в другой рабочий процесс, а не только использовать отдельно.</p>
+                </div>
+                <div class="feature-card reveal">
+                    <span class="feature-icon">Сессии</span>
+                    <h3 class="feature-title">Ничего не теряется</h3>
+                    <p class="feature-desc">Прерванную работу можно продолжить в любой момент или вернуться к прошлому варианту. Вспышку можно запускать и без интерфейса — для регулярных, повторяющихся задач.</p>
+                </div>
+                <div class="feature-card reveal">
+                    <span class="feature-icon">Arlist ID</span>
+                    <h3 class="feature-title">Модели без своего ключа</h3>
+                    <p class="feature-desc">Вход по коду с телефона, без ключа ИИ-провайдера. Модели — DeepSeek, GigaChat и YandexGPT за счёт Arlist. Лимиты — в процентах от квоты на 5 часов и на неделю.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="install" class="install-section">
+        <div class="container">
+            <h2 class="reveal" style="font-size: 1.6rem; font-weight: 500; letter-spacing: -0.02em; margin-bottom: 20px;">Установка</h2>
+            <div class="install-box reveal">
+                <div class="line"><code>npm install -g @vspyshka/cli</code></div>
+                <div class="line"><code>vsp login</code></div>
+            </div>
+            <p class="hidden-note reveal">Страница ещё не анонсирована и никуда не ведёт с сайта — только по прямой ссылке.</p>
+        </div>
+    </section>
+</main>
+
+<footer class="footer">
+    <div class="container">
+        <div class="footer-content">
+            <div class="footer-brand">
+                <a href="/" class="logo">
+                    <img src="/icon.svg" alt="" class="logo-icon">
+                    АРЛИСТ ТЕХ
+                </a>
+            </div>
+            <div class="footer-links">
+                <div class="footer-col">
+                    <span class="footer-label">Сервисы</span>
+                    <a href="https://commit.arlist.tech">Commit</a>
+                    <a href="https://leetcot.ru">ЛитКот</a>
+                </div>
+                <div class="footer-col">
+                    <span class="footer-label">Компания</span>
+                    <a href="/forEdu">Образование</a>
+                    <a href="/contacts">Контакты</a>
+                    <a href="/docs">API</a>
+                </div>
+                <div class="footer-col">
+                    <span class="footer-label">Право</span>
+                    <a href="/legal">Документы</a>
+                    <a href="/privacy-policy">Приватность</a>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p class="footer-copy">© 2026 АРЛИСТ ТЕХ. Все права защищены.</p>
+        </div>
+    </div>
+</footer>
+
+<script src="/js/global.js"></script>
+
+</body>
+</html>
