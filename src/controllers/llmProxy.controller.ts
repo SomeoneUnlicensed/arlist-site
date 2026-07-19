@@ -1,4 +1,4 @@
-import { Response } from 'express';
+import type { Response as ExpressResponse } from 'express';
 import { recordUsage, isModelAllowed } from '../services/limits.service.js';
 import { getGigaChatAccessToken } from '../services/gigachat.service.js';
 
@@ -114,7 +114,7 @@ async function callUpstream(target: ModelTarget, body: Record<string, unknown>) 
   }
 }
 
-export const chatCompletions = async (req: any, res: Response) => {
+export const chatCompletions = async (req: any, res: ExpressResponse) => {
   try {
     const userId = req.user.userId;
     const apiKey = req.apiKey;
@@ -173,7 +173,7 @@ export const chatCompletions = async (req: any, res: Response) => {
   }
 };
 
-export const listModels = async (req: any, res: Response) => {
+export const listModels = async (req: any, res: ExpressResponse) => {
   try {
     const tariff = req.user.tariff;
     const allowed: string[] = tariff?.models?.includes('*')

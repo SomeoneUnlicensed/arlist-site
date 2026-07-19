@@ -55,12 +55,39 @@ app.use(express.static(path.join(__dirname, '../dist-client'), { index: false })
 // Static HTML landing pages
 app.use(express.static(path.join(__dirname, '../html')));
 
-// OIDC Provider
-app.use(oidcProvider.callback());
+// OIDC Provider — its Koa `.callback()` is a bare (req, res) handler that never
+// calls Express's `next()` (Koa has no concept of it), so mounted directly it
+// would swallow every request that reaches it, including paths it doesn't
+// recognize, replying with Koa's own bare "Not Found". We intercept its
+// response and fall through to Express's own routing when OIDC itself 404s.
+app.use((req, res, next) => {
+  const originalEnd = res.end.bind(res);
+  res.end = ((...args: Parameters<typeof res.end>) => {
+    if (res.statusCode === 404 && !res.headersSent) {
+      res.end = originalEnd;
+      next();
+      return res;
+    }
+    return originalEnd(...args);
+  }) as typeof res.end;
+  oidcProvider.callback()(req, res);
+});
 
 // Fallback for landing pages
 app.get(/^(?!\/api|\/interaction|\/oidc).*/, (req, res) => {
   res.sendFile(path.join(__dirname, '../html/index.html'));
+});
+
+// Anything still unmatched (unknown /api routes, stray /oidc or /interaction
+// paths, or genuine OIDC 404s) previously fell through to Express's bare
+// default 404 ("Not Found" with no styling). Give API callers JSON and
+// everyone else the real 404 page.
+app.use((req, res) => {
+  if (req.path.startsWith('/api')) {
+    res.status(404).json({ error: 'Not Found' });
+  } else {
+    res.status(404).sendFile(path.join(__dirname, '../html/404.html'));
+  }
 });
 
 app.listen(PORT, () => {
