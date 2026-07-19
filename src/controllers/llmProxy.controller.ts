@@ -1,91 +1,96 @@
 import type { Response as ExpressResponse } from 'express';
-import { recordUsage, isModelAllowed } from '../services/limits.service.js';
-import { getGigaChatAccessToken } from '../services/gigachat.service.js';
+import prisma from '../services/prisma.service.js';
+import { recordUsage, isModelAllowed, effectiveModels } from '../services/limits.service.js';
+import { getOAuthClientCredentialsToken } from '../services/modelAuth.service.js';
+import type { AiModel } from '@prisma/client';
 
 // Direct pass-through to our own paid provider accounts — no third-party free-tier
 // pooling, no IP rotation, no hiding which provider answers a given model.
+//
+// Models are data, not code: which providers exist, their base URL, wire
+// protocol and auth method all live in the AiModel table and are managed from
+// the admin panel. Adding another OpenAI-shaped provider needs zero code
+// changes. A genuinely new wire protocol (request/response shape) does need a
+// new branch in callUpstream — that's an honest limit, not a workaround.
 
-type Provider = 'deepseek' | 'gigachat' | 'yandexgpt';
+const MODEL_CACHE_TTL_MS = 30_000;
+let modelCache: { byKey: Map<string, AiModel>; expiresAt: number } | null = null;
 
-interface ModelTarget {
-  provider: Provider;
-  upstreamModel: string;
+async function getModelByKey(key: string): Promise<AiModel | undefined> {
+  if (!modelCache || modelCache.expiresAt <= Date.now()) {
+    const rows = await prisma.aiModel.findMany({ where: { isEnabled: true } });
+    modelCache = { byKey: new Map(rows.map((r) => [r.key, r])), expiresAt: Date.now() + MODEL_CACHE_TTL_MS };
+  }
+  return modelCache.byKey.get(key);
 }
 
-// Upstream model identifiers here are best-effort — verify each against the
-// provider's current API docs once real DEEPSEEK_API_KEY/GIGACHAT_AUTH_KEY/
-// YANDEX_API_KEY are wired in, before relying on this in production.
-const MODEL_MAP: Record<string, ModelTarget> = {
-  'deepseek-chat': { provider: 'deepseek', upstreamModel: 'deepseek-chat' },
-  'deepseek-reasoner': { provider: 'deepseek', upstreamModel: 'deepseek-reasoner' },
-  'deepseek-v4-flash': { provider: 'deepseek', upstreamModel: 'deepseek-v4-flash' },
-  'gigachat': { provider: 'gigachat', upstreamModel: 'GigaChat' },
-  'gigachat-pro': { provider: 'gigachat', upstreamModel: 'GigaChat-Pro' },
-  'gigachat-max': { provider: 'gigachat', upstreamModel: 'GigaChat-Max' },
-  'yandexgpt': { provider: 'yandexgpt', upstreamModel: 'yandexgpt/latest' },
-  'yandexgpt-lite': { provider: 'yandexgpt', upstreamModel: 'yandexgpt-lite/latest' },
-  'yandexgpt-pro': { provider: 'yandexgpt', upstreamModel: 'yandexgpt-pro/latest' },
-};
+async function resolveToken(row: AiModel): Promise<string> {
+  switch (row.authMethod) {
+    case 'BEARER_ENV':
+    case 'API_KEY_HEADER': {
+      if (!row.apiKeyEnvVar) throw new Error(`${row.key}: apiKeyEnvVar not set`);
+      const key = process.env[row.apiKeyEnvVar];
+      if (!key) throw new Error(`${row.apiKeyEnvVar} not configured`);
+      return key;
+    }
+    case 'OAUTH2_CLIENT_CREDENTIALS': {
+      if (!row.oauthTokenUrl || !row.apiKeyEnvVar) throw new Error(`${row.key}: oauthTokenUrl/apiKeyEnvVar not set`);
+      return getOAuthClientCredentialsToken(row.id, row.oauthTokenUrl, row.apiKeyEnvVar, row.oauthScopeEnvVar);
+    }
+  }
+}
 
-const DEEPSEEK_API_URL = 'https://api.deepseek.com/chat/completions';
-// GigaChat's message format follows the OpenAI chat-completions shape (model,
-// messages, usage.prompt_tokens/completion_tokens) once you hold a Bearer
-// token — only the token acquisition (OAuth2 client-credentials) differs.
-const GIGACHAT_API_URL = 'https://gigachat.devices.sberbank.ru/api/v1/chat/completions';
-const YANDEX_COMPLETION_URL = 'https://llm.api.cloud.yandex.net/foundationModels/v1/completion';
-
-// Shared caller for providers whose HTTP API is OpenAI-compatible (DeepSeek,
-// GigaChat): same request/response shape, only base URL and bearer token differ.
-async function callOpenAiCompatible(url: string, token: string, upstreamModel: string, body: Record<string, unknown>) {
-  return fetch(url, {
+// OpenAI-shaped wire protocol: model/messages in, choices[0].message + usage
+// out. Covers DeepSeek, GigaChat (once you hold a bearer token), and any
+// future provider that speaks the same shape — just add a row, no code.
+async function callOpenAiCompatible(row: AiModel, token: string, body: Record<string, unknown>) {
+  return fetch(row.baseUrl, {
     method: 'POST',
     headers: {
       Authorization: `Bearer ${token}`,
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify({ ...body, model: upstreamModel, stream: false }),
+    body: JSON.stringify({ ...body, model: row.upstreamModel, stream: false }),
     signal: AbortSignal.timeout(120_000),
   });
 }
 
-// Yandex Foundation Models API is not OpenAI-shaped: request uses
-// modelUri/completionOptions/messages[].text, response nests the answer under
-// result.alternatives[0].message and tokens under result.usage. We translate
-// both directions so the rest of the proxy can stay provider-agnostic.
-async function callYandexGpt(upstreamModel: string, body: Record<string, unknown>) {
-  const apiKey = process.env.YANDEX_API_KEY;
-  const folderId = process.env.YANDEX_FOLDER_ID;
-  if (!apiKey) throw new Error('YANDEX_API_KEY not configured');
-  if (!folderId) throw new Error('YANDEX_FOLDER_ID not configured');
+// Yandex Foundation Models API: modelUri/completionOptions/messages[].text in,
+// result.alternatives[]/result.usage out. Not OpenAI-shaped, so this stays a
+// dedicated branch — repackaged into the OpenAI shape below so the rest of
+// chatCompletions() can stay provider-agnostic.
+async function callYandexGpt(row: AiModel, apiKey: string, body: Record<string, unknown>) {
+  if (!row.extraHeaderName || !row.extraHeaderEnvVar) {
+    throw new Error(`${row.key}: extraHeaderName/extraHeaderEnvVar not set (Yandex needs a folder id)`);
+  }
+  const folderId = process.env[row.extraHeaderEnvVar];
+  if (!folderId) throw new Error(`${row.extraHeaderEnvVar} not configured`);
 
   const messages = (body.messages as Array<{ role: string; content: string }> | undefined) ?? [];
   const maxTokens = (body.max_tokens as number | undefined) ?? 2000;
   const temperature = (body.temperature as number | undefined) ?? 0.6;
 
-  const yandexRes = await fetch(YANDEX_COMPLETION_URL, {
+  const yandexRes = await fetch(row.baseUrl, {
     method: 'POST',
     headers: {
       Authorization: `Api-Key ${apiKey}`,
-      'x-folder-id': folderId,
+      [row.extraHeaderName]: folderId,
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
-      modelUri: `gpt://${folderId}/${upstreamModel}`,
+      modelUri: `gpt://${folderId}/${row.upstreamModel}`,
       completionOptions: { stream: false, temperature, maxTokens: String(maxTokens) },
       messages: messages.map((m) => ({ role: m.role, text: m.content })),
     }),
     signal: AbortSignal.timeout(120_000),
   });
 
-  if (!yandexRes.ok) {
-    return yandexRes;
-  }
+  if (!yandexRes.ok) return yandexRes;
 
   const yandexData: any = await yandexRes.json();
   const alt = yandexData.result?.alternatives?.[0];
   const usage = yandexData.result?.usage ?? {};
 
-  // Repackage into the OpenAI shape the rest of chatCompletions() expects.
   const openAiShaped = {
     choices: [{ message: { role: 'assistant', content: alt?.message?.text ?? '' }, finish_reason: 'stop', index: 0 }],
     usage: {
@@ -98,19 +103,13 @@ async function callYandexGpt(upstreamModel: string, body: Record<string, unknown
   return new Response(JSON.stringify(openAiShaped), { status: 200 });
 }
 
-async function callUpstream(target: ModelTarget, body: Record<string, unknown>) {
-  switch (target.provider) {
-    case 'deepseek': {
-      const key = process.env.DEEPSEEK_API_KEY;
-      if (!key) throw new Error('DEEPSEEK_API_KEY not configured');
-      return callOpenAiCompatible(DEEPSEEK_API_URL, key, target.upstreamModel, body);
-    }
-    case 'gigachat': {
-      const token = await getGigaChatAccessToken();
-      return callOpenAiCompatible(GIGACHAT_API_URL, token, target.upstreamModel, body);
-    }
-    case 'yandexgpt':
-      return callYandexGpt(target.upstreamModel, body);
+async function callUpstream(row: AiModel, body: Record<string, unknown>) {
+  const token = await resolveToken(row);
+  switch (row.wireProtocol) {
+    case 'OPENAI_COMPATIBLE':
+      return callOpenAiCompatible(row, token, body);
+    case 'YANDEXGPT':
+      return callYandexGpt(row, token, body);
   }
 }
 
@@ -123,16 +122,17 @@ export const chatCompletions = async (req: any, res: ExpressResponse) => {
 
     if (!model) return res.status(400).json({ error: 'model required' });
 
-    const target = MODEL_MAP[model];
+    const target = await getModelByKey(model);
     if (!target) {
-      return res.status(400).json({ error: 'Unknown model', availableModels: Object.keys(MODEL_MAP) });
+      const available = modelCache ? Array.from(modelCache.byKey.keys()) : [];
+      return res.status(400).json({ error: 'Unknown model', availableModels: available });
     }
 
-    const tariffModels: string[] = tariff?.models ?? [];
-    if (tariff && !isModelAllowed(tariffModels, model)) {
+    const allowedModels = effectiveModels(req.user, tariff ?? { models: [] });
+    if (tariff && !isModelAllowed(allowedModels, model)) {
       return res.status(403).json({
         error: 'Model not available on your tariff',
-        availableModels: tariffModels,
+        availableModels: allowedModels,
       });
     }
 
@@ -176,11 +176,14 @@ export const chatCompletions = async (req: any, res: ExpressResponse) => {
 export const listModels = async (req: any, res: ExpressResponse) => {
   try {
     const tariff = req.user.tariff;
-    const allowed: string[] = tariff?.models?.includes('*')
-      ? Object.keys(MODEL_MAP)
-      : tariff?.models ?? [];
+    const allowedModels = effectiveModels(req.user, tariff ?? { models: [] });
 
-    res.json({ models: allowed });
+    if (allowedModels.includes('*')) {
+      const rows = await prisma.aiModel.findMany({ where: { isEnabled: true }, select: { key: true } });
+      return res.json({ models: rows.map((r) => r.key) });
+    }
+
+    res.json({ models: allowedModels });
   } catch {
     res.status(500).json({ error: 'Internal server error' });
   }

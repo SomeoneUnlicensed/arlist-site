@@ -54,12 +54,16 @@ export async function checkLimits(userId: string): Promise<LimitCheck> {
   const tariff = user.tariff;
   const now = new Date();
 
+  // Per-user overrides win over the tariff default when set.
+  const creditsPer5h = user.creditsPer5hOverride ?? tariff.creditsPer5h;
+  const creditsPerWeek = user.creditsPerWeekOverride ?? tariff.creditsPerWeek;
+
   const [credits5h, creditsWeek] = await Promise.all([
     sumCredits(userId, new Date(now.getTime() - 5 * 3600_000)),
     sumCredits(userId, new Date(now.getTime() - 7 * 24 * 3600_000)),
   ]);
 
-  const withinPlan = credits5h < tariff.creditsPer5h && creditsWeek < tariff.creditsPerWeek;
+  const withinPlan = credits5h < creditsPer5h && creditsWeek < creditsPerWeek;
 
   let allowed = withinPlan;
   let overrun = false;
@@ -76,16 +80,20 @@ export async function checkLimits(userId: string): Promise<LimitCheck> {
     allowed,
     overrun,
     usagePercent: {
-      per5h: pct(credits5h, tariff.creditsPer5h),
-      week: pct(creditsWeek, tariff.creditsPerWeek),
+      per5h: pct(credits5h, creditsPer5h),
+      week: pct(creditsWeek, creditsPerWeek),
     },
     remaining: {
-      per5h: Math.max(0, tariff.creditsPer5h - credits5h),
-      perWeek: Math.max(0, tariff.creditsPerWeek - creditsWeek),
+      per5h: Math.max(0, creditsPer5h - credits5h),
+      perWeek: Math.max(0, creditsPerWeek - creditsWeek),
     },
     balanceKopecks: user.balanceKopecks,
     overrunPriceKopecksPer1k: tariff.overrunPriceKopecks,
   };
+}
+
+export function effectiveModels(user: { modelsOverrideEnabled: boolean; modelsOverride: string[] }, tariff: { models: string[] }): string[] {
+  return user.modelsOverrideEnabled ? user.modelsOverride : tariff.models;
 }
 
 export async function recordUsage(

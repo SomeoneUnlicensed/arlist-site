@@ -30,7 +30,15 @@ export const authenticateApiKey = async (req: Request, res: Response, next: Next
     });
 
     (req as any).apiKey = apiKey;
-    (req as any).user = { userId: apiKey.user.id, role: apiKey.user.role, tariff: apiKey.user.tariff };
+    (req as any).user = {
+      userId: apiKey.user.id,
+      role: apiKey.user.role,
+      tariff: apiKey.user.tariff,
+      creditsPer5hOverride: apiKey.user.creditsPer5hOverride,
+      creditsPerWeekOverride: apiKey.user.creditsPerWeekOverride,
+      modelsOverrideEnabled: apiKey.user.modelsOverrideEnabled,
+      modelsOverride: apiKey.user.modelsOverride,
+    };
 
     next();
   } catch {

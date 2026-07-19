@@ -69,7 +69,10 @@ export const deleteClient = async (req: Request, res: Response) => {
 export const getUsers = async (req: Request, res: Response) => {
   try {
     const users = await prisma.user.findMany({
-      select: { id: true, email: true, name: true, role: true, isVerified: true, isBanned: true, balanceKopecks: true, createdAt: true },
+      select: {
+        id: true, email: true, name: true, role: true, isVerified: true, isBanned: true, balanceKopecks: true, createdAt: true,
+        creditsPer5hOverride: true, creditsPerWeekOverride: true, modelsOverrideEnabled: true, modelsOverride: true,
+      },
       orderBy: { createdAt: 'desc' },
     });
     res.json(users);
@@ -111,6 +114,55 @@ export const updateUser = async (req: Request, res: Response) => {
     });
     res.json(user);
   } catch {
+    res.status(500).json({ error: 'Internal server error' });
+  }
+};
+
+// Персональные исключения из тарифа для конкретного пользователя — лимиты и
+// список моделей. null/false в теле запроса возвращает соответствующее поле
+// обратно к значению тарифа.
+export const updateUserLimits = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params as { id: string };
+    const { creditsPer5hOverride, creditsPerWeekOverride, modelsOverrideEnabled, modelsOverride } = req.body;
+
+    if (modelsOverride !== undefined) {
+      if (!Array.isArray(modelsOverride) || !modelsOverride.every((m) => typeof m === 'string')) {
+        return res.status(400).json({ error: 'modelsOverride must be an array of strings' });
+      }
+      if (!modelsOverride.includes('*')) {
+        const known = await prisma.aiModel.findMany({ select: { key: true } });
+        const knownKeys = new Set(known.map((m) => m.key));
+        const unknown = modelsOverride.filter((m: string) => !knownKeys.has(m));
+        if (unknown.length > 0) {
+          return res.status(400).json({ error: `Unknown model(s): ${unknown.join(', ')}` });
+        }
+      }
+    }
+
+    const user = await prisma.user.update({
+      where: { id },
+      data: {
+        ...(creditsPer5hOverride !== undefined
+          ? { creditsPer5hOverride: creditsPer5hOverride === null ? null : Number(creditsPer5hOverride) }
+          : {}),
+        ...(creditsPerWeekOverride !== undefined
+          ? { creditsPerWeekOverride: creditsPerWeekOverride === null ? null : Number(creditsPerWeekOverride) }
+          : {}),
+        ...(modelsOverrideEnabled !== undefined ? { modelsOverrideEnabled: Boolean(modelsOverrideEnabled) } : {}),
+        ...(modelsOverride !== undefined ? { modelsOverride } : {}),
+      },
+      select: {
+        id: true,
+        creditsPer5hOverride: true,
+        creditsPerWeekOverride: true,
+        modelsOverrideEnabled: true,
+        modelsOverride: true,
+      },
+    });
+    res.json(user);
+  } catch (error: any) {
+    if (error?.code === 'P2025') return res.status(404).json({ error: 'User not found' });
     res.status(500).json({ error: 'Internal server error' });
   }
 };
@@ -178,7 +230,17 @@ export const getTariffs = async (req: Request, res: Response) => {
   }
 };
 
-const KNOWN_MODELS = ['deepseek-chat', 'deepseek-reasoner', 'deepseek-v4-flash', 'gigachat', 'gigachat-pro', 'gigachat-max', 'yandexgpt', 'yandexgpt-lite', 'yandexgpt-pro'];
+async function validateModelKeys(models: unknown): Promise<string | null> {
+  if (!Array.isArray(models) || !models.every((m) => typeof m === 'string')) {
+    return 'models must be an array of strings';
+  }
+  if (models.includes('*')) return null;
+  const known = await prisma.aiModel.findMany({ select: { key: true } });
+  const knownKeys = new Set(known.map((m) => m.key));
+  const unknown = models.filter((m: string) => !knownKeys.has(m));
+  if (unknown.length > 0) return `Unknown model(s): ${unknown.join(', ')}`;
+  return null;
+}
 
 export const updateTariff = async (req: Request, res: Response) => {
   try {
@@ -186,13 +248,8 @@ export const updateTariff = async (req: Request, res: Response) => {
     const { name, description, models, creditsPer5h, creditsPerWeek, overrunEnabled, overrunPriceKopecks, priceMonth } = req.body;
 
     if (models !== undefined) {
-      if (!Array.isArray(models) || !models.every((m) => typeof m === 'string')) {
-        return res.status(400).json({ error: 'models must be an array of strings' });
-      }
-      const unknown = models.filter((m: string) => m !== '*' && !KNOWN_MODELS.includes(m));
-      if (unknown.length > 0) {
-        return res.status(400).json({ error: `Unknown model(s): ${unknown.join(', ')}`, knownModels: KNOWN_MODELS });
-      }
+      const error = await validateModelKeys(models);
+      if (error) return res.status(400).json({ error });
     }
 
     const tariff = await prisma.tariff.update({
@@ -216,5 +273,114 @@ export const updateTariff = async (req: Request, res: Response) => {
 };
 
 export const getKnownModels = async (req: Request, res: Response) => {
-  res.json({ models: KNOWN_MODELS });
+  try {
+    const models = await prisma.aiModel.findMany({ select: { key: true }, orderBy: { key: 'asc' } });
+    res.json({ models: models.map((m) => m.key) });
+  } catch {
+    res.status(500).json({ error: 'Internal server error' });
+  }
+};
+
+// ── AI Models (data-driven provider registry) ──────────────
+
+export const getAiModels = async (req: Request, res: Response) => {
+  try {
+    const models = await prisma.aiModel.findMany({ orderBy: { key: 'asc' } });
+    res.json(models);
+  } catch {
+    res.status(500).json({ error: 'Internal server error' });
+  }
+};
+
+const WIRE_PROTOCOLS = ['OPENAI_COMPATIBLE', 'YANDEXGPT'];
+const AUTH_METHODS = ['BEARER_ENV', 'OAUTH2_CLIENT_CREDENTIALS', 'API_KEY_HEADER'];
+
+export const createAiModel = async (req: Request, res: Response) => {
+  try {
+    const {
+      key, label, wireProtocol, authMethod, baseUrl, upstreamModel,
+      apiKeyEnvVar, headerName, extraHeaderName, extraHeaderEnvVar,
+      oauthTokenUrl, oauthScopeEnvVar, isEnabled,
+    } = req.body;
+
+    if (!key || !label || !baseUrl || !upstreamModel) {
+      return res.status(400).json({ error: 'key, label, baseUrl, upstreamModel required' });
+    }
+    if (!WIRE_PROTOCOLS.includes(wireProtocol)) {
+      return res.status(400).json({ error: `wireProtocol must be one of: ${WIRE_PROTOCOLS.join(', ')}` });
+    }
+    if (!AUTH_METHODS.includes(authMethod)) {
+      return res.status(400).json({ error: `authMethod must be one of: ${AUTH_METHODS.join(', ')}` });
+    }
+
+    const model = await prisma.aiModel.create({
+      data: {
+        key, label, wireProtocol, authMethod, baseUrl, upstreamModel,
+        apiKeyEnvVar: apiKeyEnvVar ?? null,
+        headerName: headerName ?? null,
+        extraHeaderName: extraHeaderName ?? null,
+        extraHeaderEnvVar: extraHeaderEnvVar ?? null,
+        oauthTokenUrl: oauthTokenUrl ?? null,
+        oauthScopeEnvVar: oauthScopeEnvVar ?? null,
+        isEnabled: isEnabled !== undefined ? Boolean(isEnabled) : true,
+      },
+    });
+    res.status(201).json(model);
+  } catch (error: any) {
+    if (error?.code === 'P2002') return res.status(409).json({ error: 'Model key already exists' });
+    res.status(500).json({ error: 'Internal server error' });
+  }
+};
+
+export const updateAiModel = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params as { id: string };
+    const {
+      key, label, wireProtocol, authMethod, baseUrl, upstreamModel,
+      apiKeyEnvVar, headerName, extraHeaderName, extraHeaderEnvVar,
+      oauthTokenUrl, oauthScopeEnvVar, isEnabled,
+    } = req.body;
+
+    if (wireProtocol !== undefined && !WIRE_PROTOCOLS.includes(wireProtocol)) {
+      return res.status(400).json({ error: `wireProtocol must be one of: ${WIRE_PROTOCOLS.join(', ')}` });
+    }
+    if (authMethod !== undefined && !AUTH_METHODS.includes(authMethod)) {
+      return res.status(400).json({ error: `authMethod must be one of: ${AUTH_METHODS.join(', ')}` });
+    }
+
+    const model = await prisma.aiModel.update({
+      where: { id },
+      data: {
+        ...(key !== undefined ? { key } : {}),
+        ...(label !== undefined ? { label } : {}),
+        ...(wireProtocol !== undefined ? { wireProtocol } : {}),
+        ...(authMethod !== undefined ? { authMethod } : {}),
+        ...(baseUrl !== undefined ? { baseUrl } : {}),
+        ...(upstreamModel !== undefined ? { upstreamModel } : {}),
+        ...(apiKeyEnvVar !== undefined ? { apiKeyEnvVar } : {}),
+        ...(headerName !== undefined ? { headerName } : {}),
+        ...(extraHeaderName !== undefined ? { extraHeaderName } : {}),
+        ...(extraHeaderEnvVar !== undefined ? { extraHeaderEnvVar } : {}),
+        ...(oauthTokenUrl !== undefined ? { oauthTokenUrl } : {}),
+        ...(oauthScopeEnvVar !== undefined ? { oauthScopeEnvVar } : {}),
+        ...(isEnabled !== undefined ? { isEnabled: Boolean(isEnabled) } : {}),
+      },
+    });
+    res.json(model);
+  } catch (error: any) {
+    if (error?.code === 'P2025') return res.status(404).json({ error: 'Model not found' });
+    if (error?.code === 'P2002') return res.status(409).json({ error: 'Model key already exists' });
+    res.status(500).json({ error: 'Internal server error' });
+  }
+};
+
+export const deleteAiModel = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params as { id: string };
+    await prisma.aiModel.delete({ where: { id } });
+    res.json({ ok: true });
+  } catch (error: any) {
+    if (error?.code === 'P2025') return res.status(404).json({ error: 'Model not found' });
+    res.status(500).json({ error: 'Internal server error' });
+  }
 };

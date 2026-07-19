@@ -78,6 +78,12 @@ const UsersTab = () => {
   const [editBalanceVal, setEditBalanceVal] = useState<string>('')
   const [balanceSaving, setBalanceSaving] = useState(false)
 
+  // Per-user limit/model override state
+  const [expandedLimitsId, setExpandedLimitsId] = useState<string | null>(null)
+  const [limitsForm, setLimitsForm] = useState<any>({})
+  const [limitsSaving, setLimitsSaving] = useState(false)
+  const [knownModels, setKnownModels] = useState<string[]>([])
+
   const load = async () => {
     setLoading(true)
     try {
@@ -147,6 +153,49 @@ const UsersTab = () => {
       setUsers(prev => prev.filter(u => u.id !== id))
     } catch {
       setErr('Ошибка удаления пользователя')
+    }
+  }
+
+  const toggleLimits = async (u: any) => {
+    if (expandedLimitsId === u.id) { setExpandedLimitsId(null); return }
+    setExpandedLimitsId(u.id)
+    setLimitsForm({
+      creditsPer5hOverride: u.creditsPer5hOverride ?? '',
+      creditsPerWeekOverride: u.creditsPerWeekOverride ?? '',
+      modelsOverrideEnabled: u.modelsOverrideEnabled ?? false,
+      modelsOverride: new Set<string>(u.modelsOverride ?? []),
+    })
+    if (knownModels.length === 0) {
+      try {
+        const { data } = await axios.get('/api/admin/known-models')
+        setKnownModels(data.models)
+      } catch { /* non-fatal — model pills just won't render */ }
+    }
+  }
+
+  const toggleLimitsModel = (m: string) => {
+    setLimitsForm((f: any) => {
+      const models = new Set<string>(f.modelsOverride)
+      models.has(m) ? models.delete(m) : models.add(m)
+      return { ...f, modelsOverride: models }
+    })
+  }
+
+  const saveLimits = async (id: string) => {
+    setLimitsSaving(true); setErr('')
+    try {
+      const { data } = await axios.patch(`/api/admin/users/${id}/limits`, {
+        creditsPer5hOverride: limitsForm.creditsPer5hOverride === '' ? null : Number(limitsForm.creditsPer5hOverride),
+        creditsPerWeekOverride: limitsForm.creditsPerWeekOverride === '' ? null : Number(limitsForm.creditsPerWeekOverride),
+        modelsOverrideEnabled: limitsForm.modelsOverrideEnabled,
+        modelsOverride: Array.from(limitsForm.modelsOverride),
+      })
+      setUsers(prev => prev.map(u => u.id === id ? { ...u, ...data } : u))
+      setExpandedLimitsId(null)
+    } catch (e: any) {
+      setErr(e.response?.data?.error || 'Ошибка сохранения лимитов')
+    } finally {
+      setLimitsSaving(false)
     }
   }
 
@@ -263,7 +312,8 @@ const UsersTab = () => {
             </thead>
             <tbody className="divide-y divide-border/30">
               {filteredUsers.map(u => (
-                <tr key={u.id} className="hover:bg-accent/30 transition-colors">
+                <React.Fragment key={u.id}>
+                <tr className="hover:bg-accent/30 transition-colors">
                   {/* User info */}
                   <td className="px-5 py-3.5">
                     <div className="flex flex-col gap-0.5">
@@ -400,6 +450,16 @@ const UsersTab = () => {
 
                       <Button
                         size="sm"
+                        variant="outline"
+                        onClick={() => toggleLimits(u)}
+                        className="h-7 text-[10px] font-semibold text-muted-foreground border-border/80 hover:bg-accent"
+                        title="Персональные лимиты и модели"
+                      >
+                        <Coins size={12} />Лимиты
+                      </Button>
+
+                      <Button
+                        size="sm"
                         variant="ghost"
                         onClick={() => remove(u.id, u.email)}
                         className="h-7 px-2 text-red-400 hover:bg-red-500/10 hover:text-red-300"
@@ -410,6 +470,60 @@ const UsersTab = () => {
                     </div>
                   </td>
                 </tr>
+                {expandedLimitsId === u.id && (
+                  <tr className="bg-muted/5">
+                    <td colSpan={6} className="px-5 py-4">
+                      <div className="space-y-4 max-w-2xl">
+                        <p className="text-xs text-muted-foreground">
+                          Персональные исключения поверх тарифа для {u.email}. Пустое поле — использовать значение тарифа.
+                        </p>
+                        <div className="grid grid-cols-2 gap-4">
+                          <div className="space-y-2">
+                            <Label>Кредиты / 5ч (override)</Label>
+                            <Input type="number" placeholder="как в тарифе" value={limitsForm.creditsPer5hOverride}
+                              onChange={e => setLimitsForm({ ...limitsForm, creditsPer5hOverride: e.target.value })} />
+                          </div>
+                          <div className="space-y-2">
+                            <Label>Кредиты / неделя (override)</Label>
+                            <Input type="number" placeholder="как в тарифе" value={limitsForm.creditsPerWeekOverride}
+                              onChange={e => setLimitsForm({ ...limitsForm, creditsPerWeekOverride: e.target.value })} />
+                          </div>
+                        </div>
+                        <div className="flex items-start gap-3">
+                          <input type="checkbox" checked={limitsForm.modelsOverrideEnabled}
+                            onChange={e => setLimitsForm({ ...limitsForm, modelsOverrideEnabled: e.target.checked })}
+                            className="mt-0.5 h-4 w-4 rounded border-input bg-background accent-foreground cursor-pointer" />
+                          <div>
+                            <label className="text-sm font-medium cursor-pointer">Свой список моделей для этого юзера</label>
+                            <p className="text-xs text-muted-foreground mt-0.5">Выключено — модели берутся из тарифа как обычно</p>
+                          </div>
+                        </div>
+                        {limitsForm.modelsOverrideEnabled && (
+                          <div className="flex flex-wrap gap-2">
+                            {knownModels.map(m => (
+                              <button key={m} type="button" onClick={() => toggleLimitsModel(m)}
+                                className={cn(
+                                  'text-xs font-mono px-3 py-1.5 rounded-full border transition-colors',
+                                  limitsForm.modelsOverride?.has(m)
+                                    ? 'border-violet-500/40 bg-violet-500/10 text-violet-300'
+                                    : 'border-border/40 text-muted-foreground hover:border-border'
+                                )}>
+                                {m}
+                              </button>
+                            ))}
+                          </div>
+                        )}
+                        <div className="flex gap-2">
+                          <Button size="sm" disabled={limitsSaving} onClick={() => saveLimits(u.id)}>
+                            {limitsSaving && <Loader2 size={13} className="animate-spin" />}Сохранить
+                          </Button>
+                          <Button size="sm" variant="ghost" onClick={() => setExpandedLimitsId(null)}>Отмена</Button>
+                        </div>
+                      </div>
+                    </td>
+                  </tr>
+                )}
+                </React.Fragment>
               ))}
             </tbody>
           </table>
@@ -1178,6 +1292,242 @@ const TariffsTab = () => {
   )
 }
 
+const WIRE_PROTOCOLS = ['OPENAI_COMPATIBLE', 'YANDEXGPT']
+const AUTH_METHODS = ['BEARER_ENV', 'OAUTH2_CLIENT_CREDENTIALS', 'API_KEY_HEADER']
+
+const EMPTY_MODEL_FORM = {
+  key: '', label: '', wireProtocol: 'OPENAI_COMPATIBLE', authMethod: 'BEARER_ENV',
+  baseUrl: '', upstreamModel: '', apiKeyEnvVar: '', headerName: '',
+  extraHeaderName: '', extraHeaderEnvVar: '', oauthTokenUrl: '', oauthScopeEnvVar: '',
+  isEnabled: true,
+}
+
+const ModelsTab = () => {
+  const [models, setModels] = useState<any[]>([])
+  const [editing, setEditing] = useState<string | null>(null)
+  const [creating, setCreating] = useState(false)
+  const [form, setForm] = useState<any>(EMPTY_MODEL_FORM)
+  const [saving, setSaving] = useState(false)
+  const [err, setErr] = useState('')
+
+  const load = async () => {
+    try {
+      const { data } = await axios.get('/api/admin/models')
+      setModels(data)
+    } catch { setErr('Не удалось загрузить') }
+  }
+
+  useEffect(() => { load() }, [])
+
+  const startEdit = (m: any) => {
+    setEditing(m.id); setCreating(false); setErr('')
+    setForm({
+      key: m.key, label: m.label, wireProtocol: m.wireProtocol, authMethod: m.authMethod,
+      baseUrl: m.baseUrl, upstreamModel: m.upstreamModel,
+      apiKeyEnvVar: m.apiKeyEnvVar ?? '', headerName: m.headerName ?? '',
+      extraHeaderName: m.extraHeaderName ?? '', extraHeaderEnvVar: m.extraHeaderEnvVar ?? '',
+      oauthTokenUrl: m.oauthTokenUrl ?? '', oauthScopeEnvVar: m.oauthScopeEnvVar ?? '',
+      isEnabled: m.isEnabled,
+    })
+  }
+
+  const startCreate = () => {
+    setCreating(true); setEditing(null); setErr('')
+    setForm(EMPTY_MODEL_FORM)
+  }
+
+  const payload = () => ({
+    key: form.key, label: form.label, wireProtocol: form.wireProtocol, authMethod: form.authMethod,
+    baseUrl: form.baseUrl, upstreamModel: form.upstreamModel,
+    apiKeyEnvVar: form.apiKeyEnvVar || null, headerName: form.headerName || null,
+    extraHeaderName: form.extraHeaderName || null, extraHeaderEnvVar: form.extraHeaderEnvVar || null,
+    oauthTokenUrl: form.oauthTokenUrl || null, oauthScopeEnvVar: form.oauthScopeEnvVar || null,
+    isEnabled: form.isEnabled,
+  })
+
+  const save = async (id: string) => {
+    setSaving(true); setErr('')
+    try {
+      await axios.patch(`/api/admin/models/${id}`, payload())
+      setEditing(null)
+      load()
+    } catch (e: any) { setErr(e.response?.data?.error || 'Ошибка сохранения') }
+    finally { setSaving(false) }
+  }
+
+  const create = async () => {
+    setSaving(true); setErr('')
+    try {
+      await axios.post('/api/admin/models', payload())
+      setCreating(false)
+      load()
+    } catch (e: any) { setErr(e.response?.data?.error || 'Ошибка создания') }
+    finally { setSaving(false) }
+  }
+
+  const remove = async (id: string) => {
+    if (!confirm('Удалить модель? Тарифы, где она указана, перестанут иметь к ней доступ.')) return
+    try {
+      await axios.delete(`/api/admin/models/${id}`)
+      load()
+    } catch (e: any) { setErr(e.response?.data?.error || 'Ошибка удаления') }
+  }
+
+  const editForm = (
+    <div className="space-y-4">
+      <div className="grid grid-cols-2 gap-4">
+        <div className="space-y-2">
+          <Label>Ключ (id для тарифов)</Label>
+          <Input value={form.key} onChange={e => setForm({ ...form, key: e.target.value })} placeholder="deepseek-chat" />
+        </div>
+        <div className="space-y-2">
+          <Label>Название</Label>
+          <Input value={form.label} onChange={e => setForm({ ...form, label: e.target.value })} placeholder="DeepSeek Chat" />
+        </div>
+      </div>
+      <div className="grid grid-cols-2 gap-4">
+        <div className="space-y-2">
+          <Label>Протокол запроса/ответа</Label>
+          <select value={form.wireProtocol} onChange={e => setForm({ ...form, wireProtocol: e.target.value })}
+            className="w-full h-9 rounded-md border border-input bg-background px-3 text-sm">
+            {WIRE_PROTOCOLS.map(p => <option key={p} value={p}>{p}</option>)}
+          </select>
+        </div>
+        <div className="space-y-2">
+          <Label>Способ авторизации</Label>
+          <select value={form.authMethod} onChange={e => setForm({ ...form, authMethod: e.target.value })}
+            className="w-full h-9 rounded-md border border-input bg-background px-3 text-sm">
+            {AUTH_METHODS.map(a => <option key={a} value={a}>{a}</option>)}
+          </select>
+        </div>
+      </div>
+      <div className="grid grid-cols-2 gap-4">
+        <div className="space-y-2">
+          <Label>Base URL</Label>
+          <Input value={form.baseUrl} onChange={e => setForm({ ...form, baseUrl: e.target.value })} placeholder="https://api.deepseek.com/chat/completions" />
+        </div>
+        <div className="space-y-2">
+          <Label>Имя модели у провайдера</Label>
+          <Input value={form.upstreamModel} onChange={e => setForm({ ...form, upstreamModel: e.target.value })} placeholder="deepseek-chat" />
+        </div>
+      </div>
+
+      {(form.authMethod === 'BEARER_ENV' || form.authMethod === 'API_KEY_HEADER') && (
+        <div className="space-y-2 max-w-sm">
+          <Label>Env-переменная с ключом</Label>
+          <Input value={form.apiKeyEnvVar} onChange={e => setForm({ ...form, apiKeyEnvVar: e.target.value })} placeholder="DEEPSEEK_API_KEY" />
+        </div>
+      )}
+      {form.authMethod === 'OAUTH2_CLIENT_CREDENTIALS' && (
+        <div className="grid grid-cols-3 gap-4">
+          <div className="space-y-2">
+            <Label>Env с authKey</Label>
+            <Input value={form.apiKeyEnvVar} onChange={e => setForm({ ...form, apiKeyEnvVar: e.target.value })} placeholder="GIGACHAT_AUTH_KEY" />
+          </div>
+          <div className="space-y-2">
+            <Label>OAuth token URL</Label>
+            <Input value={form.oauthTokenUrl} onChange={e => setForm({ ...form, oauthTokenUrl: e.target.value })} placeholder="https://ngw.devices.sberbank.ru:9443/api/v2/oauth" />
+          </div>
+          <div className="space-y-2">
+            <Label>Env со scope (опционально)</Label>
+            <Input value={form.oauthScopeEnvVar} onChange={e => setForm({ ...form, oauthScopeEnvVar: e.target.value })} placeholder="GIGACHAT_SCOPE" />
+          </div>
+        </div>
+      )}
+      {form.wireProtocol === 'YANDEXGPT' && (
+        <div className="grid grid-cols-2 gap-4">
+          <div className="space-y-2">
+            <Label>Доп. заголовок (имя)</Label>
+            <Input value={form.extraHeaderName} onChange={e => setForm({ ...form, extraHeaderName: e.target.value })} placeholder="x-folder-id" />
+          </div>
+          <div className="space-y-2">
+            <Label>Env со значением заголовка</Label>
+            <Input value={form.extraHeaderEnvVar} onChange={e => setForm({ ...form, extraHeaderEnvVar: e.target.value })} placeholder="YANDEX_FOLDER_ID" />
+          </div>
+        </div>
+      )}
+
+      <div className="flex items-start gap-3">
+        <input type="checkbox" checked={form.isEnabled} onChange={e => setForm({ ...form, isEnabled: e.target.checked })}
+          className="mt-0.5 h-4 w-4 rounded border-input bg-background accent-foreground cursor-pointer" />
+        <label className="text-sm font-medium cursor-pointer">Модель включена</label>
+      </div>
+    </div>
+  )
+
+  return (
+    <div className="p-5 space-y-5">
+      {err && <Alert variant="destructive"><AlertDescription>{err}</AlertDescription></Alert>}
+      <div className="flex items-center justify-between">
+        <p className="text-xs text-muted-foreground">
+          Провайдеры и модели — данные, не код. Добавляйте новые OpenAI-совместимые провайдеры без деплоя;
+          для нового протокола запроса/ответа (не OpenAI и не Yandex) всё ещё нужна правка кода прокси.
+        </p>
+        {!creating && (
+          <Button size="sm" variant="outline" onClick={startCreate}>
+            <Plus size={13} />Добавить модель
+          </Button>
+        )}
+      </div>
+
+      {creating && (
+        <Card>
+          <CardHeader className="py-3 px-5 border-b border-border/40 flex flex-row items-center justify-between">
+            <p className="text-sm font-medium">Новая модель</p>
+            <div className="flex gap-2">
+              <Button size="sm" variant="ghost" onClick={() => setCreating(false)}>Отмена</Button>
+              <Button size="sm" disabled={saving} onClick={create}>
+                {saving && <Loader2 size={13} className="animate-spin" />}Создать
+              </Button>
+            </div>
+          </CardHeader>
+          <CardContent className="p-5">{editForm}</CardContent>
+        </Card>
+      )}
+
+      {models.map(m => (
+        <Card key={m.id}>
+          <CardHeader className="py-3 px-5 border-b border-border/40 flex flex-row items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Globe size={14} className="text-muted-foreground" />
+              <p className="text-sm font-medium font-mono">{m.key}</p>
+              <Badge variant="muted" className="text-[10px]">{m.wireProtocol}</Badge>
+              {!m.isEnabled && <Badge variant="destructive" className="text-[10px]">выключена</Badge>}
+            </div>
+            {editing !== m.id ? (
+              <div className="flex gap-2">
+                <Button size="sm" variant="outline" onClick={() => startEdit(m)}>
+                  <Pencil size={13} />Изменить
+                </Button>
+                <Button size="sm" variant="ghost" onClick={() => remove(m.id)}>
+                  <Trash2 size={13} />
+                </Button>
+              </div>
+            ) : (
+              <div className="flex gap-2">
+                <Button size="sm" variant="ghost" onClick={() => setEditing(null)}>Отмена</Button>
+                <Button size="sm" disabled={saving} onClick={() => save(m.id)}>
+                  {saving && <Loader2 size={13} className="animate-spin" />}Сохранить
+                </Button>
+              </div>
+            )}
+          </CardHeader>
+          <CardContent className="p-5">
+            {editing !== m.id ? (
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-sm">
+                <div><p className="text-xs text-muted-foreground mb-1">Название</p>{m.label}</div>
+                <div><p className="text-xs text-muted-foreground mb-1">Авторизация</p>{m.authMethod}</div>
+                <div className="col-span-2"><p className="text-xs text-muted-foreground mb-1">Base URL</p><span className="font-mono text-xs">{m.baseUrl}</span></div>
+                <div className="col-span-2"><p className="text-xs text-muted-foreground mb-1">Модель у провайдера</p><span className="font-mono text-xs">{m.upstreamModel}</span></div>
+              </div>
+            ) : editForm}
+          </CardContent>
+        </Card>
+      ))}
+    </div>
+  )
+}
+
 // ── Main ──────────────────────────────────────────────────
 
 const Admin = () => {
@@ -1212,6 +1562,7 @@ const Admin = () => {
               <TabsTrigger value="clients">OIDC-клиенты</TabsTrigger>
               <TabsTrigger value="broadcast">Рассылка писем</TabsTrigger>
               <TabsTrigger value="tariffs">Тарифы Вспышки</TabsTrigger>
+              <TabsTrigger value="models">Модели ИИ</TabsTrigger>
               <TabsTrigger value="settings">Режимы регистрации</TabsTrigger>
               <TabsTrigger value="logs">Логи системы</TabsTrigger>
             </TabsList>
@@ -1219,6 +1570,7 @@ const Admin = () => {
             <TabsContent value="clients"><ClientsTab /></TabsContent>
             <TabsContent value="broadcast"><BroadcastTab /></TabsContent>
             <TabsContent value="tariffs"><TariffsTab /></TabsContent>
+            <TabsContent value="models"><ModelsTab /></TabsContent>
             <TabsContent value="settings"><SettingsTab /></TabsContent>
             <TabsContent value="logs"><LogsTab /></TabsContent>
           </Card>

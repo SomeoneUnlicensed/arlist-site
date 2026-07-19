@@ -22,6 +22,19 @@ enum TariffType {
   PRO
 }
 
+// How the upstream API shapes request/response bodies.
+enum ModelWireProtocol {
+  OPENAI_COMPATIBLE // messages/model in, choices[0].message + usage out (DeepSeek, GigaChat, most others)
+  YANDEXGPT         // modelUri/completionOptions/messages[].text in, result.alternatives[] out
+}
+
+// How we obtain the credential to send upstream.
+enum ModelAuthMethod {
+  BEARER_ENV                  // static token straight from an env var
+  OAUTH2_CLIENT_CREDENTIALS   // exchange authKeyEnvVar for a short-lived token, cached (GigaChat-style)
+  API_KEY_HEADER              // static key from an env var sent as a custom header (Yandex-style)
+}
+
 model User {
   id            String   @id @default(cuid())
   email         String   @unique
@@ -35,6 +48,13 @@ model User {
   balanceKopecks Int     @default(0) // Кошелёк для овердрафта сверх лимита тарифа
   tariffId      String?
   tariff        Tariff?  @relation(fields: [tariffId], references: [id])
+
+  // Персональные исключения поверх тарифа — null/false = использовать тариф как есть.
+  creditsPer5hOverride   Int?
+  creditsPerWeekOverride Int?
+  modelsOverrideEnabled  Boolean  @default(false)
+  modelsOverride         String[] @default([])
+
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 
@@ -98,6 +118,31 @@ model Tariff {
   updatedAt           DateTime @updatedAt
 
   users               User[]
+}
+
+// Data-driven model/provider registry — lets admins add new upstream models
+// (and even new providers, as long as they speak a supported wire protocol)
+// without a code change. Actual secrets stay in env vars, never in the DB;
+// these columns just say *which* env var to read.
+model AiModel {
+  id            String            @id @default(cuid())
+  key           String            @unique // user-facing id, e.g. "deepseek-chat"
+  label         String            // shown in admin UI, e.g. "DeepSeek Chat"
+  wireProtocol  ModelWireProtocol
+  authMethod    ModelAuthMethod
+  baseUrl       String
+  upstreamModel String            // actual model name/URI segment sent upstream
+
+  apiKeyEnvVar    String? // BEARER_ENV, API_KEY_HEADER, and the OAuth authKey for OAUTH2_CLIENT_CREDENTIALS
+  headerName      String? // API_KEY_HEADER: header to send the key under (e.g. "x-folder-id" needs a second one — see extraHeaderEnvVar)
+  extraHeaderName    String? // second static header some providers need (e.g. Yandex "x-folder-id")
+  extraHeaderEnvVar  String? // env var holding that second header's value (e.g. YANDEX_FOLDER_ID)
+  oauthTokenUrl      String? // OAUTH2_CLIENT_CREDENTIALS: token endpoint
+  oauthScopeEnvVar   String? // OAUTH2_CLIENT_CREDENTIALS: env var holding the scope, if any
+
+  isEnabled     Boolean  @default(true)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 }
 
 model ApiKey {
