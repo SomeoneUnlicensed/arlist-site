@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import axios from 'axios'
 import { useNavigate } from 'react-router-dom'
-import { LogOut, ShieldCheck, Check, Pencil, X, KeyRound, User, Home, Lock, ChevronRight, Wallet, CreditCard, Smartphone, Bitcoin, Terminal, BarChart3, AlertTriangle } from 'lucide-react'
+import { LogOut, ShieldCheck, Check, Pencil, X, KeyRound, User, Home, Lock, Wallet, BarChart3, AlertTriangle } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -10,7 +10,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert'
 import { cn } from '@/lib/utils'
 
 const GRADIENTS = [
-  'from-violet-600 via-purple-500 to-pink-500',
+  'from-lime-700 via-purple-500 to-pink-500',
   'from-blue-600 via-cyan-500 to-teal-400',
   'from-emerald-500 via-green-400 to-lime-400',
   'from-orange-500 via-rose-500 to-pink-600',
@@ -96,7 +96,7 @@ const ChangePassword = () => {
   return (
     <form onSubmit={submit} className="space-y-3">
       {msg && <Alert variant={msg.type === 'ok' ? 'success' : 'destructive'}><AlertDescription>{msg.text}</AlertDescription></Alert>}
-      <div className="grid grid-cols-2 gap-3">
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
         <div className="space-y-1.5">
           <Label htmlFor="cur-pw">Текущий пароль</Label>
           <Input id="cur-pw" type="password" value={current} onChange={e => setCurrent(e.target.value)} autoComplete="current-password" required className="h-9" />
@@ -114,22 +114,21 @@ const ChangePassword = () => {
   )
 }
 
-type Section = 'profile' | 'security' | 'usage' | 'billing'
+type Section = 'profile' | 'security' | 'usage'
+
+const profileSections = [
+  { id: 'profile' as Section, icon: User, label: 'Профиль' },
+  { id: 'security' as Section, icon: Lock, label: 'Безопасность' },
+  { id: 'usage' as Section, icon: BarChart3, label: 'Использование' },
+]
 
 const Sidebar = ({ user, active, setActive, onLogout, onAdmin }:
   { user: any; active: Section; setActive: (s: Section) => void; onLogout: () => void; onAdmin: () => void }) => {
 
-  const nav = [
-    { id: 'profile' as Section, icon: User, label: 'Профиль' },
-    { id: 'security' as Section, icon: Lock, label: 'Безопасность' },
-    { id: 'usage' as Section, icon: BarChart3, label: 'Использование' },
-    ...(user.role === 'ADMIN' ? [{ id: 'billing' as Section, icon: Wallet, label: 'Тарификация' }] : []),
-  ]
-
   return (
-    <aside className="w-60 shrink-0 border-r border-border/60 flex flex-col bg-card/40">
+    <aside className="hidden w-60 shrink-0 flex-col border-r border-border/60 bg-card/40 md:flex">
       <div className="h-14 flex items-center px-5 border-b border-border/60">
-        <a href="/" className="font-display text-base tracking-tight hover:opacity-75 transition-opacity">Arlist ID</a>
+        <a href="/" className="font-display text-base tracking-tight hover:opacity-75 transition-opacity">арлист id</a>
       </div>
 
       <div className="px-5 py-5 border-b border-border/40">
@@ -146,7 +145,7 @@ const Sidebar = ({ user, active, setActive, onLogout, onAdmin }:
       </div>
 
       <nav className="flex-1 px-3 py-4 space-y-0.5">
-        {nav.map(({ id, icon: Icon, label }) => (
+        {profileSections.map(({ id, icon: Icon, label }) => (
           <button key={id} onClick={() => setActive(id)}
             className={cn(
               'w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-colors',
@@ -163,7 +162,7 @@ const Sidebar = ({ user, active, setActive, onLogout, onAdmin }:
       <div className="px-3 py-4 border-t border-border/40 space-y-0.5">
         {user.role === 'ADMIN' && (
           <button onClick={onAdmin}
-            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-muted-foreground hover:text-violet-400 hover:bg-violet-500/10 transition-colors">
+            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-muted-foreground hover:text-lime-700 hover:bg-lime-700/10 transition-colors">
             <ShieldCheck size={16} /> Управление
           </button>
         )}
@@ -180,9 +179,26 @@ const Sidebar = ({ user, active, setActive, onLogout, onAdmin }:
   )
 }
 
+const MobileNavigation = ({ user, active, setActive, onLogout, onAdmin }:
+  { user: any; active: Section; setActive: (section: Section) => void; onLogout: () => void; onAdmin: () => void }) => (
+  <header className="sticky top-0 z-30 border-b border-border/60 bg-background/90 backdrop-blur-xl md:hidden">
+    <div className="flex h-14 items-center justify-between px-4">
+      <a href="/" className="font-display text-base tracking-tight">арлист id</a>
+      <div className="flex items-center gap-1">
+        {user.role === 'ADMIN' && <button type="button" onClick={onAdmin} aria-label="Управление" className="rounded-lg p-2 text-muted-foreground hover:bg-accent hover:text-foreground"><ShieldCheck size={17} /></button>}
+        <a href="/" aria-label="На главную" className="rounded-lg p-2 text-muted-foreground hover:bg-accent hover:text-foreground"><Home size={17} /></a>
+        <button type="button" onClick={onLogout} aria-label="Выйти" className="rounded-lg p-2 text-muted-foreground hover:bg-red-500/10 hover:text-red-500"><LogOut size={17} /></button>
+      </div>
+    </div>
+    <nav className="flex overflow-x-auto px-2 pb-2">
+      {profileSections.map(({ id, icon: Icon, label }) => <button key={id} type="button" onClick={() => setActive(id)} className={cn('flex shrink-0 items-center gap-2 rounded-lg px-3 py-2 text-xs', active === id ? 'bg-accent font-medium text-foreground' : 'text-muted-foreground')}><Icon size={14} />{label}</button>)}
+    </nav>
+  </header>
+)
+
 const UsageGauge = ({ percent, label }: { percent: number; label: string }) => {
   const pct = Math.min(100, Math.max(0, percent))
-  const color = pct >= 90 ? 'bg-red-500' : pct >= 70 ? 'bg-amber-500' : 'bg-violet-500'
+  const color = pct >= 90 ? 'bg-red-500' : pct >= 70 ? 'bg-amber-500' : 'bg-lime-700'
   return (
     <div className="space-y-1.5">
       <div className="flex justify-between text-sm">
@@ -205,26 +221,26 @@ const UsageSection = () => {
   }, [])
 
   if (loading) return (
-    <div className="px-10 pt-14 pb-10">
+    <div className="px-5 pb-10 pt-9 sm:px-8 md:px-10 md:pt-14">
       <p className="text-sm text-muted-foreground">Загрузка...</p>
     </div>
   )
 
   if (!stats) return (
-    <div className="px-10 pt-14 pb-10">
+    <div className="px-5 pb-10 pt-9 sm:px-8 md:px-10 md:pt-14">
       <p className="text-sm text-muted-foreground">Не удалось загрузить статистику</p>
     </div>
   )
 
   return (
-    <div className="px-10 pt-14 pb-10">
+    <div className="px-5 pb-10 pt-9 sm:px-8 md:px-10 md:pt-14">
       <h1 className="text-2xl font-semibold tracking-tight mb-1">Использование</h1>
-      <p className="text-muted-foreground text-sm mb-8">Использование и лимиты тарифа</p>
+      <p className="text-muted-foreground text-sm mb-8">Фактический расход токенов и доступные лимиты</p>
 
       <div className="max-w-2xl space-y-6">
         <div className="rounded-xl border border-border/50 bg-card/60 p-5">
           <div className="flex items-center justify-between mb-4">
-            <p className="text-sm font-medium">Тариф: {stats.tariff.name}</p>
+            <p className="text-sm font-medium">Лимиты: {stats.tariff.name}</p>
             <Badge variant="purple" className="text-[10px] px-2 py-0">{stats.tariff.type}</Badge>
           </div>
           <div className="space-y-4">
@@ -275,10 +291,6 @@ const Profile = () => {
   const [active, setActive] = useState<Section>('profile')
   const navigate = useNavigate()
 
-  const [billingMethod, setBillingMethod] = useState<'card' | 'sbp' | null>('card')
-  const [billingAmount, setBillingAmount] = useState<string>('500')
-  const [billingMessage, setBillingMessage] = useState<string | null>(null)
-
   useEffect(() => {
     axios.get('/api/auth/profile').then(r => setUser(r.data)).catch(() => navigate('/login'))
   }, [navigate])
@@ -294,18 +306,19 @@ const Profile = () => {
   const grad = avatarGradient((user.name || user.email || '?').slice(0, 1).toUpperCase())
 
   return (
-    <div className="h-screen flex overflow-hidden bg-background">
+    <div className="flex min-h-screen flex-col bg-background md:h-screen md:flex-row md:overflow-hidden">
       <Sidebar user={user} active={active} setActive={setActive} onLogout={logout} onAdmin={() => navigate('/admin')} />
+      <MobileNavigation user={user} active={active} setActive={setActive} onLogout={logout} onAdmin={() => navigate('/admin')} />
 
-      <main className="flex-1 overflow-y-auto">
+      <main className="min-w-0 flex-1 overflow-y-auto">
         {active === 'profile' && (
           <div className="min-h-full flex flex-col">
-            <div className="relative overflow-hidden px-10 pt-14 pb-16 border-b border-border/60" style={{ background: 'linear-gradient(to bottom, hsl(var(--background)), hsl(var(--background)) 70%, transparent)' }}>
+            <div className="relative overflow-hidden border-b border-border/60 px-5 pb-12 pt-10 sm:px-8 md:px-10 md:pb-16 md:pt-14" style={{ background: 'linear-gradient(to bottom, hsl(var(--background)), hsl(var(--background)) 70%, transparent)' }}>
               <div className={cn('absolute -top-20 -left-20 w-96 h-96 rounded-full bg-gradient-to-br opacity-10 blur-3xl pointer-events-none', grad)} />
               <div className={cn('absolute -bottom-10 right-10 w-64 h-64 rounded-full bg-gradient-to-br opacity-5 blur-3xl pointer-events-none', grad)} />
 
               <p className="text-muted-foreground text-base mb-1">{greeting()},</p>
-              <h1 className={cn('text-5xl font-bold tracking-tight bg-gradient-to-r bg-clip-text text-transparent', grad)}>
+              <h1 className={cn('break-words text-4xl font-bold tracking-tight bg-gradient-to-r bg-clip-text text-transparent sm:text-5xl', grad)}>
                 {user.name || user.email.split('@')[0]}
               </h1>
               <p className="text-muted-foreground mt-3 text-sm">
@@ -313,7 +326,7 @@ const Profile = () => {
               </p>
             </div>
 
-            <div className="px-10 pt-8 pb-6 grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 gap-4 px-5 pb-6 pt-8 sm:px-8 lg:grid-cols-3 lg:px-10">
               <InfoCard label="Email" value={user.email} />
               <InfoCard label="Имя">
                 <EditName initial={user.name || ''} onSaved={name => setUser({ ...user, name })} />
@@ -321,7 +334,7 @@ const Profile = () => {
               <InfoCard label="ID" value={user.id} mono />
             </div>
 
-            <div className="px-10 pb-10">
+            <div className="px-5 pb-10 sm:px-8 lg:px-10">
               <div className="rounded-xl border border-border/50 bg-card/60 divide-y divide-border/40">
                 <Row label="Роль" value={user.role === 'ADMIN' ? 'Администратор' : 'Пользователь'} />
                 <Row label="Статус" value={user.isVerified ? 'Подтверждён' : 'Не подтверждён'} />
@@ -332,7 +345,7 @@ const Profile = () => {
         )}
 
         {active === 'security' && (
-          <div className="px-10 pt-14 pb-10">
+          <div className="px-5 pb-10 pt-9 sm:px-8 md:px-10 md:pt-14">
             <h1 className="text-2xl font-semibold tracking-tight mb-1">Безопасность</h1>
             <p className="text-muted-foreground text-sm mb-8">Управление паролем и доступом</p>
             <div className="max-w-lg">
@@ -346,84 +359,6 @@ const Profile = () => {
 
         {active === 'usage' && <UsageSection />}
 
-        {active === 'billing' && (
-          <div className="px-10 pt-14 pb-10">
-            <h1 className="text-2xl font-semibold tracking-tight mb-1">Тарификация</h1>
-            <p className="text-muted-foreground text-sm mb-8">Баланс и способы пополнения</p>
-
-            <div className="max-w-2xl space-y-6">
-              <div className="rounded-xl border border-border/50 bg-card/60 p-5 flex items-center justify-between">
-                <div>
-                  <p className="text-xs uppercase tracking-widest text-muted-foreground mb-2">Баланс</p>
-                  <p className="text-3xl font-bold tracking-tight">
-                    {((user.balanceKopecks ?? 0) / 100).toFixed(2)} ₽
-                  </p>
-                </div>
-                <Wallet size={32} className="text-muted-foreground/40" />
-              </div>
-
-              <div>
-                <p className="text-sm font-medium mb-3">Способ пополнения</p>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  {[
-                    { id: 'card' as const, icon: CreditCard, label: 'Банковская карта' },
-                    { id: 'sbp' as const, icon: Smartphone, label: 'СБП' },
-                  ].map(({ id, icon: Icon, label }) => (
-                    <button
-                      key={id}
-                      type="button"
-                      onClick={() => { setBillingMethod(id); setBillingMessage(null); }}
-                      className={cn(
-                        'relative rounded-xl border p-5 flex flex-col items-center gap-2 transition-all text-left w-full hover:bg-accent/40',
-                        billingMethod === id
-                          ? 'border-violet-500 bg-violet-500/10 text-foreground shadow-sm shadow-violet-500/15'
-                          : 'border-border/50 bg-card/40 text-muted-foreground'
-                      )}
-                    >
-                      <Icon size={22} className={billingMethod === id ? 'text-violet-400' : 'text-muted-foreground'} />
-                      <p className="text-sm font-medium text-center">{label}</p>
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              <form onSubmit={(e) => {
-                e.preventDefault();
-                const amt = parseFloat(billingAmount);
-                if (isNaN(amt) || amt <= 0) { setBillingMessage('Укажите корректную сумму'); return }
-                setBillingMessage(`Переход к оплате на сумму ${amt.toFixed(2)} ₽`);
-              }} className="space-y-4 border border-border/40 bg-card/40 p-5 rounded-xl">
-                <div className="space-y-2">
-                  <Label htmlFor="topup-amount" className="text-sm font-medium text-muted-foreground">Сумма пополнения (₽)</Label>
-                  <div className="flex gap-2 flex-wrap">
-                    {['100', '500', '1000', '5000'].map((val) => (
-                      <Button key={val} type="button" variant={billingAmount === val ? 'default' : 'outline'}
-                        onClick={() => { setBillingAmount(val); setBillingMessage(null) }}
-                        className={cn('h-9 px-4 text-sm font-medium', billingAmount === val ? 'bg-violet-600 hover:bg-violet-700 text-white' : '')}>
-                        {val} ₽
-                      </Button>
-                    ))}
-                  </div>
-                  <Input id="topup-amount" type="number" value={billingAmount}
-                    onChange={(e) => { setBillingAmount(e.target.value); setBillingMessage(null) }}
-                    className="max-w-xs mt-2 pr-8 text-base font-semibold" placeholder="Другая сумма" min="1" required />
-                </div>
-                <Button type="submit" className="w-full sm:w-auto px-6 bg-violet-600 hover:bg-violet-700 text-white">
-                  Пополнить баланс
-                </Button>
-              </form>
-
-              {billingMessage && (
-                <div className="p-5 rounded-xl border border-violet-500/20 bg-violet-950/10 flex items-center gap-3">
-                  <div className="w-7 h-7 rounded-lg bg-violet-600 flex items-center justify-center shrink-0">
-                    <Wallet size={14} className="text-white" />
-                  </div>
-                  <p className="text-sm text-foreground/90">{billingMessage}</p>
-                </div>
-              )}
-            </div>
-          </div>
-        )}
       </main>
     </div>
   )

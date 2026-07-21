@@ -6,9 +6,8 @@ import { rateLimit } from '../middleware/rateLimit.middleware.js';
 const router = Router();
 
 router.use(authenticateApiKey);
-router.use(rateLimit);
 
-router.post('/chat/completions', chatCompletions);
 router.get('/models', listModels);
+router.post('/chat/completions', rateLimit, chatCompletions);
 
 export default router;

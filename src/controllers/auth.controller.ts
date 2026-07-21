@@ -5,6 +5,7 @@ import crypto from 'crypto';
 import prisma from '../services/prisma.service.js';
 import { sendVerificationEmail, sendResetPasswordEmail, sendLogin2faEmail } from '../services/mail.service.js';
 import { getSettings } from '../services/settings.service.js';
+import { ensureDefaultFreeTariff } from '../services/defaultTariff.service.js';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'super-secret-key';
 
@@ -20,7 +21,7 @@ const issueAuthCookie = (res: Response, user: { id: string; role: string }) => {
 
 export const register = async (req: Request, res: Response) => {
   try {
-    const settings = getSettings();
+    const settings = await getSettings();
     if (settings.registrationMode === 'CLOSED') {
       return res.status(403).json({ error: 'Регистрация временно закрыта администратором' });
     }
@@ -33,7 +34,17 @@ export const register = async (req: Request, res: Response) => {
     if (existing) return res.status(400).json({ error: 'User already exists' });
 
     const passwordHash = await bcrypt.hash(password, 10);
-    const user = await prisma.user.create({ data: { email, passwordHash, name, isVerified: false, agreedToPolicy: true } });
+    const { tariff: freeTariff } = await ensureDefaultFreeTariff();
+    const user = await prisma.user.create({
+      data: {
+        email,
+        passwordHash,
+        name,
+        isVerified: false,
+        agreedToPolicy: true,
+        tariffId: freeTariff.id,
+      },
+    });
 
     const code = Math.floor(100000 + Math.random() * 900000).toString();
     await prisma.verificationToken.create({
@@ -112,7 +123,7 @@ export const login = async (req: Request, res: Response) => {
     const isMatch = await bcrypt.compare(password, user.passwordHash);
     if (!isMatch) return res.status(400).json({ error: 'Invalid credentials' });
 
-    if (getSettings().email2faEnabled) {
+    if ((await getSettings()).email2faEnabled) {
       await prisma.verificationToken.deleteMany({ where: { userId: user.id, type: 'LOGIN_2FA' } });
       const code = Math.floor(100000 + Math.random() * 900000).toString();
       await prisma.verificationToken.create({
@@ -251,7 +262,7 @@ export const changePassword = async (req: any, res: Response) => {
 
 export const getRegistrationStatus = async (req: Request, res: Response) => {
   try {
-    res.json(getSettings());
+    res.json(await getSettings());
   } catch {
     res.status(500).json({ error: 'Internal server error' });
   }

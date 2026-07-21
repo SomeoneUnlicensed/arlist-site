@@ -1,0 +1,9 @@
+User-agent: *
+Allow: /
+Disallow: /login
+Disallow: /register
+Disallow: /admin
+Disallow: /api/
+Disallow: /interaction/
+
+Sitemap: https://arlist.ru/sitemap.xml

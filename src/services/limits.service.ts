@@ -44,7 +44,8 @@ export async function checkLimits(userId: string): Promise<LimitCheck> {
     return {
       allowed: false,
       overrun: false,
-      usagePercent: { per5h: 100, week: 100 },
+      // No assigned tariff means "not configured", not "quota exhausted".
+      usagePercent: { per5h: 0, week: 0 },
       remaining: { per5h: 0, perWeek: 0 },
       balanceKopecks: user?.balanceKopecks ?? 0,
       overrunPriceKopecksPer1k: 0,

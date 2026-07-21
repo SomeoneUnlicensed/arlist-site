@@ -22,43 +22,82 @@ enum TariffType {
   PRO
 }
 
-model User {
-  id            String   @id @default(cuid())
-  email         String   @unique
-  passwordHash  String
-  name          String?
-  avatarUrl     String?
-  isVerified    Boolean  @default(false)
-  isBanned      Boolean  @default(false)
-  agreedToPolicy Boolean  @default(false)
-  role          Role     @default(USER)
-  balanceKopecks Int     @default(0) // Кошелёк для овердрафта сверх лимита тарифа
-  tariffId      String?
-  tariff        Tariff?  @relation(fields: [tariffId], references: [id])
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+enum TransparencyEntryType {
+  INCIDENT
+  ADVISORY
+}
 
-  tokens        VerificationToken[]
-  apiKeys       ApiKey[]
-  usageRecords  UsageRecord[]
-  deviceCodes   DeviceCode[]
+enum IncidentSeverity {
+  CRITICAL
+  HIGH
+  MEDIUM
+  LOW
+}
+
+enum IncidentStatus {
+  INVESTIGATING
+  IDENTIFIED
+  MONITORING
+  RESOLVED
+}
+
+enum ModelWireProtocol {
+  OPENAI_COMPATIBLE
+  YANDEXGPT
+}
+
+enum ModelAuthMethod {
+  BEARER_ENV
+  OAUTH2_CLIENT_CREDENTIALS
+  API_KEY_HEADER
+}
+
+enum RegistrationMode {
+  OPEN
+  CLOSED
+}
+
+model User {
+  id                     String   @id @default(cuid())
+  email                  String   @unique
+  passwordHash           String
+  name                   String?
+  avatarUrl              String?
+  isVerified             Boolean  @default(false)
+  isBanned               Boolean  @default(false)
+  agreedToPolicy         Boolean  @default(false)
+  role                   Role     @default(USER)
+  balanceKopecks         Int      @default(0) // Кошелёк для овердрафта сверх лимита тарифа
+  tariffId               String?
+  tariff                 Tariff?  @relation(fields: [tariffId], references: [id])
+  creditsPer5hOverride   Int?
+  creditsPerWeekOverride Int?
+  modelsOverrideEnabled  Boolean  @default(false)
+  modelsOverride         String[] @default([])
+  createdAt              DateTime @default(now())
+  updatedAt              DateTime @updatedAt
+
+  tokens       VerificationToken[]
+  apiKeys      ApiKey[]
+  usageRecords UsageRecord[]
+  deviceCodes  DeviceCode[]
 }
 
 model VerificationToken {
-  id        String   @id @default(cuid())
-  token     String   @unique
-  userId    String
-  expires   DateTime
-  type      String   // 'EMAIL_VERIFICATION' | 'PASSWORD_RESET'
+  id      String   @id @default(cuid())
+  token   String   @unique
+  userId  String
+  expires DateTime
+  type    String // 'EMAIL_VERIFICATION' | 'PASSWORD_RESET'
 
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
 }
 
 // Generic store for all oidc-provider state (sessions, codes, tokens, etc.)
 model OidcModel {
-  id         String   @id
+  id         String    @id
   type       String
   payload    Json
   grantId    String?
@@ -88,27 +127,27 @@ model Tariff {
   type                TariffType @unique
   name                String
   description         String?
-  priceMonth          Int      @default(0) // Абонплата в копейках
-  creditsPer5h        Int      @default(50000) // Кредиты = токены (prompt+output) за 5 часов
-  creditsPerWeek      Int      @default(300000) // Кредиты за неделю
+  priceMonth          Int        @default(0) // Абонплата в копейках
+  creditsPer5h        Int        @default(50000) // Кредиты = токены (prompt+output) за 5 часов
+  creditsPerWeek      Int        @default(300000) // Кредиты за неделю
   models              String[] // Список доступных моделей, '*' — все
-  overrunEnabled      Boolean  @default(false) // Разрешён ли платный овердрафт сверх лимита
-  overrunPriceKopecks Int      @default(0) // Цена за 1000 кредитов сверх лимита, списывается с balanceKopecks
-  createdAt           DateTime @default(now())
-  updatedAt           DateTime @updatedAt
+  overrunEnabled      Boolean    @default(false) // Разрешён ли платный овердрафт сверх лимита
+  overrunPriceKopecks Int        @default(0) // Цена за 1000 кредитов сверх лимита, списывается с balanceKopecks
+  createdAt           DateTime   @default(now())
+  updatedAt           DateTime   @updatedAt
 
-  users               User[]
+  users User[]
 }
 
 model ApiKey {
-  id        String   @id @default(cuid())
-  key       String   @unique
+  id        String    @id @default(cuid())
+  key       String    @unique
   userId    String
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  name      String   @default("default")
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name      String    @default("default")
   lastUsed  DateTime?
-  isRevoked Boolean  @default(false)
-  createdAt DateTime @default(now())
+  isRevoked Boolean   @default(false)
+  createdAt DateTime  @default(now())
 
   usageRecords UsageRecord[]
 
@@ -134,15 +173,62 @@ model UsageRecord {
 }
 
 model DeviceCode {
-  id          String    @id @default(cuid())
-  deviceCode  String    @unique
-  userCode    String    @unique
+  id          String   @id @default(cuid())
+  deviceCode  String   @unique
+  userCode    String   @unique
   userId      String?
-  user        User?     @relation(fields: [userId], references: [id], onDelete: SetNull)
-  isConfirmed Boolean   @default(false)
+  user        User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  isConfirmed Boolean  @default(false)
   expiresAt   DateTime
-  createdAt   DateTime  @default(now())
+  createdAt   DateTime @default(now())
 
   @@index([deviceCode])
   @@index([userCode])
+}
+
+model AiModel {
+  id                String            @id @default(cuid())
+  key               String            @unique
+  label             String
+  wireProtocol      ModelWireProtocol
+  authMethod        ModelAuthMethod
+  baseUrl           String
+  upstreamModel     String
+  apiKeyEnvVar      String?
+  headerName        String?
+  extraHeaderName   String?
+  extraHeaderEnvVar String?
+  oauthTokenUrl     String?
+  oauthScopeEnvVar  String?
+  isEnabled         Boolean           @default(true)
+  createdAt         DateTime          @default(now())
+  updatedAt         DateTime          @updatedAt
+}
+
+model SystemSetting {
+  id               String           @id @default("system")
+  registrationMode RegistrationMode @default(OPEN)
+  email2faEnabled  Boolean          @default(false)
+  updatedAt        DateTime         @updatedAt
+}
+
+model TransparencyEntry {
+  id               String                @id @default(cuid())
+  type             TransparencyEntryType
+  title            String
+  summary          String
+  severity         IncidentSeverity
+  status           IncidentStatus?
+  affectedServices String[]              @default([])
+  impact           String?
+  response         String?
+  recommendation   String?
+  publishedAt      DateTime              @default(now())
+  resolvedAt       DateTime?
+  isPublished      Boolean               @default(true)
+  createdAt        DateTime              @default(now())
+  updatedAt        DateTime              @updatedAt
+
+  @@index([isPublished, publishedAt])
+  @@index([type, status])
 }

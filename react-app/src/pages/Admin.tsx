@@ -41,7 +41,7 @@ const StatsBar = () => {
     { icon: Users, label: 'Всего пользователей', value: stats.totalUsers, color: 'text-blue-400', bg: 'bg-blue-500/5 border-blue-500/10' },
     { icon: Activity, label: 'Верифицировано', value: stats.verifiedUsers, color: 'text-emerald-400', bg: 'bg-emerald-500/5 border-emerald-500/10' },
     { icon: Ban, label: 'Заблокировано', value: stats.bannedUsers, color: 'text-red-400', bg: 'bg-red-500/5 border-red-500/10' },
-    { icon: AppWindow, label: 'OIDC-клиенты', value: stats.totalClients, color: 'text-violet-400', bg: 'bg-violet-500/5 border-violet-500/10' },
+    { icon: AppWindow, label: 'OIDC-клиенты', value: stats.totalClients, color: 'text-lime-700', bg: 'bg-lime-700/5 border-lime-700/10' },
   ]
 
   return (
@@ -171,7 +171,7 @@ const UsersTab = () => {
 
   if (loading) return (
     <div className="flex items-center justify-center py-20 text-muted-foreground gap-2 text-sm">
-      <Loader2 size={18} className="animate-spin text-violet-500" /> Загрузка списка пользователей...
+      <Loader2 size={18} className="animate-spin text-lime-700" /> Загрузка списка пользователей...
     </div>
   )
 
@@ -252,7 +252,7 @@ const UsersTab = () => {
           Пользователи по заданным критериям поиска не найдены
         </div>
       ) : (
-        <div className="overflow-x-auto">
+        <div className="scrollbar-none overflow-x-auto">
           <table className="w-full text-xs">
             <thead>
               <tr className="border-b border-border/40 bg-muted/10">
@@ -300,7 +300,7 @@ const UsersTab = () => {
                           />
                           <span className="absolute right-2 top-1/2 -translate-y-1/2 text-[10px] text-muted-foreground font-semibold">₽</span>
                         </div>
-                        <Button size="sm" onClick={() => saveBalance(u.id)} disabled={balanceSaving} className="h-8 px-2 bg-violet-600 hover:bg-violet-700 text-white">
+                        <Button size="sm" onClick={() => saveBalance(u.id)} disabled={balanceSaving} className="h-8 px-2 bg-lime-700 hover:bg-lime-800 text-white">
                           {balanceSaving ? <Loader2 size={12} className="animate-spin" /> : <Check size={12} />}
                         </Button>
                         <Button size="sm" variant="ghost" onClick={() => setEditingBalanceId(null)} className="h-8 px-2 text-muted-foreground hover:bg-accent">
@@ -383,7 +383,7 @@ const UsersTab = () => {
                           size="sm"
                           variant="outline"
                           onClick={() => promote(u.id, 'ADMIN')}
-                          className="h-7 text-[10px] font-semibold text-violet-400 border-violet-500/25 hover:bg-violet-500/10 hover:text-violet-300"
+                          className="h-7 text-[10px] font-semibold text-lime-700 border-lime-700/25 hover:bg-lime-700/10 hover:text-lime-700"
                         >
                           Админ
                         </Button>
@@ -476,7 +476,7 @@ const ClientsTab = () => {
           <CardHeader className="py-3 px-5 border-b border-border/40">
             <p className="text-xs uppercase tracking-widest text-muted-foreground font-normal">Приложения ({clients.length})</p>
           </CardHeader>
-          <div className="overflow-x-auto">
+          <div className="scrollbar-none overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-border/40">
@@ -566,7 +566,7 @@ const LogsTab = () => {
     <div className="p-5 space-y-4">
       <div className="flex items-center justify-between border-b border-border/40 pb-3">
         <p className="text-xs uppercase tracking-widest text-muted-foreground font-normal">Последние события безопасности</p>
-        <Badge variant="outline" className="text-[10px] text-violet-400 border-violet-500/20 bg-violet-500/5">
+        <Badge variant="outline" className="text-[10px] text-lime-700 border-lime-700/20 bg-lime-700/5">
           Живой поток событий
         </Badge>
       </div>
@@ -617,14 +617,14 @@ const standardEmailTemplate = (subject: string, content: string) => `
 <body>
   <div class="container">
     <div class="header">
-      <h1>Arlist ID</h1>
+      <h1>арлист id</h1>
     </div>
     <div class="content font-sans">
       <h2 style="color: #ffffff; margin-top: 0; margin-bottom: 20px; font-size: 18px; font-weight: 600;">${subject}</h2>
       ${content.replace(/\n/g, '<br>')}
     </div>
     <div class="footer">
-      Это системное уведомление от платформы <a href="https://arlist.ru">Arlist ID</a>.
+      Это системное уведомление от платформы <a href="https://arlist.ru">арлист id</a>.
     </div>
   </div>
 </body>
@@ -791,7 +791,7 @@ const BroadcastTab = () => {
             <div className="space-y-2">
               <div className="flex items-center justify-between">
                 <Label htmlFor="email-html" className="text-xs">HTML код письма</Label>
-                <Button type="button" variant="outline" size="sm" onClick={checkHtml} className="h-7 text-[10px] px-2 gap-1 border-violet-500/20 text-violet-400 hover:bg-violet-500/10">
+                <Button type="button" variant="outline" size="sm" onClick={checkHtml} className="h-7 text-[10px] px-2 gap-1 border-lime-700/20 text-lime-700 hover:bg-lime-700/10">
                   <Check size={10} />Проверить разметку
                 </Button>
               </div>
@@ -815,7 +815,7 @@ const BroadcastTab = () => {
             </div>
           )}
 
-          <Button type="submit" disabled={loading} className="w-full h-9 bg-violet-600 hover:bg-violet-700 text-white font-semibold text-xs">
+          <Button type="submit" disabled={loading} className="w-full h-9 bg-lime-700 hover:bg-lime-800 text-white font-semibold text-xs">
             {loading ? <Loader2 size={14} className="animate-spin mr-1.5" /> : <Mail size={14} className="mr-1.5" />}
             {loading ? 'Отправка писем...' : 'Запустить рассылку'}
           </Button>
@@ -895,7 +895,7 @@ const SettingsTab = () => {
 
   if (loading) return (
     <div className="flex items-center justify-center py-20 text-muted-foreground gap-2 text-sm">
-      <Loader2 size={18} className="animate-spin text-violet-500" /> Загрузка настроек системы...
+      <Loader2 size={18} className="animate-spin text-lime-700" /> Загрузка настроек системы...
     </div>
   )
 
@@ -1032,6 +1032,112 @@ const SettingsTab = () => {
   )
 }
 
+// ── Transparency incidents tab ───────────────────────────
+
+const EMPTY_INCIDENT = {
+  type: 'INCIDENT',
+  title: '',
+  summary: '',
+  severity: 'MEDIUM',
+  status: 'INVESTIGATING',
+  affectedServices: '',
+  impact: '',
+  response: '',
+  recommendation: '',
+  publishedAt: new Date().toISOString().slice(0, 10),
+  isPublished: true,
+}
+
+const incidentStatusLabels: Record<string, string> = {
+  INVESTIGATING: 'Расследуем',
+  IDENTIFIED: 'Причина найдена',
+  MONITORING: 'Наблюдаем',
+  RESOLVED: 'Устранён',
+}
+
+const IncidentsTab = () => {
+  const [entries, setEntries] = useState<any[]>([])
+  const [creating, setCreating] = useState(false)
+  const [form, setForm] = useState<any>(EMPTY_INCIDENT)
+  const [saving, setSaving] = useState(false)
+  const [err, setErr] = useState('')
+
+  const load = async () => {
+    try {
+      const { data } = await axios.get('/api/admin/transparency')
+      setEntries(data)
+    } catch { setErr('Не удалось загрузить реестр') }
+  }
+
+  useEffect(() => { load() }, [])
+
+  const create = async () => {
+    setSaving(true); setErr('')
+    try {
+      await axios.post('/api/admin/transparency', {
+        ...form,
+        status: form.type === 'INCIDENT' ? form.status : null,
+        affectedServices: form.affectedServices.split(',').map((item: string) => item.trim()).filter(Boolean),
+      })
+      setCreating(false)
+      setForm({ ...EMPTY_INCIDENT, publishedAt: new Date().toISOString().slice(0, 10) })
+      await load()
+    } catch (e: any) { setErr(e.response?.data?.error || 'Не удалось создать запись') }
+    finally { setSaving(false) }
+  }
+
+  const patchEntry = async (id: string, patch: Record<string, unknown>) => {
+    setErr('')
+    try {
+      const { data } = await axios.patch(`/api/admin/transparency/${id}`, patch)
+      setEntries((current) => current.map((entry) => entry.id === id ? data : entry))
+    } catch (e: any) { setErr(e.response?.data?.error || 'Не удалось обновить запись') }
+  }
+
+  const remove = async (id: string) => {
+    if (!confirm('Удалить запись из реестра без возможности восстановления?')) return
+    try {
+      await axios.delete(`/api/admin/transparency/${id}`)
+      setEntries((current) => current.filter((entry) => entry.id !== id))
+    } catch (e: any) { setErr(e.response?.data?.error || 'Не удалось удалить запись') }
+  }
+
+  const fieldClass = 'w-full rounded-md border border-input bg-background px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-ring'
+
+  return <div className="p-5 space-y-5">
+    {err && <Alert variant="destructive"><AlertDescription>{err}</AlertDescription></Alert>}
+    <div className="flex items-start justify-between gap-4">
+      <div><p className="text-sm font-medium">Публичный реестр</p><p className="mt-1 text-xs text-muted-foreground">Инциденты, предупреждения безопасности и ход устранения на странице прозрачности.</p></div>
+      {!creating && <Button size="sm" onClick={() => setCreating(true)}><Plus size={13} />Создать запись</Button>}
+    </div>
+
+    {creating && <Card>
+      <CardHeader className="flex flex-row items-center justify-between border-b border-border/40 px-5 py-3"><p className="text-sm font-medium">Новая публикация</p><Button size="sm" variant="ghost" onClick={() => setCreating(false)}>Отмена</Button></CardHeader>
+      <CardContent className="space-y-4 p-5">
+        <div className="grid gap-4 sm:grid-cols-3">
+          <div className="space-y-2"><Label>Тип</Label><select className={fieldClass} value={form.type} onChange={e => setForm({ ...form, type: e.target.value })}><option value="INCIDENT">Инцидент</option><option value="ADVISORY">Предупреждение</option></select></div>
+          <div className="space-y-2"><Label>Серьёзность</Label><select className={fieldClass} value={form.severity} onChange={e => setForm({ ...form, severity: e.target.value })}><option value="CRITICAL">Критическая</option><option value="HIGH">Высокая</option><option value="MEDIUM">Средняя</option><option value="LOW">Низкая</option></select></div>
+          {form.type === 'INCIDENT' && <div className="space-y-2"><Label>Статус</Label><select className={fieldClass} value={form.status} onChange={e => setForm({ ...form, status: e.target.value })}>{Object.entries(incidentStatusLabels).map(([value, label]) => <option key={value} value={value}>{label}</option>)}</select></div>}
+        </div>
+        <div className="space-y-2"><Label>Заголовок</Label><Input value={form.title} onChange={e => setForm({ ...form, title: e.target.value })} placeholder="Кратко и без маркетинговых формулировок" /></div>
+        <div className="space-y-2"><Label>Краткое описание</Label><textarea className={`${fieldClass} min-h-24 resize-y`} value={form.summary} onChange={e => setForm({ ...form, summary: e.target.value })} /></div>
+        <div className="space-y-2"><Label>Затронутые сервисы</Label><Input value={form.affectedServices} onChange={e => setForm({ ...form, affectedServices: e.target.value })} placeholder="Arlist ID, ЛитКот — через запятую" /></div>
+        {form.type === 'INCIDENT' ? <div className="grid gap-4 sm:grid-cols-2"><div className="space-y-2"><Label>Влияние</Label><textarea className={`${fieldClass} min-h-24 resize-y`} value={form.impact} onChange={e => setForm({ ...form, impact: e.target.value })} /></div><div className="space-y-2"><Label>Принятые меры</Label><textarea className={`${fieldClass} min-h-24 resize-y`} value={form.response} onChange={e => setForm({ ...form, response: e.target.value })} /></div></div> : <div className="space-y-2"><Label>Рекомендация пользователям</Label><textarea className={`${fieldClass} min-h-24 resize-y`} value={form.recommendation} onChange={e => setForm({ ...form, recommendation: e.target.value })} /></div>}
+        <div className="flex flex-wrap items-end justify-between gap-4"><div className="space-y-2"><Label>Дата публикации</Label><Input type="date" value={form.publishedAt} onChange={e => setForm({ ...form, publishedAt: e.target.value })} /></div><label className="flex items-center gap-2 text-sm"><input type="checkbox" checked={form.isPublished} onChange={e => setForm({ ...form, isPublished: e.target.checked })} />Опубликовать сразу</label><Button disabled={saving || !form.title.trim() || !form.summary.trim()} onClick={create}>{saving && <Loader2 size={13} className="animate-spin" />}Создать</Button></div>
+      </CardContent>
+    </Card>}
+
+    {entries.length === 0 && !creating && <div className="rounded-xl border border-dashed border-border p-10 text-center text-sm text-muted-foreground">Реестр пуст. Создайте первый инцидент или предупреждение.</div>}
+    {entries.map(entry => <Card key={entry.id}>
+      <CardHeader className="flex flex-row items-start justify-between gap-4 border-b border-border/40 px-5 py-4">
+        <div><div className="flex flex-wrap items-center gap-2"><Badge variant={entry.type === 'INCIDENT' ? 'destructive' : 'purple'} className="text-[10px]">{entry.type === 'INCIDENT' ? 'Инцидент' : 'Предупреждение'}</Badge><Badge variant={entry.isPublished ? 'success' : 'muted'} className="text-[10px]">{entry.isPublished ? 'Опубликовано' : 'Черновик'}</Badge><span className="text-xs text-muted-foreground">{new Date(entry.publishedAt).toLocaleDateString('ru-RU')}</span></div><h3 className="mt-3 text-sm font-semibold">{entry.title}</h3></div>
+        <div className="flex gap-1"><Button size="sm" variant="outline" onClick={() => patchEntry(entry.id, { isPublished: !entry.isPublished })}><Eye size={13} />{entry.isPublished ? 'Скрыть' : 'Опубликовать'}</Button><Button size="sm" variant="ghost" onClick={() => remove(entry.id)}><Trash2 size={13} /></Button></div>
+      </CardHeader>
+      <CardContent className="p-5"><p className="text-sm leading-6 text-muted-foreground">{entry.summary}</p>{entry.affectedServices.length > 0 && <div className="mt-4 flex flex-wrap gap-2">{entry.affectedServices.map((service: string) => <Badge key={service} variant="muted">{service}</Badge>)}</div>}{entry.type === 'INCIDENT' && <div className="mt-5 flex flex-wrap gap-2">{Object.entries(incidentStatusLabels).map(([value, label]) => <button key={value} onClick={() => patchEntry(entry.id, { status: value, resolvedAt: value === 'RESOLVED' ? new Date().toISOString() : null })} className={cn('rounded-full border px-3 py-1 text-xs transition-colors', entry.status === value ? 'border-lime-700/40 bg-lime-700/10 text-lime-700' : 'border-border text-muted-foreground hover:text-foreground')}>{label}</button>)}</div>}</CardContent>
+    </Card>)}
+  </div>
+}
+
 // ── Tariffs tab ───────────────────────────────────────────
 
 const TariffsTab = () => {
@@ -1161,7 +1267,7 @@ const TariffsTab = () => {
                         className={cn(
                           'text-xs font-mono px-3 py-1.5 rounded-full border transition-colors',
                           form.models?.has(m)
-                            ? 'border-violet-500/40 bg-violet-500/10 text-violet-300'
+                            ? 'border-lime-700/40 bg-lime-700/10 text-lime-700'
                             : 'border-border/40 text-muted-foreground hover:border-border'
                         )}>
                         {m}
@@ -1178,6 +1284,101 @@ const TariffsTab = () => {
   )
 }
 
+// ── AI models tab ────────────────────────────────────────
+
+const EMPTY_MODEL = {
+  key: '', label: '', wireProtocol: 'OPENAI_COMPATIBLE', authMethod: 'BEARER_ENV',
+  baseUrl: '', upstreamModel: '', apiKeyEnvVar: '', headerName: '',
+  extraHeaderName: '', extraHeaderEnvVar: '', oauthTokenUrl: '', oauthScopeEnvVar: '',
+  isEnabled: false,
+}
+
+const ModelsTab = () => {
+  const [models, setModels] = useState<any[]>([])
+  const [form, setForm] = useState<any>(EMPTY_MODEL)
+  const [editing, setEditing] = useState<string | 'new' | null>(null)
+  const [saving, setSaving] = useState(false)
+  const [err, setErr] = useState('')
+
+  const load = async () => {
+    try {
+      const { data } = await axios.get('/api/admin/models')
+      setModels(data)
+    } catch { setErr('Не удалось загрузить реестр моделей') }
+  }
+
+  useEffect(() => { load() }, [])
+
+  const startEdit = (model: any) => {
+    setEditing(model.id)
+    setErr('')
+    setForm({
+      key: model.key, label: model.label, wireProtocol: model.wireProtocol, authMethod: model.authMethod,
+      baseUrl: model.baseUrl, upstreamModel: model.upstreamModel,
+      apiKeyEnvVar: model.apiKeyEnvVar ?? '', headerName: model.headerName ?? '',
+      extraHeaderName: model.extraHeaderName ?? '', extraHeaderEnvVar: model.extraHeaderEnvVar ?? '',
+      oauthTokenUrl: model.oauthTokenUrl ?? '', oauthScopeEnvVar: model.oauthScopeEnvVar ?? '',
+      isEnabled: model.isEnabled,
+    })
+  }
+
+  const payload = () => ({
+    ...form,
+    apiKeyEnvVar: form.apiKeyEnvVar || null,
+    headerName: form.headerName || null,
+    extraHeaderName: form.extraHeaderName || null,
+    extraHeaderEnvVar: form.extraHeaderEnvVar || null,
+    oauthTokenUrl: form.oauthTokenUrl || null,
+    oauthScopeEnvVar: form.oauthScopeEnvVar || null,
+  })
+
+  const save = async () => {
+    setSaving(true); setErr('')
+    try {
+      if (editing === 'new') await axios.post('/api/admin/models', payload())
+      else await axios.patch(`/api/admin/models/${editing}`, payload())
+      setEditing(null)
+      await load()
+    } catch (error: any) { setErr(error.response?.data?.error || 'Не удалось сохранить модель') }
+    finally { setSaving(false) }
+  }
+
+  const remove = async (id: string) => {
+    if (!confirm('Удалить модель из реестра?')) return
+    try {
+      await axios.delete(`/api/admin/models/${id}`)
+      await load()
+    } catch (error: any) { setErr(error.response?.data?.error || 'Не удалось удалить модель') }
+  }
+
+  const fields = (
+    <div className="space-y-5">
+      <div className="grid gap-4 sm:grid-cols-2">
+        <div className="space-y-2"><Label>Ключ модели</Label><Input value={form.key} onChange={e => setForm({ ...form, key: e.target.value })} placeholder="gemini-2.5-flash" /><p className="text-xs text-muted-foreground">Именно это значение передаёт клиент в поле model.</p></div>
+        <div className="space-y-2"><Label>Название в интерфейсе</Label><Input value={form.label} onChange={e => setForm({ ...form, label: e.target.value })} placeholder="Gemini 2.5 Flash" /></div>
+        <div className="space-y-2"><Label>API endpoint</Label><Input value={form.baseUrl} onChange={e => setForm({ ...form, baseUrl: e.target.value })} placeholder="https://provider.example/v1/chat/completions" /></div>
+        <div className="space-y-2"><Label>Модель у провайдера</Label><Input value={form.upstreamModel} onChange={e => setForm({ ...form, upstreamModel: e.target.value })} placeholder="provider-model-id" /></div>
+        <div className="space-y-2"><Label>Протокол</Label><select value={form.wireProtocol} onChange={e => setForm({ ...form, wireProtocol: e.target.value })} className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm"><option value="OPENAI_COMPATIBLE">OpenAI-compatible</option><option value="YANDEXGPT">YandexGPT</option></select></div>
+        <div className="space-y-2"><Label>Авторизация</Label><select value={form.authMethod} onChange={e => setForm({ ...form, authMethod: e.target.value })} className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm"><option value="BEARER_ENV">Bearer token из env</option><option value="API_KEY_HEADER">API key в заголовке</option><option value="OAUTH2_CLIENT_CREDENTIALS">OAuth2 client credentials</option></select></div>
+        <div className="space-y-2"><Label>Имя env-переменной с секретом</Label><Input value={form.apiKeyEnvVar} onChange={e => setForm({ ...form, apiKeyEnvVar: e.target.value.toUpperCase() })} placeholder="PROVIDER_API_KEY" /><p className="text-xs text-muted-foreground">Сам секрет в базу не записывается.</p></div>
+        {form.authMethod === 'API_KEY_HEADER' && form.wireProtocol === 'OPENAI_COMPATIBLE' && <div className="space-y-2"><Label>Название заголовка</Label><Input value={form.headerName} onChange={e => setForm({ ...form, headerName: e.target.value })} placeholder="x-api-key" /></div>}
+        {form.authMethod === 'OAUTH2_CLIENT_CREDENTIALS' && <><div className="space-y-2"><Label>OAuth token URL</Label><Input value={form.oauthTokenUrl} onChange={e => setForm({ ...form, oauthTokenUrl: e.target.value })} placeholder="https://provider.example/oauth" /></div><div className="space-y-2"><Label>Env-переменная scope</Label><Input value={form.oauthScopeEnvVar} onChange={e => setForm({ ...form, oauthScopeEnvVar: e.target.value.toUpperCase() })} placeholder="PROVIDER_SCOPE" /></div></>}
+        {form.wireProtocol === 'YANDEXGPT' && <><div className="space-y-2"><Label>Дополнительный заголовок</Label><Input value={form.extraHeaderName} onChange={e => setForm({ ...form, extraHeaderName: e.target.value })} placeholder="x-folder-id" /></div><div className="space-y-2"><Label>Env со значением заголовка</Label><Input value={form.extraHeaderEnvVar} onChange={e => setForm({ ...form, extraHeaderEnvVar: e.target.value.toUpperCase() })} placeholder="YANDEX_FOLDER_ID" /></div></>}
+      </div>
+      <label className="flex items-start gap-3 rounded-lg border border-border/60 p-3 text-sm"><input type="checkbox" checked={form.isEnabled} onChange={e => setForm({ ...form, isEnabled: e.target.checked })} className="mt-0.5 h-4 w-4 accent-foreground" /><span><span className="font-medium">Модель включена в прокси</span><span className="mt-0.5 block text-xs text-muted-foreground">После включения назначьте её нужным тарифам во вкладке «Тарифы Вспышки».</span></span></label>
+    </div>
+  )
+
+  return <div className="space-y-5 p-4 sm:p-5">
+    {err && <Alert variant="destructive"><AlertDescription>{err}</AlertDescription></Alert>}
+    <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between"><div><h2 className="text-sm font-semibold">Реестр моделей и провайдеров</h2><p className="mt-1 max-w-2xl text-xs leading-5 text-muted-foreground">OpenAI-совместимые модели добавляются без изменения кода. Здесь хранится конфигурация подключения, а секреты остаются только в окружении сервера.</p></div>{editing !== 'new' && <Button size="sm" variant="outline" className="shrink-0" onClick={() => { setEditing('new'); setForm(EMPTY_MODEL); setErr('') }}><Plus size={13} />Добавить модель</Button>}</div>
+
+    {editing === 'new' && <Card><CardHeader className="flex flex-row items-center justify-between gap-3 border-b border-border/40 px-4 py-3 sm:px-5"><p className="text-sm font-medium">Новая модель</p><div className="flex gap-2"><Button size="sm" variant="ghost" onClick={() => setEditing(null)}>Отмена</Button><Button size="sm" disabled={saving} onClick={save}>{saving && <Loader2 size={13} className="animate-spin" />}Сохранить</Button></div></CardHeader><CardContent className="p-4 sm:p-5">{fields}</CardContent></Card>}
+
+    {models.map(model => <Card key={model.id}><CardHeader className="flex flex-col gap-3 border-b border-border/40 px-4 py-3 sm:flex-row sm:items-center sm:justify-between sm:px-5"><div className="flex min-w-0 flex-wrap items-center gap-2"><Globe size={14} className="text-muted-foreground" /><span className="break-all font-mono text-sm font-medium">{model.key}</span><Badge variant={model.isEnabled ? 'success' : 'muted'} className="text-[10px]">{model.isEnabled ? 'включена' : 'выключена'}</Badge><Badge variant={model.isConfigured ? 'outline' : 'warning'} className="text-[10px]">{model.isConfigured ? 'секрет подключён' : 'нужен секрет'}</Badge></div><div className="flex gap-2">{editing === model.id ? <><Button size="sm" variant="ghost" onClick={() => setEditing(null)}>Отмена</Button><Button size="sm" disabled={saving} onClick={save}>{saving && <Loader2 size={13} className="animate-spin" />}Сохранить</Button></> : <><Button size="sm" variant="outline" onClick={() => startEdit(model)}><Pencil size={13} />Изменить</Button><Button size="sm" variant="ghost" aria-label={`Удалить ${model.label}`} onClick={() => remove(model.id)}><Trash2 size={13} /></Button></>}</div></CardHeader><CardContent className="p-4 sm:p-5">{editing === model.id ? fields : <div className="grid gap-4 text-sm sm:grid-cols-2 lg:grid-cols-4"><div><p className="mb-1 text-xs text-muted-foreground">Название</p>{model.label}</div><div><p className="mb-1 text-xs text-muted-foreground">Протокол</p>{model.wireProtocol}</div><div className="min-w-0 lg:col-span-2"><p className="mb-1 text-xs text-muted-foreground">Endpoint</p><span className="break-all font-mono text-xs">{model.baseUrl}</span></div><div><p className="mb-1 text-xs text-muted-foreground">Авторизация</p>{model.authMethod}</div><div><p className="mb-1 text-xs text-muted-foreground">Env</p><span className="font-mono text-xs">{model.apiKeyEnvVar || '—'}</span></div><div className="min-w-0 lg:col-span-2"><p className="mb-1 text-xs text-muted-foreground">Модель провайдера</p><span className="break-all font-mono text-xs">{model.upstreamModel}</span></div>{!model.isConfigured && <div className="sm:col-span-2 lg:col-span-4"><p className="text-xs text-amber-500">Добавьте в окружение сервера: {model.missingEnvVars.join(', ') || model.apiKeyEnvVar}</p></div>}</div>}</CardContent></Card>)}
+  </div>
+}
+
 // ── Main ──────────────────────────────────────────────────
 
 const Admin = () => {
@@ -1186,7 +1387,7 @@ const Admin = () => {
   return (
     <div className="min-h-screen flex flex-col">
       <header className="h-14 sticky top-0 z-50 border-b border-border/60 bg-background/80 backdrop-blur-xl flex items-center justify-between px-6">
-        <a href="/" className="font-display text-base tracking-tight hover:opacity-75 transition-opacity">Arlist ID</a>
+        <a href="/" className="font-display text-base tracking-tight hover:opacity-75 transition-opacity">арлист id</a>
         <Button variant="outline" size="sm" onClick={() => navigate('/profile')}>
           <ArrowLeft size={14} />Профиль
         </Button>
@@ -1194,12 +1395,12 @@ const Admin = () => {
 
       <main className="flex-1 max-w-5xl w-full mx-auto px-4 py-10 animate-fade-up">
         <div className="mb-6 flex items-center gap-3">
-          <div className="p-2 rounded-lg bg-violet-500/10 border border-violet-500/20">
-            <ShieldCheck size={18} className="text-violet-400" />
+          <div className="p-2 rounded-lg bg-lime-700/10 border border-lime-700/20">
+            <ShieldCheck size={18} className="text-lime-700" />
           </div>
           <div>
             <h1 className="text-lg font-semibold tracking-tight">Панель управления</h1>
-            <p className="text-sm text-muted-foreground">Arlist ID</p>
+            <p className="text-sm text-muted-foreground">арлист id</p>
           </div>
         </div>
 
@@ -1207,18 +1408,22 @@ const Admin = () => {
 
         <Tabs defaultValue="users">
           <Card className="overflow-hidden">
-            <TabsList className="rounded-none border-b border-border/60 bg-transparent px-2 gap-0">
+            <TabsList className="scrollbar-none overflow-x-auto rounded-none border-b border-border/60 bg-transparent px-2 gap-0">
               <TabsTrigger value="users">Пользователи</TabsTrigger>
               <TabsTrigger value="clients">OIDC-клиенты</TabsTrigger>
               <TabsTrigger value="broadcast">Рассылка писем</TabsTrigger>
+              <TabsTrigger value="incidents">Инциденты</TabsTrigger>
               <TabsTrigger value="tariffs">Тарифы Вспышки</TabsTrigger>
+              <TabsTrigger value="models">Модели ИИ</TabsTrigger>
               <TabsTrigger value="settings">Режимы регистрации</TabsTrigger>
               <TabsTrigger value="logs">Логи системы</TabsTrigger>
             </TabsList>
             <TabsContent value="users"><UsersTab /></TabsContent>
             <TabsContent value="clients"><ClientsTab /></TabsContent>
             <TabsContent value="broadcast"><BroadcastTab /></TabsContent>
+            <TabsContent value="incidents"><IncidentsTab /></TabsContent>
             <TabsContent value="tariffs"><TariffsTab /></TabsContent>
+            <TabsContent value="models"><ModelsTab /></TabsContent>
             <TabsContent value="settings"><SettingsTab /></TabsContent>
             <TabsContent value="logs"><LogsTab /></TabsContent>
           </Card>

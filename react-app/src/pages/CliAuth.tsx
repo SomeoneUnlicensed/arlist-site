@@ -65,7 +65,7 @@ const CliAuth = () => {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center px-4 py-12 gap-8 animate-fade-up">
         <div className="text-center space-y-2">
-          <div className="mx-auto w-14 h-14 rounded-2xl bg-gradient-to-br from-violet-500 to-blue-500 flex items-center justify-center shadow-lg shadow-violet-500/20 mb-4">
+          <div className="mx-auto w-14 h-14 rounded-2xl bg-gradient-to-br from-lime-700 to-blue-500 flex items-center justify-center shadow-lg shadow-lime-700/20 mb-4">
             <Terminal size={28} className="text-white" />
           </div>
           <h1 className="font-display text-4xl text-foreground tracking-tight">Подключение CLI</h1>
@@ -120,7 +120,7 @@ const CliAuth = () => {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center px-4 py-12 gap-8 animate-fade-up">
         <div className="text-center space-y-2">
-          <div className="mx-auto w-14 h-14 rounded-2xl bg-gradient-to-br from-violet-500 to-blue-500 flex items-center justify-center shadow-lg shadow-violet-500/20 mb-4">
+          <div className="mx-auto w-14 h-14 rounded-2xl bg-gradient-to-br from-lime-700 to-blue-500 flex items-center justify-center shadow-lg shadow-lime-700/20 mb-4">
             <Terminal size={28} className="text-white" />
           </div>
           <h1 className="font-display text-3xl text-foreground tracking-tight">Войди в аккаунт</h1>
@@ -131,9 +131,9 @@ const CliAuth = () => {
 
         <Card className="w-full max-w-sm shadow-2xl border-border/60">
           <CardContent className="pt-6 space-y-3">
-            <Alert className="border-violet-500/20 bg-violet-950/10">
+            <Alert className="border-lime-700/20 bg-lime-900/10">
               <AlertDescription className="flex items-center gap-2 text-sm">
-                <Check size={14} className="text-violet-400 shrink-0" />
+                <Check size={14} className="text-lime-700 shrink-0" />
                 Код <span className="font-mono text-foreground font-medium">{userCode}</span>
               </AlertDescription>
             </Alert>
@@ -158,7 +158,7 @@ const CliAuth = () => {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center px-4 py-12 gap-8 animate-fade-up">
         <div className="text-center space-y-2">
-          <div className="mx-auto w-14 h-14 rounded-2xl bg-gradient-to-br from-violet-500 to-blue-500 flex items-center justify-center shadow-lg shadow-violet-500/20 mb-4">
+          <div className="mx-auto w-14 h-14 rounded-2xl bg-gradient-to-br from-lime-700 to-blue-500 flex items-center justify-center shadow-lg shadow-lime-700/20 mb-4">
             <Terminal size={28} className="text-white" />
           </div>
           <h1 className="font-display text-3xl text-foreground tracking-tight">Подтверди устройство</h1>
@@ -174,9 +174,9 @@ const CliAuth = () => {
                 <AlertDescription>{error}</AlertDescription>
               </Alert>
             )}
-            <Alert className="border-violet-500/20 bg-violet-950/10">
+            <Alert className="border-lime-700/20 bg-lime-900/10">
               <AlertDescription className="flex items-center gap-2 text-sm">
-                <Check size={14} className="text-violet-400 shrink-0" />
+                <Check size={14} className="text-lime-700 shrink-0" />
                 Код: <span className="font-mono text-foreground font-medium">{userCode}</span>
               </AlertDescription>
             </Alert>
@@ -214,7 +214,7 @@ const CliAuth = () => {
               {Steps.map((s, i) => (
                 <div key={s.num} className="flex items-center gap-1.5">
                   <div className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold ${
-                    i < 3 ? 'bg-violet-600 text-white' : 'bg-accent text-muted-foreground'
+                    i < 3 ? 'bg-lime-700 text-white' : 'bg-accent text-muted-foreground'
                   }`}>
                     {i < 3 ? <Check size={14} /> : s.num}
                   </div>

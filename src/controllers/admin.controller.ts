@@ -3,6 +3,8 @@ import prisma from '../services/prisma.service.js';
 import crypto from 'crypto';
 import { getSettings, saveSettings } from '../services/settings.service.js';
 import { sendCustomEmail } from '../services/mail.service.js';
+import { invalidateModelRegistry } from '../services/modelRegistry.service.js';
+import { invalidateModelAuth } from '../services/modelAuth.service.js';
 
 // ── Stats ─────────────────────────────────────────────────
 
@@ -95,6 +97,12 @@ export const updateUser = async (req: Request, res: Response) => {
     const { id } = req.params as { id: string };
     const self = (req as any).user?.userId;
     const { isBanned, role, isVerified, balanceKopecks } = req.body;
+    if (isBanned !== undefined && typeof isBanned !== 'boolean') return res.status(400).json({ error: 'isBanned must be a boolean' });
+    if (isVerified !== undefined && typeof isVerified !== 'boolean') return res.status(400).json({ error: 'isVerified must be a boolean' });
+    if (role !== undefined && !['USER', 'ADMIN'].includes(role)) return res.status(400).json({ error: 'Invalid role' });
+    if (balanceKopecks !== undefined && (!Number.isSafeInteger(Number(balanceKopecks)) || Number(balanceKopecks) < 0)) {
+      return res.status(400).json({ error: 'balanceKopecks must be a non-negative integer' });
+    }
     if (id === self && isBanned === true) return res.status(400).json({ error: 'Нельзя забанить себя' });
     if (id === self && role !== undefined && role !== 'ADMIN') {
       return res.status(400).json({ error: 'Нельзя снять с себя права администратора' });
@@ -102,9 +110,9 @@ export const updateUser = async (req: Request, res: Response) => {
     const user = await prisma.user.update({
       where: { id },
       data: {
-        ...(isBanned !== undefined ? { isBanned: Boolean(isBanned) } : {}),
+        ...(isBanned !== undefined ? { isBanned } : {}),
         ...(role !== undefined ? { role } : {}),
-        ...(isVerified !== undefined ? { isVerified: Boolean(isVerified) } : {}),
+        ...(isVerified !== undefined ? { isVerified } : {}),
         ...(balanceKopecks !== undefined ? { balanceKopecks: Number(balanceKopecks) } : {}),
       },
       select: { id: true, email: true, role: true, isBanned: true, isVerified: true, balanceKopecks: true },
@@ -117,7 +125,7 @@ export const updateUser = async (req: Request, res: Response) => {
 
 export const getSystemSettings = async (req: Request, res: Response) => {
   try {
-    res.json(getSettings());
+    res.json(await getSettings());
   } catch {
     res.status(500).json({ error: 'Internal server error' });
   }
@@ -126,12 +134,15 @@ export const getSystemSettings = async (req: Request, res: Response) => {
 export const updateSystemSettings = async (req: Request, res: Response) => {
   try {
     const { registrationMode, email2faEnabled } = req.body;
-    if (registrationMode && !['OPEN', 'CLOSED'].includes(registrationMode)) {
+    if (registrationMode !== undefined && !['OPEN', 'CLOSED'].includes(registrationMode)) {
       return res.status(400).json({ error: 'Invalid registrationMode value' });
     }
-    const updated = saveSettings({
-      ...(registrationMode ? { registrationMode } : {}),
-      ...(email2faEnabled !== undefined ? { email2faEnabled: Boolean(email2faEnabled) } : {}),
+    if (email2faEnabled !== undefined && typeof email2faEnabled !== 'boolean') {
+      return res.status(400).json({ error: 'email2faEnabled must be a boolean' });
+    }
+    const updated = await saveSettings({
+      ...(registrationMode !== undefined ? { registrationMode } : {}),
+      ...(email2faEnabled !== undefined ? { email2faEnabled } : {}),
     });
     res.json(updated);
   } catch {
@@ -178,7 +189,16 @@ export const getTariffs = async (req: Request, res: Response) => {
   }
 };
 
-const KNOWN_MODELS = ['deepseek-chat', 'deepseek-reasoner', 'deepseek-v4-flash', 'gigachat', 'gigachat-pro', 'gigachat-max', 'yandexgpt', 'yandexgpt-lite', 'yandexgpt-pro'];
+async function validateModelKeys(models: unknown): Promise<string | null> {
+  if (!Array.isArray(models) || !models.every((model) => typeof model === 'string')) {
+    return 'models must be an array of strings';
+  }
+  if (models.includes('*')) return models.length === 1 ? null : 'Wildcard * must be the only model in the list';
+  const known = await prisma.aiModel.findMany({ select: { key: true } });
+  const knownKeys = new Set(known.map((model) => model.key));
+  const unknown = models.filter((model: string) => !knownKeys.has(model));
+  return unknown.length ? `Unknown or disabled model(s): ${unknown.join(', ')}` : null;
+}
 
 export const updateTariff = async (req: Request, res: Response) => {
   try {
@@ -186,13 +206,23 @@ export const updateTariff = async (req: Request, res: Response) => {
     const { name, description, models, creditsPer5h, creditsPerWeek, overrunEnabled, overrunPriceKopecks, priceMonth } = req.body;
 
     if (models !== undefined) {
-      if (!Array.isArray(models) || !models.every((m) => typeof m === 'string')) {
-        return res.status(400).json({ error: 'models must be an array of strings' });
+      const error = await validateModelKeys(models);
+      if (error) return res.status(400).json({ error });
+    }
+
+    const integerFields = { creditsPer5h, creditsPerWeek, overrunPriceKopecks, priceMonth };
+    for (const [field, value] of Object.entries(integerFields)) {
+      if (value === undefined) continue;
+      const number = Number(value);
+      if (!Number.isSafeInteger(number) || number < 0) {
+        return res.status(400).json({ error: `${field} must be a non-negative integer` });
       }
-      const unknown = models.filter((m: string) => m !== '*' && !KNOWN_MODELS.includes(m));
-      if (unknown.length > 0) {
-        return res.status(400).json({ error: `Unknown model(s): ${unknown.join(', ')}`, knownModels: KNOWN_MODELS });
+      if ((field === 'creditsPer5h' || field === 'creditsPerWeek') && number === 0) {
+        return res.status(400).json({ error: `${field} must be greater than zero` });
       }
+    }
+    if (overrunEnabled !== undefined && typeof overrunEnabled !== 'boolean') {
+      return res.status(400).json({ error: 'overrunEnabled must be a boolean' });
     }
 
     const tariff = await prisma.tariff.update({
@@ -203,7 +233,7 @@ export const updateTariff = async (req: Request, res: Response) => {
         ...(models !== undefined ? { models } : {}),
         ...(creditsPer5h !== undefined ? { creditsPer5h: Number(creditsPer5h) } : {}),
         ...(creditsPerWeek !== undefined ? { creditsPerWeek: Number(creditsPerWeek) } : {}),
-        ...(overrunEnabled !== undefined ? { overrunEnabled: Boolean(overrunEnabled) } : {}),
+        ...(overrunEnabled !== undefined ? { overrunEnabled } : {}),
         ...(overrunPriceKopecks !== undefined ? { overrunPriceKopecks: Number(overrunPriceKopecks) } : {}),
         ...(priceMonth !== undefined ? { priceMonth: Number(priceMonth) } : {}),
       },
@@ -216,5 +246,176 @@ export const updateTariff = async (req: Request, res: Response) => {
 };
 
 export const getKnownModels = async (req: Request, res: Response) => {
-  res.json({ models: KNOWN_MODELS });
+  try {
+    const models = await prisma.aiModel.findMany({ where: { isEnabled: true }, select: { key: true }, orderBy: { key: 'asc' } });
+    res.json({ models: models.map((model) => model.key) });
+  } catch {
+    res.status(500).json({ error: 'Internal server error' });
+  }
+};
+
+// ── AI model registry ─────────────────────────────────────
+
+const WIRE_PROTOCOLS = ['OPENAI_COMPATIBLE', 'YANDEXGPT'] as const;
+const AUTH_METHODS = ['BEARER_ENV', 'OAUTH2_CLIENT_CREDENTIALS', 'API_KEY_HEADER'] as const;
+const ENV_NAME_PATTERN = /^[A-Z_][A-Z0-9_]*$/;
+const MODEL_KEY_PATTERN = /^[a-z0-9][a-z0-9._/-]*$/;
+
+function optionalText(value: unknown): string | null {
+  if (value === null || value === undefined) return null;
+  const text = String(value).trim();
+  return text || null;
+}
+
+function validateModelInput(body: any, partial = false): string | null {
+  const required = ['key', 'label', 'wireProtocol', 'authMethod', 'baseUrl', 'upstreamModel'];
+  if (!partial) {
+    const missing = required.filter((field) => !String(body[field] ?? '').trim());
+    if (missing.length) return `Required fields: ${missing.join(', ')}`;
+  }
+  if (body.key !== undefined && !MODEL_KEY_PATTERN.test(String(body.key))) {
+    return 'Model key may contain lowercase letters, digits, dot, slash, underscore and hyphen';
+  }
+  if (body.wireProtocol !== undefined && !WIRE_PROTOCOLS.includes(body.wireProtocol)) {
+    return `wireProtocol must be one of: ${WIRE_PROTOCOLS.join(', ')}`;
+  }
+  if (body.authMethod !== undefined && !AUTH_METHODS.includes(body.authMethod)) {
+    return `authMethod must be one of: ${AUTH_METHODS.join(', ')}`;
+  }
+  if (body.isEnabled !== undefined && typeof body.isEnabled !== 'boolean') {
+    return 'isEnabled must be a boolean';
+  }
+  if (body.baseUrl !== undefined) {
+    try {
+      const url = new URL(String(body.baseUrl));
+      if (url.protocol !== 'https:' && url.hostname !== 'localhost') return 'baseUrl must use HTTPS';
+    } catch { return 'baseUrl must be a valid URL'; }
+  }
+  if (optionalText(body.oauthTokenUrl)) {
+    try {
+      const url = new URL(String(body.oauthTokenUrl));
+      if (url.protocol !== 'https:' && url.hostname !== 'localhost') return 'oauthTokenUrl must use HTTPS';
+    } catch { return 'oauthTokenUrl must be a valid URL'; }
+  }
+  for (const field of ['apiKeyEnvVar', 'extraHeaderEnvVar', 'oauthScopeEnvVar']) {
+    const value = optionalText(body[field]);
+    if (value && !ENV_NAME_PATTERN.test(value)) return `${field} must be an environment variable name`;
+  }
+  if (!partial) {
+    if (!optionalText(body.apiKeyEnvVar)) return 'apiKeyEnvVar is required';
+    if (body.authMethod === 'API_KEY_HEADER' && body.wireProtocol === 'OPENAI_COMPATIBLE' && !optionalText(body.headerName)) {
+      return 'headerName is required for API_KEY_HEADER';
+    }
+    if (body.authMethod === 'OAUTH2_CLIENT_CREDENTIALS' && !optionalText(body.oauthTokenUrl)) return 'oauthTokenUrl is required for OAuth2';
+    if (body.wireProtocol === 'YANDEXGPT' && (!optionalText(body.extraHeaderName) || !optionalText(body.extraHeaderEnvVar))) {
+      return 'extraHeaderName and extraHeaderEnvVar are required for YandexGPT';
+    }
+  }
+  return null;
+}
+
+function modelReadiness(model: any) {
+  const names = [model.apiKeyEnvVar, model.extraHeaderEnvVar]
+    .filter(Boolean) as string[];
+  const missingEnvVars = names.filter((name) => !process.env[name]);
+  const hasRequiredConfig = Boolean(model.apiKeyEnvVar)
+    && (model.authMethod !== 'API_KEY_HEADER' || model.wireProtocol === 'YANDEXGPT' || Boolean(model.headerName))
+    && (model.authMethod !== 'OAUTH2_CLIENT_CREDENTIALS' || Boolean(model.oauthTokenUrl))
+    && (model.wireProtocol !== 'YANDEXGPT' || Boolean(model.extraHeaderName && model.extraHeaderEnvVar));
+  return { ...model, isConfigured: hasRequiredConfig && missingEnvVars.length === 0, missingEnvVars };
+}
+
+export const getAiModels = async (_req: Request, res: Response) => {
+  try {
+    const models = await prisma.aiModel.findMany({ orderBy: [{ isEnabled: 'desc' }, { key: 'asc' }] });
+    res.json(models.map(modelReadiness));
+  } catch {
+    res.status(500).json({ error: 'Internal server error' });
+  }
+};
+
+export const createAiModel = async (req: Request, res: Response) => {
+  try {
+    const error = validateModelInput(req.body);
+    if (error) return res.status(400).json({ error });
+    const model = await prisma.aiModel.create({ data: {
+      key: String(req.body.key).trim(),
+      label: String(req.body.label).trim(),
+      wireProtocol: req.body.wireProtocol,
+      authMethod: req.body.authMethod,
+      baseUrl: String(req.body.baseUrl).trim(),
+      upstreamModel: String(req.body.upstreamModel).trim(),
+      apiKeyEnvVar: optionalText(req.body.apiKeyEnvVar),
+      headerName: optionalText(req.body.headerName),
+      extraHeaderName: optionalText(req.body.extraHeaderName),
+      extraHeaderEnvVar: optionalText(req.body.extraHeaderEnvVar),
+      oauthTokenUrl: optionalText(req.body.oauthTokenUrl),
+      oauthScopeEnvVar: optionalText(req.body.oauthScopeEnvVar),
+      isEnabled: req.body.isEnabled === true,
+    } });
+    invalidateModelRegistry();
+    res.status(201).json(modelReadiness(model));
+  } catch (error: any) {
+    if (error?.code === 'P2002') return res.status(409).json({ error: 'Model key already exists' });
+    res.status(500).json({ error: 'Internal server error' });
+  }
+};
+
+export const updateAiModel = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params as { id: string };
+    const existing = await prisma.aiModel.findUnique({ where: { id } });
+    if (!existing) return res.status(404).json({ error: 'Model not found' });
+    const error = validateModelInput({ ...existing, ...req.body });
+    if (error) return res.status(400).json({ error });
+    const textFields = ['key', 'label', 'baseUrl', 'upstreamModel'] as const;
+    const optionalFields = ['apiKeyEnvVar', 'headerName', 'extraHeaderName', 'extraHeaderEnvVar', 'oauthTokenUrl', 'oauthScopeEnvVar'] as const;
+    const data: Record<string, unknown> = {};
+    for (const field of textFields) if (req.body[field] !== undefined) data[field] = String(req.body[field]).trim();
+    for (const field of optionalFields) if (req.body[field] !== undefined) data[field] = optionalText(req.body[field]);
+    if (req.body.wireProtocol !== undefined) data.wireProtocol = req.body.wireProtocol;
+    if (req.body.authMethod !== undefined) data.authMethod = req.body.authMethod;
+    if (req.body.isEnabled !== undefined) data.isEnabled = req.body.isEnabled;
+    const newKey = typeof data.key === 'string' ? data.key : existing.key;
+    const referencingTariffs = newKey !== existing.key
+      ? await prisma.tariff.findMany({ where: { models: { has: existing.key } }, select: { id: true, models: true } })
+      : [];
+    const model = await prisma.$transaction(async (tx) => {
+      const updated = await tx.aiModel.update({ where: { id }, data });
+      for (const tariff of referencingTariffs) {
+        await tx.tariff.update({
+          where: { id: tariff.id },
+          data: { models: tariff.models.map((key) => key === existing.key ? newKey : key) },
+        });
+      }
+      return updated;
+    });
+    invalidateModelRegistry();
+    invalidateModelAuth(id);
+    res.json(modelReadiness(model));
+  } catch (error: any) {
+    if (error?.code === 'P2025') return res.status(404).json({ error: 'Model not found' });
+    if (error?.code === 'P2002') return res.status(409).json({ error: 'Model key already exists' });
+    res.status(500).json({ error: 'Internal server error' });
+  }
+};
+
+export const deleteAiModel = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params as { id: string };
+    const model = await prisma.aiModel.findUnique({ where: { id } });
+    if (!model) return res.status(404).json({ error: 'Model not found' });
+    const tariffs = await prisma.tariff.findMany({ select: { id: true, name: true, models: true } });
+    const usedBy = tariffs.filter((tariff) => tariff.models.includes('*') || tariff.models.includes(model.key));
+    if (usedBy.length) {
+      return res.status(409).json({ error: `Сначала уберите модель из тарифов: ${usedBy.map((tariff) => tariff.name).join(', ')}` });
+    }
+    await prisma.aiModel.delete({ where: { id } });
+    invalidateModelRegistry();
+    invalidateModelAuth(id);
+    res.json({ ok: true });
+  } catch (error: any) {
+    if (error?.code === 'P2025') return res.status(404).json({ error: 'Model not found' });
+    res.status(500).json({ error: 'Internal server error' });
+  }
 };
