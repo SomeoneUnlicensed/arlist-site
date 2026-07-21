@@ -252,7 +252,7 @@ const UsersTab = () => {
           Пользователи по заданным критериям поиска не найдены
         </div>
       ) : (
-        <div className="overflow-x-auto">
+        <div className="scrollbar-none overflow-x-auto">
           <table className="w-full text-xs">
             <thead>
               <tr className="border-b border-border/40 bg-muted/10">
@@ -476,7 +476,7 @@ const ClientsTab = () => {
           <CardHeader className="py-3 px-5 border-b border-border/40">
             <p className="text-xs uppercase tracking-widest text-muted-foreground font-normal">Приложения ({clients.length})</p>
           </CardHeader>
-          <div className="overflow-x-auto">
+          <div className="scrollbar-none overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-border/40">
@@ -1408,7 +1408,7 @@ const Admin = () => {
 
         <Tabs defaultValue="users">
           <Card className="overflow-hidden">
-            <TabsList className="overflow-x-auto rounded-none border-b border-border/60 bg-transparent px-2 gap-0">
+            <TabsList className="scrollbar-none overflow-x-auto rounded-none border-b border-border/60 bg-transparent px-2 gap-0">
               <TabsTrigger value="users">Пользователи</TabsTrigger>
               <TabsTrigger value="clients">OIDC-клиенты</TabsTrigger>
               <TabsTrigger value="broadcast">Рассылка писем</TabsTrigger>

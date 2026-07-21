@@ -54,13 +54,20 @@ app.get(['/', '/products', '/forEdu', '/contacts', '/docs', '/landings', '/legal
 // SPA static assets
 app.use(express.static(path.join(__dirname, '../dist-client'), { index: false }));
 
+// React SPA fallback must run before oidc-provider: the provider responds with
+// its own 404 for unknown paths instead of delegating them to React Router.
+const oidcPaths = ['/auth', '/token', '/me', '/jwks', '/session'];
+app.get(/.*/, (req, res, next) => {
+  const isBackendPath = req.path.startsWith('/api')
+    || req.path.startsWith('/interaction')
+    || req.path.startsWith('/.well-known')
+    || oidcPaths.some((route) => req.path === route || req.path.startsWith(`${route}/`));
+  if (isBackendPath) return next();
+  return res.sendFile(path.join(__dirname, '../dist-client/index.html'));
+});
+
 // OIDC Provider
 app.use(oidcProvider.callback());
-
-// React SPA fallback for all public pages
-app.get(/^(?!\/api|\/interaction|\/oidc).*/, (req, res) => {
-  res.sendFile(path.join(__dirname, '../dist-client/index.html'));
-});
 
 const startServer = async () => {
   const createdModels = await ensureDefaultAiModels();

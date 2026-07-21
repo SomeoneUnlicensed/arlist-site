@@ -4,6 +4,7 @@ import crypto from 'crypto';
 import { getSettings, saveSettings } from '../services/settings.service.js';
 import { sendCustomEmail } from '../services/mail.service.js';
 import { invalidateModelRegistry } from '../services/modelRegistry.service.js';
+import { invalidateModelAuth } from '../services/modelAuth.service.js';
 
 // ── Stats ─────────────────────────────────────────────────
 
@@ -96,6 +97,12 @@ export const updateUser = async (req: Request, res: Response) => {
     const { id } = req.params as { id: string };
     const self = (req as any).user?.userId;
     const { isBanned, role, isVerified, balanceKopecks } = req.body;
+    if (isBanned !== undefined && typeof isBanned !== 'boolean') return res.status(400).json({ error: 'isBanned must be a boolean' });
+    if (isVerified !== undefined && typeof isVerified !== 'boolean') return res.status(400).json({ error: 'isVerified must be a boolean' });
+    if (role !== undefined && !['USER', 'ADMIN'].includes(role)) return res.status(400).json({ error: 'Invalid role' });
+    if (balanceKopecks !== undefined && (!Number.isSafeInteger(Number(balanceKopecks)) || Number(balanceKopecks) < 0)) {
+      return res.status(400).json({ error: 'balanceKopecks must be a non-negative integer' });
+    }
     if (id === self && isBanned === true) return res.status(400).json({ error: 'Нельзя забанить себя' });
     if (id === self && role !== undefined && role !== 'ADMIN') {
       return res.status(400).json({ error: 'Нельзя снять с себя права администратора' });
@@ -103,9 +110,9 @@ export const updateUser = async (req: Request, res: Response) => {
     const user = await prisma.user.update({
       where: { id },
       data: {
-        ...(isBanned !== undefined ? { isBanned: Boolean(isBanned) } : {}),
+        ...(isBanned !== undefined ? { isBanned } : {}),
         ...(role !== undefined ? { role } : {}),
-        ...(isVerified !== undefined ? { isVerified: Boolean(isVerified) } : {}),
+        ...(isVerified !== undefined ? { isVerified } : {}),
         ...(balanceKopecks !== undefined ? { balanceKopecks: Number(balanceKopecks) } : {}),
       },
       select: { id: true, email: true, role: true, isBanned: true, isVerified: true, balanceKopecks: true },
@@ -275,11 +282,20 @@ function validateModelInput(body: any, partial = false): string | null {
   if (body.authMethod !== undefined && !AUTH_METHODS.includes(body.authMethod)) {
     return `authMethod must be one of: ${AUTH_METHODS.join(', ')}`;
   }
+  if (body.isEnabled !== undefined && typeof body.isEnabled !== 'boolean') {
+    return 'isEnabled must be a boolean';
+  }
   if (body.baseUrl !== undefined) {
     try {
       const url = new URL(String(body.baseUrl));
       if (url.protocol !== 'https:' && url.hostname !== 'localhost') return 'baseUrl must use HTTPS';
     } catch { return 'baseUrl must be a valid URL'; }
+  }
+  if (optionalText(body.oauthTokenUrl)) {
+    try {
+      const url = new URL(String(body.oauthTokenUrl));
+      if (url.protocol !== 'https:' && url.hostname !== 'localhost') return 'oauthTokenUrl must use HTTPS';
+    } catch { return 'oauthTokenUrl must be a valid URL'; }
   }
   for (const field of ['apiKeyEnvVar', 'extraHeaderEnvVar', 'oauthScopeEnvVar']) {
     const value = optionalText(body[field]);
@@ -359,7 +375,7 @@ export const updateAiModel = async (req: Request, res: Response) => {
     for (const field of optionalFields) if (req.body[field] !== undefined) data[field] = optionalText(req.body[field]);
     if (req.body.wireProtocol !== undefined) data.wireProtocol = req.body.wireProtocol;
     if (req.body.authMethod !== undefined) data.authMethod = req.body.authMethod;
-    if (req.body.isEnabled !== undefined) data.isEnabled = Boolean(req.body.isEnabled);
+    if (req.body.isEnabled !== undefined) data.isEnabled = req.body.isEnabled;
     const newKey = typeof data.key === 'string' ? data.key : existing.key;
     const referencingTariffs = newKey !== existing.key
       ? await prisma.tariff.findMany({ where: { models: { has: existing.key } }, select: { id: true, models: true } })
@@ -375,6 +391,7 @@ export const updateAiModel = async (req: Request, res: Response) => {
       return updated;
     });
     invalidateModelRegistry();
+    invalidateModelAuth(id);
     res.json(modelReadiness(model));
   } catch (error: any) {
     if (error?.code === 'P2025') return res.status(404).json({ error: 'Model not found' });
@@ -395,6 +412,7 @@ export const deleteAiModel = async (req: Request, res: Response) => {
     }
     await prisma.aiModel.delete({ where: { id } });
     invalidateModelRegistry();
+    invalidateModelAuth(id);
     res.json({ ok: true });
   } catch (error: any) {
     if (error?.code === 'P2025') return res.status(404).json({ error: 'Model not found' });

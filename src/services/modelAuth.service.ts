@@ -3,6 +3,10 @@ import crypto from 'crypto';
 const REFRESH_MARGIN_MS = 60_000;
 const tokenCache = new Map<string, { value: string; expiresAt: number }>();
 
+export function invalidateModelAuth(modelId: string): void {
+  tokenCache.delete(modelId);
+}
+
 export async function getOAuthClientCredentialsToken(
   modelId: string,
   tokenUrl: string,
@@ -33,7 +37,8 @@ export async function getOAuthClientCredentialsToken(
     throw new Error(`OAuth token exchange failed: ${response.status} ${detail}`);
   }
 
-  const data = (await response.json()) as { access_token: string; expires_at?: number; expires_in?: number };
+  const data = (await response.json()) as { access_token?: string; expires_at?: number; expires_in?: number };
+  if (!data.access_token) throw new Error('OAuth token exchange returned no access_token');
   const expiresAt = data.expires_at ?? Date.now() + (data.expires_in ?? 1800) * 1000;
   tokenCache.set(modelId, { value: data.access_token, expiresAt });
   return data.access_token;
