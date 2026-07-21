@@ -65,8 +65,9 @@ export const getUsageStats = async (req: any, res: Response) => {
         output: totalTokens._sum.outputTokens ?? 0,
       },
       tariff: {
+        assigned: Boolean(user?.tariff),
         type: user?.tariff?.type ?? 'FREE',
-        name: user?.tariff?.name ?? 'Бесплатный',
+        name: user?.tariff?.name ?? 'Не назначен',
       },
     });
   } catch {

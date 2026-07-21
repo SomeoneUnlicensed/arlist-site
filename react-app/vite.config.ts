@@ -18,5 +18,11 @@ export default defineConfig({
       '/api': 'http://localhost:8086',
       '/interaction': 'http://localhost:8086',
     }
+  },
+  preview: {
+    proxy: {
+      '/api': 'http://localhost:8086',
+      '/interaction': 'http://localhost:8086',
+    },
   }
 })

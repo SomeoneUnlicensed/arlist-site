@@ -1,47 +1,33 @@
-import fs from 'fs';
-import path from 'path';
-import { fileURLToPath } from 'url';
+import type { RegistrationMode } from '@prisma/client';
+import prisma from './prisma.service.js';
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-const SETTINGS_FILE = path.join(__dirname, '../../data/settings.json');
+const SYSTEM_SETTINGS_ID = 'system';
 
 export interface SystemSettings {
-  registrationMode: 'OPEN' | 'CLOSED';
+  registrationMode: RegistrationMode;
   email2faEnabled: boolean;
 }
 
-const defaultSettings: SystemSettings = {
+const defaults: SystemSettings = {
   registrationMode: 'OPEN',
   email2faEnabled: false,
 };
 
-// Ensure data directory exists
-const ensureDir = () => {
-  const dir = path.dirname(SETTINGS_FILE);
-  if (!fs.existsSync(dir)) {
-    fs.mkdirSync(dir, { recursive: true });
-  }
-};
+export async function getSettings(): Promise<SystemSettings> {
+  const settings = await prisma.systemSetting.upsert({
+    where: { id: SYSTEM_SETTINGS_ID },
+    create: { id: SYSTEM_SETTINGS_ID, ...defaults },
+    update: {},
+    select: { registrationMode: true, email2faEnabled: true },
+  });
+  return settings;
+}
 
-export const getSettings = (): SystemSettings => {
-  try {
-    ensureDir();
-    if (!fs.existsSync(SETTINGS_FILE)) {
-      fs.writeFileSync(SETTINGS_FILE, JSON.stringify(defaultSettings, null, 2));
-      return defaultSettings;
-    }
-    const raw = fs.readFileSync(SETTINGS_FILE, 'utf-8');
-    return { ...defaultSettings, ...JSON.parse(raw) };
-  } catch {
-    return defaultSettings;
-  }
-};
-
-export const saveSettings = (settings: Partial<SystemSettings>): SystemSettings => {
-  ensureDir();
-  const current = getSettings();
-  const updated = { ...current, ...settings };
-  fs.writeFileSync(SETTINGS_FILE, JSON.stringify(updated, null, 2));
-  return updated;
-};
+export async function saveSettings(settings: Partial<SystemSettings>): Promise<SystemSettings> {
+  return prisma.systemSetting.upsert({
+    where: { id: SYSTEM_SETTINGS_ID },
+    create: { id: SYSTEM_SETTINGS_ID, ...defaults, ...settings },
+    update: settings,
+    select: { registrationMode: true, email2faEnabled: true },
+  });
+}

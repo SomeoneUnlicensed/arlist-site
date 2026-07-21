@@ -13,7 +13,7 @@ const badgeVariants = cva(
         outline: "text-foreground border-border",
         success: "border-emerald-500/20 bg-emerald-500/10 text-emerald-400",
         warning: "border-amber-500/20 bg-amber-500/10 text-amber-400",
-        purple: "border-violet-500/20 bg-violet-500/10 text-violet-400",
+        purple: "border-lime-700/20 bg-lime-700/10 text-lime-700",
         muted: "border-border bg-muted text-muted-foreground",
       },
     },

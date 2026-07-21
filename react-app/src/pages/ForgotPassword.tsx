@@ -40,7 +40,7 @@ const ForgotPassword = () => {
     <div className="min-h-screen flex flex-col items-center justify-center px-4 py-12 gap-8 animate-fade-up">
       <InvisibleAltcha widgetRef={captchaWidgetRef} />
       <div className="text-center space-y-1">
-        <h1 className="font-display text-5xl text-foreground tracking-tight">Arlist ID</h1>
+        <h1 className="font-display text-5xl text-foreground tracking-tight">арлист id</h1>
         <p className="text-muted-foreground text-sm">Arlist ID — единый ключ к вашим сервисам.</p>
       </div>
 

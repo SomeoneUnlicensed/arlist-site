@@ -46,7 +46,8 @@ export default {
       fontFamily: {
         sans: ["Geist", "ui-sans-serif", "system-ui", "sans-serif"],
         mono: ["Geist Mono", "ui-monospace", "SFMono-Regular", "monospace"],
-        display: ["Dela Gothic One", "sans-serif"],
+        display: ["Unbounded", "Geist", "sans-serif"],
+        brand: ["Unbounded", "Geist", "sans-serif"],
       },
       keyframes: {
         "fade-up": {
