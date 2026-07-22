@@ -10,6 +10,7 @@ import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs'
 import { cn } from '@/lib/utils'
+import { StatusAdminTab } from '@/components/StatusAdminTab'
 
 // ── Copy button ───────────────────────────────────────────
 
@@ -47,13 +48,13 @@ const StatsBar = () => {
   return (
     <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8">
       {tiles.map(({ icon: Icon, label, value, color, bg }) => (
-        <div key={label} className={cn("rounded-2xl border bg-card/40 p-5 flex items-center gap-4 transition-all duration-300 hover:scale-[1.02] hover:bg-card/75", bg)}>
-          <div className={cn("p-3 rounded-xl bg-background/85 border border-border/40", color)}>
+        <div key={label} className={cn("min-w-0 rounded-2xl border bg-card/40 p-4 flex flex-col items-start gap-3 transition-all duration-300 hover:bg-card/75 sm:p-5 lg:flex-row lg:items-center lg:gap-4 lg:hover:scale-[1.02]", bg)}>
+          <div className={cn("shrink-0 p-3 rounded-xl bg-background/85 border border-border/40", color)}>
             <Icon size={20} className="shrink-0" />
           </div>
-          <div>
+          <div className="min-w-0">
             <p className="text-2xl font-bold tracking-tight">{value}</p>
-            <p className="text-xs font-semibold text-muted-foreground mt-0.5 leading-tight">{label}</p>
+            <p className="break-words text-xs font-semibold text-muted-foreground mt-0.5 leading-tight">{label}</p>
           </div>
         </div>
       ))}
@@ -1032,112 +1033,6 @@ const SettingsTab = () => {
   )
 }
 
-// ── Transparency incidents tab ───────────────────────────
-
-const EMPTY_INCIDENT = {
-  type: 'INCIDENT',
-  title: '',
-  summary: '',
-  severity: 'MEDIUM',
-  status: 'INVESTIGATING',
-  affectedServices: '',
-  impact: '',
-  response: '',
-  recommendation: '',
-  publishedAt: new Date().toISOString().slice(0, 10),
-  isPublished: true,
-}
-
-const incidentStatusLabels: Record<string, string> = {
-  INVESTIGATING: 'Расследуем',
-  IDENTIFIED: 'Причина найдена',
-  MONITORING: 'Наблюдаем',
-  RESOLVED: 'Устранён',
-}
-
-const IncidentsTab = () => {
-  const [entries, setEntries] = useState<any[]>([])
-  const [creating, setCreating] = useState(false)
-  const [form, setForm] = useState<any>(EMPTY_INCIDENT)
-  const [saving, setSaving] = useState(false)
-  const [err, setErr] = useState('')
-
-  const load = async () => {
-    try {
-      const { data } = await axios.get('/api/admin/transparency')
-      setEntries(data)
-    } catch { setErr('Не удалось загрузить реестр') }
-  }
-
-  useEffect(() => { load() }, [])
-
-  const create = async () => {
-    setSaving(true); setErr('')
-    try {
-      await axios.post('/api/admin/transparency', {
-        ...form,
-        status: form.type === 'INCIDENT' ? form.status : null,
-        affectedServices: form.affectedServices.split(',').map((item: string) => item.trim()).filter(Boolean),
-      })
-      setCreating(false)
-      setForm({ ...EMPTY_INCIDENT, publishedAt: new Date().toISOString().slice(0, 10) })
-      await load()
-    } catch (e: any) { setErr(e.response?.data?.error || 'Не удалось создать запись') }
-    finally { setSaving(false) }
-  }
-
-  const patchEntry = async (id: string, patch: Record<string, unknown>) => {
-    setErr('')
-    try {
-      const { data } = await axios.patch(`/api/admin/transparency/${id}`, patch)
-      setEntries((current) => current.map((entry) => entry.id === id ? data : entry))
-    } catch (e: any) { setErr(e.response?.data?.error || 'Не удалось обновить запись') }
-  }
-
-  const remove = async (id: string) => {
-    if (!confirm('Удалить запись из реестра без возможности восстановления?')) return
-    try {
-      await axios.delete(`/api/admin/transparency/${id}`)
-      setEntries((current) => current.filter((entry) => entry.id !== id))
-    } catch (e: any) { setErr(e.response?.data?.error || 'Не удалось удалить запись') }
-  }
-
-  const fieldClass = 'w-full rounded-md border border-input bg-background px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-ring'
-
-  return <div className="p-5 space-y-5">
-    {err && <Alert variant="destructive"><AlertDescription>{err}</AlertDescription></Alert>}
-    <div className="flex items-start justify-between gap-4">
-      <div><p className="text-sm font-medium">Публичный реестр</p><p className="mt-1 text-xs text-muted-foreground">Инциденты, предупреждения безопасности и ход устранения на странице прозрачности.</p></div>
-      {!creating && <Button size="sm" onClick={() => setCreating(true)}><Plus size={13} />Создать запись</Button>}
-    </div>
-
-    {creating && <Card>
-      <CardHeader className="flex flex-row items-center justify-between border-b border-border/40 px-5 py-3"><p className="text-sm font-medium">Новая публикация</p><Button size="sm" variant="ghost" onClick={() => setCreating(false)}>Отмена</Button></CardHeader>
-      <CardContent className="space-y-4 p-5">
-        <div className="grid gap-4 sm:grid-cols-3">
-          <div className="space-y-2"><Label>Тип</Label><select className={fieldClass} value={form.type} onChange={e => setForm({ ...form, type: e.target.value })}><option value="INCIDENT">Инцидент</option><option value="ADVISORY">Предупреждение</option></select></div>
-          <div className="space-y-2"><Label>Серьёзность</Label><select className={fieldClass} value={form.severity} onChange={e => setForm({ ...form, severity: e.target.value })}><option value="CRITICAL">Критическая</option><option value="HIGH">Высокая</option><option value="MEDIUM">Средняя</option><option value="LOW">Низкая</option></select></div>
-          {form.type === 'INCIDENT' && <div className="space-y-2"><Label>Статус</Label><select className={fieldClass} value={form.status} onChange={e => setForm({ ...form, status: e.target.value })}>{Object.entries(incidentStatusLabels).map(([value, label]) => <option key={value} value={value}>{label}</option>)}</select></div>}
-        </div>
-        <div className="space-y-2"><Label>Заголовок</Label><Input value={form.title} onChange={e => setForm({ ...form, title: e.target.value })} placeholder="Кратко и без маркетинговых формулировок" /></div>
-        <div className="space-y-2"><Label>Краткое описание</Label><textarea className={`${fieldClass} min-h-24 resize-y`} value={form.summary} onChange={e => setForm({ ...form, summary: e.target.value })} /></div>
-        <div className="space-y-2"><Label>Затронутые сервисы</Label><Input value={form.affectedServices} onChange={e => setForm({ ...form, affectedServices: e.target.value })} placeholder="Arlist ID, ЛитКот — через запятую" /></div>
-        {form.type === 'INCIDENT' ? <div className="grid gap-4 sm:grid-cols-2"><div className="space-y-2"><Label>Влияние</Label><textarea className={`${fieldClass} min-h-24 resize-y`} value={form.impact} onChange={e => setForm({ ...form, impact: e.target.value })} /></div><div className="space-y-2"><Label>Принятые меры</Label><textarea className={`${fieldClass} min-h-24 resize-y`} value={form.response} onChange={e => setForm({ ...form, response: e.target.value })} /></div></div> : <div className="space-y-2"><Label>Рекомендация пользователям</Label><textarea className={`${fieldClass} min-h-24 resize-y`} value={form.recommendation} onChange={e => setForm({ ...form, recommendation: e.target.value })} /></div>}
-        <div className="flex flex-wrap items-end justify-between gap-4"><div className="space-y-2"><Label>Дата публикации</Label><Input type="date" value={form.publishedAt} onChange={e => setForm({ ...form, publishedAt: e.target.value })} /></div><label className="flex items-center gap-2 text-sm"><input type="checkbox" checked={form.isPublished} onChange={e => setForm({ ...form, isPublished: e.target.checked })} />Опубликовать сразу</label><Button disabled={saving || !form.title.trim() || !form.summary.trim()} onClick={create}>{saving && <Loader2 size={13} className="animate-spin" />}Создать</Button></div>
-      </CardContent>
-    </Card>}
-
-    {entries.length === 0 && !creating && <div className="rounded-xl border border-dashed border-border p-10 text-center text-sm text-muted-foreground">Реестр пуст. Создайте первый инцидент или предупреждение.</div>}
-    {entries.map(entry => <Card key={entry.id}>
-      <CardHeader className="flex flex-row items-start justify-between gap-4 border-b border-border/40 px-5 py-4">
-        <div><div className="flex flex-wrap items-center gap-2"><Badge variant={entry.type === 'INCIDENT' ? 'destructive' : 'purple'} className="text-[10px]">{entry.type === 'INCIDENT' ? 'Инцидент' : 'Предупреждение'}</Badge><Badge variant={entry.isPublished ? 'success' : 'muted'} className="text-[10px]">{entry.isPublished ? 'Опубликовано' : 'Черновик'}</Badge><span className="text-xs text-muted-foreground">{new Date(entry.publishedAt).toLocaleDateString('ru-RU')}</span></div><h3 className="mt-3 text-sm font-semibold">{entry.title}</h3></div>
-        <div className="flex gap-1"><Button size="sm" variant="outline" onClick={() => patchEntry(entry.id, { isPublished: !entry.isPublished })}><Eye size={13} />{entry.isPublished ? 'Скрыть' : 'Опубликовать'}</Button><Button size="sm" variant="ghost" onClick={() => remove(entry.id)}><Trash2 size={13} /></Button></div>
-      </CardHeader>
-      <CardContent className="p-5"><p className="text-sm leading-6 text-muted-foreground">{entry.summary}</p>{entry.affectedServices.length > 0 && <div className="mt-4 flex flex-wrap gap-2">{entry.affectedServices.map((service: string) => <Badge key={service} variant="muted">{service}</Badge>)}</div>}{entry.type === 'INCIDENT' && <div className="mt-5 flex flex-wrap gap-2">{Object.entries(incidentStatusLabels).map(([value, label]) => <button key={value} onClick={() => patchEntry(entry.id, { status: value, resolvedAt: value === 'RESOLVED' ? new Date().toISOString() : null })} className={cn('rounded-full border px-3 py-1 text-xs transition-colors', entry.status === value ? 'border-lime-700/40 bg-lime-700/10 text-lime-700' : 'border-border text-muted-foreground hover:text-foreground')}>{label}</button>)}</div>}</CardContent>
-    </Card>)}
-  </div>
-}
-
 // ── Tariffs tab ───────────────────────────────────────────
 
 const TariffsTab = () => {
@@ -1412,7 +1307,7 @@ const Admin = () => {
               <TabsTrigger value="users">Пользователи</TabsTrigger>
               <TabsTrigger value="clients">OIDC-клиенты</TabsTrigger>
               <TabsTrigger value="broadcast">Рассылка писем</TabsTrigger>
-              <TabsTrigger value="incidents">Инциденты</TabsTrigger>
+              <TabsTrigger value="status">Статус</TabsTrigger>
               <TabsTrigger value="tariffs">Тарифы Вспышки</TabsTrigger>
               <TabsTrigger value="models">Модели ИИ</TabsTrigger>
               <TabsTrigger value="settings">Режимы регистрации</TabsTrigger>
@@ -1421,7 +1316,7 @@ const Admin = () => {
             <TabsContent value="users"><UsersTab /></TabsContent>
             <TabsContent value="clients"><ClientsTab /></TabsContent>
             <TabsContent value="broadcast"><BroadcastTab /></TabsContent>
-            <TabsContent value="incidents"><IncidentsTab /></TabsContent>
+            <TabsContent value="status"><StatusAdminTab /></TabsContent>
             <TabsContent value="tariffs"><TariffsTab /></TabsContent>
             <TabsContent value="models"><ModelsTab /></TabsContent>
             <TabsContent value="settings"><SettingsTab /></TabsContent>

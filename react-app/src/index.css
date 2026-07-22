@@ -65,20 +65,31 @@
 .otp-input::-webkit-inner-spin-button { -webkit-appearance: none; }
 .otp-input.filled { @apply border-border/60; }
 
-.transparency-page {
-  background-image:
-    linear-gradient(rgba(255, 255, 255, 0.018) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255, 255, 255, 0.018) 1px, transparent 1px);
-  background-size: 64px 64px;
+.status-page {
+  background-image: radial-gradient(circle at 82% 5%, rgba(194, 226, 130, 0.18), transparent 30rem);
 }
 
-.transparency-glow {
-  position: absolute;
-  inset: -20% -10% 0;
-  pointer-events: none;
-  background:
-    radial-gradient(ellipse 42% 40% at 72% 8%, rgba(80, 180, 255, 0.13), transparent 70%),
-    radial-gradient(ellipse 35% 35% at 42% 8%, rgba(100, 255, 190, 0.09), transparent 72%);
+.uptime-grid {
+  display: grid;
+  grid-template-columns: repeat(90, minmax(2px, 1fr));
+  gap: 2px;
+  height: 24px;
+}
+
+.uptime-grid span {
+  min-width: 0;
+  border-radius: 2px;
+  opacity: 0.9;
+}
+
+@media (max-width: 640px) {
+  .uptime-grid {
+    grid-template-columns: repeat(45, minmax(3px, 1fr));
+  }
+
+  .uptime-grid span:nth-child(-n + 45) {
+    display: none;
+  }
 }
 
 html {

@@ -7,7 +7,11 @@ import {
   getAiModels, createAiModel, updateAiModel, deleteAiModel,
 } from '../controllers/admin.controller.js';
 import { authenticate, authorize } from '../middleware/auth.middleware.js';
-import { createTransparencyEntry, deleteTransparencyEntry, getTransparencyEntries, updateTransparencyEntry } from '../controllers/transparency.controller.js';
+import {
+  addIncidentUpdate, createMaintenance, createStatusComponent, createStatusIncident,
+  deleteMaintenance, deleteStatusComponent, deleteStatusIncident, getAdminStatus,
+  updateMaintenance, updateStatusComponent, updateStatusIncident,
+} from '../controllers/status.controller.js';
 
 const router = Router();
 
@@ -37,9 +41,16 @@ router.post('/models', createAiModel);
 router.patch('/models/:id', updateAiModel);
 router.delete('/models/:id', deleteAiModel);
 
-router.get('/transparency', getTransparencyEntries);
-router.post('/transparency', createTransparencyEntry);
-router.patch('/transparency/:id', updateTransparencyEntry);
-router.delete('/transparency/:id', deleteTransparencyEntry);
+router.get('/status', getAdminStatus);
+router.post('/status/components', createStatusComponent);
+router.patch('/status/components/:id', updateStatusComponent);
+router.delete('/status/components/:id', deleteStatusComponent);
+router.post('/status/incidents', createStatusIncident);
+router.patch('/status/incidents/:id', updateStatusIncident);
+router.post('/status/incidents/:id/updates', addIncidentUpdate);
+router.delete('/status/incidents/:id', deleteStatusIncident);
+router.post('/status/maintenance', createMaintenance);
+router.patch('/status/maintenance/:id', updateMaintenance);
+router.delete('/status/maintenance/:id', deleteMaintenance);
 
 export default router;

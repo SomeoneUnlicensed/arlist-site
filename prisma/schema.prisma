@@ -22,23 +22,32 @@ enum TariffType {
   PRO
 }
 
-enum TransparencyEntryType {
-  INCIDENT
-  ADVISORY
-}
-
-enum IncidentSeverity {
+enum IncidentImpact {
   CRITICAL
-  HIGH
-  MEDIUM
-  LOW
+  MAJOR
+  MINOR
 }
 
-enum IncidentStatus {
+enum StatusIncidentState {
   INVESTIGATING
   IDENTIFIED
   MONITORING
   RESOLVED
+}
+
+enum ComponentStatus {
+  OPERATIONAL
+  DEGRADED
+  PARTIAL_OUTAGE
+  MAJOR_OUTAGE
+  MAINTENANCE
+}
+
+enum MaintenanceState {
+  SCHEDULED
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
 }
 
 enum ModelWireProtocol {
@@ -212,23 +221,65 @@ model SystemSetting {
   updatedAt        DateTime         @updatedAt
 }
 
-model TransparencyEntry {
-  id               String                @id @default(cuid())
-  type             TransparencyEntryType
-  title            String
-  summary          String
-  severity         IncidentSeverity
-  status           IncidentStatus?
-  affectedServices String[]              @default([])
-  impact           String?
-  response         String?
-  recommendation   String?
-  publishedAt      DateTime              @default(now())
-  resolvedAt       DateTime?
-  isPublished      Boolean               @default(true)
-  createdAt        DateTime              @default(now())
-  updatedAt        DateTime              @updatedAt
+model StatusComponent {
+  id          String          @id @default(cuid())
+  slug        String          @unique
+  name        String
+  description String?
+  group       String          @default("Сервисы")
+  order       Int             @default(0)
+  status      ComponentStatus @default(OPERATIONAL)
+  isVisible   Boolean         @default(true)
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
 
-  @@index([isPublished, publishedAt])
-  @@index([type, status])
+  incidents   StatusIncident[]
+  maintenance ScheduledMaintenance[]
+
+  @@index([isVisible, order])
+}
+
+model StatusIncident {
+  id          String              @id @default(cuid())
+  title       String
+  summary     String
+  impact      IncidentImpact
+  status      StatusIncidentState @default(INVESTIGATING)
+  isPublished Boolean             @default(true)
+  publishedAt DateTime            @default(now())
+  resolvedAt  DateTime?
+  createdAt   DateTime            @default(now())
+  updatedAt   DateTime            @updatedAt
+
+  components StatusComponent[]
+  updates    IncidentUpdate[]
+
+  @@index([isPublished, status, publishedAt])
+}
+
+model IncidentUpdate {
+  id         String              @id @default(cuid())
+  incidentId String
+  incident   StatusIncident      @relation(fields: [incidentId], references: [id], onDelete: Cascade)
+  status     StatusIncidentState
+  message    String
+  createdAt  DateTime            @default(now())
+
+  @@index([incidentId, createdAt])
+}
+
+model ScheduledMaintenance {
+  id          String           @id @default(cuid())
+  title       String
+  description String
+  status      MaintenanceState @default(SCHEDULED)
+  startsAt    DateTime
+  endsAt      DateTime
+  isPublished Boolean          @default(true)
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+
+  components StatusComponent[]
+
+  @@index([isPublished, startsAt])
 }

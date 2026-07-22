@@ -12,8 +12,9 @@ import cliAuthRoutes from './routes/cliAuth.routes.js';
 import llmProxyRoutes from './routes/llmProxy.routes.js';
 import oidcProvider from './services/oidc.service.js';
 import { ensureDefaultFreeTariff } from './services/defaultTariff.service.js';
-import transparencyRoutes from './routes/transparency.routes.js';
+import statusRoutes from './routes/status.routes.js';
 import { ensureDefaultAiModels } from './services/defaultModels.service.js';
+import { ensureDefaultStatusComponents } from './services/defaultStatusComponents.service.js';
 
 process.on('unhandledRejection', (reason, promise) => {
   console.error('[process] Unhandled Rejection:', reason);
@@ -41,13 +42,13 @@ app.use('/api/admin', adminRoutes);
 app.use('/api/v1', arlistApiRoutes);
 app.use('/api/cli/auth', cliAuthRoutes);
 app.use('/api/v1', llmProxyRoutes);
-app.use('/api/transparency', transparencyRoutes);
+app.use('/api/status', statusRoutes);
 app.get('/api/health', (req, res) => {
   res.json({ status: 'ok' });
 });
 
 // React SPA routes
-app.get(['/', '/products', '/forEdu', '/contacts', '/docs', '/landings', '/legal', '/legal/geotekt-policies', '/promo', '/promo/manifest', '/vspyshka', '/grusnub', '/login', '/register', '/verify', '/profile', '/admin', '/privacy-policy', '/forgot-password', '/reset-password', '/cli/auth', '/transparency', '/transparancy'], (req, res) => {
+app.get(['/', '/products', '/forEdu', '/contacts', '/docs', '/landings', '/legal', '/legal/geotekt-policies', '/promo', '/promo/manifest', '/vspyshka', '/grusnub', '/login', '/register', '/verify', '/profile', '/admin', '/privacy-policy', '/forgot-password', '/reset-password', '/cli/auth', '/status', '/transparency', '/transparancy'], (req, res) => {
   res.sendFile(path.join(__dirname, '../dist-client/index.html'));
 });
 
@@ -70,6 +71,9 @@ app.get(/.*/, (req, res, next) => {
 app.use(oidcProvider.callback());
 
 const startServer = async () => {
+  const createdComponents = await ensureDefaultStatusComponents();
+  if (createdComponents > 0) console.log(`[status] Created ${createdComponents} default component(s)`);
+
   const createdModels = await ensureDefaultAiModels();
   if (createdModels > 0) console.log(`[models] Created ${createdModels} default model(s)`);
 

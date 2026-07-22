@@ -9,7 +9,7 @@ import Admin from './pages/Admin';
 import ForgotPassword from './pages/ForgotPassword';
 import ResetPassword from './pages/ResetPassword';
 import CliAuth from './pages/CliAuth';
-import Transparency from './pages/Transparency';
+import Status from './pages/Status';
 import Home from './pages/Home';
 import { LegalPage } from './pages/LegalPage';
 import { LegalDocumentPage } from './pages/LegalDocumentPage';
@@ -56,8 +56,9 @@ function App() {
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/reset-password" element={<ResetPassword />} />
           <Route path="/cli/auth" element={<CliAuth />} />
-          <Route path="/transparency" element={<Transparency />} />
-          <Route path="/transparancy" element={<Navigate to="/transparency" replace />} />
+          <Route path="/status" element={<Status />} />
+          <Route path="/transparency" element={<Navigate to="/status" replace />} />
+          <Route path="/transparancy" element={<Navigate to="/status" replace />} />
           <Route path="*" element={<Navigate to="/" />} />
         </Routes>
       </div>
