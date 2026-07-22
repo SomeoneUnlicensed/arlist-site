@@ -17,6 +17,7 @@ import { ensureDefaultAiModels } from './services/defaultModels.service.js';
 import { ensureDefaultStatusComponents } from './services/defaultStatusComponents.service.js';
 import { systemLogMiddleware } from './middleware/systemLog.middleware.js';
 import { pruneSystemLogs, writeSystemLog } from './services/systemLog.service.js';
+import { ensureStatusPageSettings } from './services/statusPageSettings.service.js';
 
 process.on('unhandledRejection', (reason, promise) => {
   console.error('[process] Unhandled Rejection:', reason);
@@ -80,6 +81,7 @@ const startServer = async () => {
 
   const createdComponents = await ensureDefaultStatusComponents();
   if (createdComponents > 0) console.log(`[status] Created ${createdComponents} default component(s)`);
+  await ensureStatusPageSettings();
 
   const createdModels = await ensureDefaultAiModels();
   if (createdModels > 0) console.log(`[models] Created ${createdModels} default model(s)`);

@@ -1,12 +1,15 @@
 import type { Request, Response } from 'express'
 import type { ComponentStatus, IncidentImpact, MaintenanceState } from '@prisma/client'
 import prisma from '../services/prisma.service.js'
+import { ensureStatusPageSettings } from '../services/statusPageSettings.service.js'
 
 const COMPONENT_STATUSES = ['OPERATIONAL', 'DEGRADED', 'PARTIAL_OUTAGE', 'MAJOR_OUTAGE', 'MAINTENANCE'] as const
 const INCIDENT_IMPACTS = ['MINOR', 'MAJOR', 'CRITICAL'] as const
 const INCIDENT_STATES = ['INVESTIGATING', 'IDENTIFIED', 'MONITORING', 'RESOLVED'] as const
 const MAINTENANCE_STATES = ['SCHEDULED', 'IN_PROGRESS', 'COMPLETED', 'CANCELLED'] as const
 const SLUG_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/
+const DOMAIN_PATTERN = /^(?=.{1,253}$)(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z]{2,63}$/i
+const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
 const incidentInclude = {
   components: { orderBy: { order: 'asc' as const } },
@@ -64,22 +67,23 @@ async function recalculateComponents(tx: any, componentIds: string[]) {
 
 export const getPublicStatus = async (_req: Request, res: Response) => {
   try {
-    const ninetyDaysAgo = new Date(Date.now() - 90 * 24 * 60 * 60 * 1000)
+    const settings = await ensureStatusPageSettings()
+    const historyStart = new Date(Date.now() - settings.historyDays * 24 * 60 * 60 * 1000)
     const [components, activeIncidents, incidentHistory, maintenance] = await Promise.all([
       prisma.statusComponent.findMany({ where: { isVisible: true }, orderBy: [{ group: 'asc' }, { order: 'asc' }] }),
       prisma.statusIncident.findMany({ where: { isPublished: true, status: { not: 'RESOLVED' } }, include: incidentInclude, orderBy: { publishedAt: 'desc' } }),
-      prisma.statusIncident.findMany({ where: { isPublished: true, status: 'RESOLVED', publishedAt: { gte: ninetyDaysAgo } }, include: incidentInclude, orderBy: { resolvedAt: 'desc' }, take: 50 }),
-      prisma.scheduledMaintenance.findMany({ where: { isPublished: true, status: { not: 'CANCELLED' }, endsAt: { gte: ninetyDaysAgo } }, include: maintenanceInclude, orderBy: { startsAt: 'desc' }, take: 30 }),
+      prisma.statusIncident.findMany({ where: { isPublished: true, status: 'RESOLVED', OR: [{ publishedAt: { gte: historyStart } }, { resolvedAt: { gte: historyStart } }] }, include: incidentInclude, orderBy: { resolvedAt: 'desc' }, take: 100 }),
+      prisma.scheduledMaintenance.findMany({ where: { isPublished: true, status: { not: 'CANCELLED' }, endsAt: { gte: historyStart } }, include: maintenanceInclude, orderBy: { startsAt: 'desc' }, take: 60 }),
     ])
 
     const timestamps = [
       ...components.map((item) => item.updatedAt),
       ...activeIncidents.map((item) => item.updatedAt),
       ...incidentHistory.map((item) => item.updatedAt),
-      ...maintenance.map((item) => item.updatedAt),
+      ...maintenance.map((item) => item.updatedAt), settings.updatedAt,
     ]
     const updatedAt = timestamps.length ? new Date(Math.max(...timestamps.map((date) => date.getTime()))) : new Date()
-    res.json({ components, activeIncidents, incidentHistory, maintenance, updatedAt })
+    res.json({ settings, components, activeIncidents, incidentHistory, maintenance, updatedAt })
   } catch {
     res.status(500).json({ error: 'Не удалось загрузить статус сервисов' })
   }
@@ -87,14 +91,54 @@ export const getPublicStatus = async (_req: Request, res: Response) => {
 
 export const getAdminStatus = async (_req: Request, res: Response) => {
   try {
-    const [components, incidents, maintenance] = await Promise.all([
+    const [settings, components, incidents, maintenance] = await Promise.all([
+      ensureStatusPageSettings(),
       prisma.statusComponent.findMany({ orderBy: [{ group: 'asc' }, { order: 'asc' }] }),
       prisma.statusIncident.findMany({ include: incidentInclude, orderBy: { publishedAt: 'desc' } }),
       prisma.scheduledMaintenance.findMany({ include: maintenanceInclude, orderBy: { startsAt: 'desc' } }),
     ])
-    res.json({ components, incidents, maintenance })
+    res.json({ settings, components, incidents, maintenance })
   } catch {
     res.status(500).json({ error: 'Не удалось загрузить управление статусом' })
+  }
+}
+
+export const updateStatusPageSettings = async (req: Request, res: Response) => {
+  try {
+    const body = req.body
+    const textFields = [
+      ['productName', 60], ['pageTitle', 120], ['description', 400], ['supportEmail', 320], ['timezone', 80],
+    ] as const
+    for (const [field, max] of textFields) {
+      if (body[field] !== undefined && (typeof body[field] !== 'string' || !body[field].trim() || body[field].trim().length > max)) {
+        return res.status(400).json({ error: `Проверьте поле ${field}` })
+      }
+    }
+    if (body.supportEmail !== undefined && !EMAIL_PATTERN.test(body.supportEmail.trim())) return res.status(400).json({ error: 'Укажите корректную почту поддержки' })
+    if (body.customDomain !== undefined && body.customDomain !== null && (typeof body.customDomain !== 'string' || (body.customDomain.trim() && !DOMAIN_PATTERN.test(body.customDomain.trim())))) return res.status(400).json({ error: 'Укажите домен без протокола и пути' })
+    if (body.timezone !== undefined) {
+      try { new Intl.DateTimeFormat('ru-RU', { timeZone: body.timezone.trim() }).format() } catch { return res.status(400).json({ error: 'Неизвестный часовой пояс' }) }
+    }
+    if (body.historyDays !== undefined && ![30, 60, 90, 180].includes(Number(body.historyDays))) return res.status(400).json({ error: 'История: 30, 60, 90 или 180 дней' })
+    if (body.refreshSeconds !== undefined && ![15, 30, 60, 120, 300].includes(Number(body.refreshSeconds))) return res.status(400).json({ error: 'Автообновление: 15, 30, 60, 120 или 300 секунд' })
+    for (const field of ['showUptimePercent', 'showHistory']) if (body[field] !== undefined && typeof body[field] !== 'boolean') return res.status(400).json({ error: `${field} должен быть boolean` })
+
+    await ensureStatusPageSettings()
+    const settings = await prisma.statusPageSetting.update({ where: { id: 'status' }, data: {
+      ...(body.productName !== undefined ? { productName: body.productName.trim() } : {}),
+      ...(body.pageTitle !== undefined ? { pageTitle: body.pageTitle.trim() } : {}),
+      ...(body.description !== undefined ? { description: body.description.trim() } : {}),
+      ...(body.supportEmail !== undefined ? { supportEmail: body.supportEmail.trim().toLowerCase() } : {}),
+      ...(body.customDomain !== undefined ? { customDomain: typeof body.customDomain === 'string' ? body.customDomain.trim().toLowerCase() || null : null } : {}),
+      ...(body.timezone !== undefined ? { timezone: body.timezone.trim() } : {}),
+      ...(body.historyDays !== undefined ? { historyDays: Number(body.historyDays) } : {}),
+      ...(body.refreshSeconds !== undefined ? { refreshSeconds: Number(body.refreshSeconds) } : {}),
+      ...(body.showUptimePercent !== undefined ? { showUptimePercent: body.showUptimePercent } : {}),
+      ...(body.showHistory !== undefined ? { showHistory: body.showHistory } : {}),
+    } })
+    res.json(settings)
+  } catch {
+    res.status(500).json({ error: 'Не удалось сохранить настройки status page' })
   }
 }
 
