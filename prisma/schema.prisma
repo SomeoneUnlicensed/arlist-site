@@ -239,6 +239,21 @@ model SystemSetting {
   updatedAt        DateTime         @updatedAt
 }
 
+model StatusPageSetting {
+  id                String   @id @default("status")
+  productName       String   @default("Поток.Статус")
+  pageTitle         String   @default("Статус сервисов Арлист")
+  description       String   @default("Актуальное состояние сервисов, история инцидентов и плановые работы.")
+  supportEmail      String   @default("hello@arlist.ru")
+  customDomain      String?
+  timezone          String   @default("Europe/Moscow")
+  historyDays       Int      @default(90)
+  refreshSeconds    Int      @default(60)
+  showUptimePercent Boolean  @default(true)
+  showHistory       Boolean  @default(true)
+  updatedAt         DateTime @updatedAt
+}
+
 model SystemLog {
   id         String            @id @default(cuid())
   level      SystemLogLevel    @default(INFO)
