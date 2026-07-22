@@ -552,47 +552,92 @@ const ClientsTab = () => {
 
 // ── System Logs tab ───────────────────────────────────────
 
+const logCategoryLabels: Record<string, string> = {
+  SYSTEM: 'Система', AUTH: 'Авторизация', SECURITY: 'Безопасность', ADMIN: 'Админка', API: 'API', STATUS: 'Status page', MAIL: 'Почта', OIDC: 'OIDC',
+}
+
+const logLevelLabels: Record<string, string> = { INFO: 'Информация', WARN: 'Предупреждение', ERROR: 'Ошибка' }
+
 const LogsTab = () => {
-  const mockLogs = [
-    { id: 1, event: 'Успешный вход администратора', user: 'admin@arlist.ru', ip: '192.168.1.45', time: 'Только что', status: 'success' },
-    { id: 2, event: 'Обновление баланса пользователя', user: 'user@example.com (Баланс: +500.00 ₽)', ip: '192.168.1.45', time: '5 мин. назад', status: 'success' },
-    { id: 3, event: 'Изменение роли пользователя на ADMIN', user: 'moderator@arlist.ru', ip: '127.0.0.1', time: '12 мин. назад', status: 'success' },
-    { id: 4, event: 'Неудачная попытка входа (неверный пароль)', user: 'hacker@scam.com', ip: '93.184.216.34', time: '34 мин. назад', status: 'warning' },
-    { id: 5, event: 'Создание OIDC-клиента «Selectel Integration»', user: 'admin@arlist.ru', ip: '192.168.1.45', time: '1 ч. назад', status: 'success' },
-    { id: 6, event: 'Регистрация нового аккаунта', user: 'developer99@gmail.com', ip: '82.200.12.190', time: '2 ч. назад', status: 'success' },
-    { id: 7, event: 'Запрос на смену пароля', user: 'guest_user@mail.ru', ip: '95.54.120.3', time: '4 ч. назад', status: 'info' }
-  ]
+  const [logs, setLogs] = useState<any[]>([])
+  const [total, setTotal] = useState(0)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState('')
+  const [level, setLevel] = useState('ALL')
+  const [category, setCategory] = useState('ALL')
+  const [query, setQuery] = useState('')
+  const [autoRefresh, setAutoRefresh] = useState(true)
+
+  const load = async (silent = false) => {
+    if (!silent) setLoading(true)
+    setError('')
+    try {
+      const response = await axios.get('/api/admin/logs', { params: {
+        limit: 200,
+        ...(level !== 'ALL' ? { level } : {}),
+        ...(category !== 'ALL' ? { category } : {}),
+        ...(query.trim() ? { query: query.trim() } : {}),
+      } })
+      setLogs(response.data.logs)
+      setTotal(response.data.total)
+    } catch (requestError: any) {
+      setError(requestError.response?.data?.error || 'Не удалось загрузить реальные логи сервера')
+    } finally {
+      if (!silent) setLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    const debounce = window.setTimeout(() => { void load() }, 250)
+    return () => window.clearTimeout(debounce)
+  }, [level, category, query])
+
+  useEffect(() => {
+    if (!autoRefresh) return
+    const interval = window.setInterval(() => { void load(true) }, 10_000)
+    return () => window.clearInterval(interval)
+  }, [autoRefresh, level, category, query])
+
+  const fieldClass = 'h-9 rounded-md border border-input bg-background px-3 text-xs outline-none focus:ring-1 focus:ring-ring'
 
   return (
-    <div className="p-5 space-y-4">
-      <div className="flex items-center justify-between border-b border-border/40 pb-3">
-        <p className="text-xs uppercase tracking-widest text-muted-foreground font-normal">Последние события безопасности</p>
-        <Badge variant="outline" className="text-[10px] text-lime-700 border-lime-700/20 bg-lime-700/5">
-          Живой поток событий
-        </Badge>
+    <div className="space-y-4 p-4 sm:p-5">
+      <div className="flex flex-col gap-3 border-b border-border/40 pb-4 sm:flex-row sm:items-center sm:justify-between">
+        <div><p className="text-sm font-semibold">Реальные события сервера</p><p className="mt-1 text-xs text-muted-foreground">HTTP-запросы, авторизация, ошибки и действия администраторов. Хранение — 90 дней.</p></div>
+        <div className="flex flex-wrap items-center gap-2">
+          <Button size="sm" variant={autoRefresh ? 'outline' : 'ghost'} onClick={() => setAutoRefresh((value) => !value)}><Activity size={13} className={autoRefresh ? 'text-emerald-500' : 'text-muted-foreground'} />{autoRefresh ? 'Автообновление' : 'Пауза'}</Button>
+          <Button size="sm" variant="outline" disabled={loading} onClick={() => void load()}><RefreshCw size={13} className={loading ? 'animate-spin' : ''} />Обновить</Button>
+        </div>
       </div>
 
-      <div className="divide-y divide-border/30">
-        {mockLogs.map(l => (
-          <div key={l.id} className="py-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs hover:bg-accent/10 px-2 rounded-lg transition-colors">
-            <div className="space-y-1">
-              <div className="flex items-center gap-2">
-                <span className={cn(
-                  "w-1.5 h-1.5 rounded-full",
-                  l.status === 'success' ? "bg-emerald-500" :
-                  l.status === 'warning' ? "bg-red-500 animate-pulse" : "bg-blue-400"
-                )} />
-                <span className="font-semibold text-foreground/90">{l.event}</span>
-              </div>
-              <p className="text-muted-foreground pl-3.5 font-mono text-[10px]">{l.user}</p>
-            </div>
-            <div className="flex items-center gap-4 text-[10px] text-muted-foreground/80 font-mono sm:text-right">
-              <span>{l.ip}</span>
-              <span className="min-w-20 text-right">{l.time}</span>
-            </div>
-          </div>
-        ))}
+      <div className="grid gap-2 sm:grid-cols-[minmax(0,1fr)_160px_170px]">
+        <div className="relative"><Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" /><Input value={query} onChange={(event) => setQuery(event.target.value)} className="h-9 pl-9 text-xs" placeholder="Событие, email, IP или путь…" /></div>
+        <select className={fieldClass} value={level} onChange={(event) => setLevel(event.target.value)}><option value="ALL">Все уровни</option>{Object.entries(logLevelLabels).map(([value, label]) => <option key={value} value={value}>{label}</option>)}</select>
+        <select className={fieldClass} value={category} onChange={(event) => setCategory(event.target.value)}><option value="ALL">Все категории</option>{Object.entries(logCategoryLabels).map(([value, label]) => <option key={value} value={value}>{label}</option>)}</select>
       </div>
+
+      <div className="flex items-center justify-between text-[10px] font-mono uppercase tracking-wider text-muted-foreground"><span>Показано {logs.length} из {total}</span>{autoRefresh && <span className="flex items-center gap-1.5 text-emerald-600"><span className="h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-500" />живой поток</span>}</div>
+      {error && <Alert variant="destructive"><AlertDescription>{error}</AlertDescription></Alert>}
+
+      {loading && logs.length === 0 ? <div className="flex items-center justify-center gap-2 py-16 text-sm text-muted-foreground"><Loader2 size={17} className="animate-spin" />Загружаем журнал…</div> : logs.length === 0 ? <div className="rounded-xl border border-dashed border-border p-10 text-center text-sm text-muted-foreground">По выбранным фильтрам событий нет.</div> : <div className="divide-y divide-border/40 overflow-hidden rounded-xl border border-border/50 bg-card/30">
+        {logs.map((log) => <article key={log.id} className="p-4 transition-colors hover:bg-accent/10 sm:p-5">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+            <div className="min-w-0">
+              <div className="flex flex-wrap items-center gap-2"><span className={cn('h-2 w-2 shrink-0 rounded-full', log.level === 'ERROR' ? 'bg-red-500' : log.level === 'WARN' ? 'bg-amber-500' : 'bg-emerald-500')} /><Badge variant="outline" className="text-[9px]">{logCategoryLabels[log.category] || log.category}</Badge><span className={cn('text-[10px] font-semibold uppercase', log.level === 'ERROR' ? 'text-red-600' : log.level === 'WARN' ? 'text-amber-600' : 'text-muted-foreground')}>{logLevelLabels[log.level] || log.level}</span></div>
+              <h3 className="mt-2 break-words text-sm font-semibold">{log.event}</h3>
+              <p className="mt-1 break-all font-mono text-[10px] text-muted-foreground">{log.user?.email || log.subject || 'Системное событие'}{log.user?.role ? ` · ${log.user.role}` : ''}</p>
+            </div>
+            <time className="shrink-0 font-mono text-[10px] text-muted-foreground" dateTime={log.createdAt}>{new Date(log.createdAt).toLocaleString('ru-RU')}</time>
+          </div>
+          <div className="mt-3 flex flex-wrap gap-x-4 gap-y-1 font-mono text-[10px] text-muted-foreground/80">
+            {log.method && log.path && <span>{log.method} {log.path}</span>}
+            {log.statusCode !== null && <span className={log.statusCode >= 400 ? 'text-red-600' : ''}>HTTP {log.statusCode}</span>}
+            {log.durationMs !== null && <span>{log.durationMs} мс</span>}
+            {log.ipAddress && <span>IP {log.ipAddress}</span>}
+          </div>
+          {(log.userAgent || log.metadata) && <details className="mt-3"><summary className="cursor-pointer text-[10px] text-muted-foreground hover:text-foreground">Технические данные</summary><div className="mt-2 space-y-2 rounded-md bg-black/[0.03] p-2 font-mono text-[10px] text-muted-foreground">{log.userAgent && <p className="break-all">User-Agent: {log.userAgent}</p>}{log.metadata && <pre className="whitespace-pre-wrap break-all">{JSON.stringify(log.metadata, null, 2)}</pre>}</div></details>}
+        </article>)}
+      </div>}
     </div>
   )
 }

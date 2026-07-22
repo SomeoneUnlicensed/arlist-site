@@ -15,12 +15,16 @@ import { ensureDefaultFreeTariff } from './services/defaultTariff.service.js';
 import statusRoutes from './routes/status.routes.js';
 import { ensureDefaultAiModels } from './services/defaultModels.service.js';
 import { ensureDefaultStatusComponents } from './services/defaultStatusComponents.service.js';
+import { systemLogMiddleware } from './middleware/systemLog.middleware.js';
+import { pruneSystemLogs, writeSystemLog } from './services/systemLog.service.js';
 
 process.on('unhandledRejection', (reason, promise) => {
   console.error('[process] Unhandled Rejection:', reason);
+  void writeSystemLog({ level: 'ERROR', category: 'SYSTEM', event: 'Необработанное отклонение Promise', metadata: { message: reason instanceof Error ? reason.message : String(reason) } });
 });
 process.on('uncaughtException', (err) => {
   console.error('[process] Uncaught Exception:', err);
+  void writeSystemLog({ level: 'ERROR', category: 'SYSTEM', event: 'Необработанное исключение процесса', metadata: { message: err.message } });
 });
 
 const __filename = fileURLToPath(import.meta.url);
@@ -33,6 +37,7 @@ app.set('trust proxy', 1);
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
+app.use(systemLogMiddleware);
 
 // API routes
 app.use('/interaction', interactionRoutes);
@@ -71,6 +76,8 @@ app.get(/.*/, (req, res, next) => {
 app.use(oidcProvider.callback());
 
 const startServer = async () => {
+  const prunedLogs = await pruneSystemLogs();
+
   const createdComponents = await ensureDefaultStatusComponents();
   if (createdComponents > 0) console.log(`[status] Created ${createdComponents} default component(s)`);
 
@@ -83,6 +90,11 @@ const startServer = async () => {
   app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
     console.log(`OIDC Issuer: ${process.env.ISSUER_URL || 'http://localhost:8086'}`);
+    void writeSystemLog({
+      category: 'SYSTEM',
+      event: 'Сервер запущен',
+      metadata: { port: Number(PORT), prunedLogs },
+    });
   });
 };
 

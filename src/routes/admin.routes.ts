@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import {
   getStats, getClients, createClient, deleteClient,
-  getUsers, deleteUser, updateUser,
+  getUsers, deleteUser, updateUser, getSystemLogs,
   getSystemSettings, updateSystemSettings, sendMailBroadcast,
   getTariffs, updateTariff, getKnownModels,
   getAiModels, createAiModel, updateAiModel, deleteAiModel,
@@ -19,6 +19,7 @@ router.use(authenticate);
 router.use(authorize(['ADMIN']));
 
 router.get('/stats', getStats);
+router.get('/logs', getSystemLogs);
 
 router.get('/clients', getClients);
 router.post('/clients', createClient);

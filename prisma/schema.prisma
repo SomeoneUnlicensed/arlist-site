@@ -66,6 +66,23 @@ enum RegistrationMode {
   CLOSED
 }
 
+enum SystemLogLevel {
+  INFO
+  WARN
+  ERROR
+}
+
+enum SystemLogCategory {
+  SYSTEM
+  AUTH
+  SECURITY
+  ADMIN
+  API
+  STATUS
+  MAIL
+  OIDC
+}
+
 model User {
   id                     String   @id @default(cuid())
   email                  String   @unique
@@ -90,6 +107,7 @@ model User {
   apiKeys      ApiKey[]
   usageRecords UsageRecord[]
   deviceCodes  DeviceCode[]
+  systemLogs   SystemLog[]
 }
 
 model VerificationToken {
@@ -219,6 +237,29 @@ model SystemSetting {
   registrationMode RegistrationMode @default(OPEN)
   email2faEnabled  Boolean          @default(false)
   updatedAt        DateTime         @updatedAt
+}
+
+model SystemLog {
+  id         String            @id @default(cuid())
+  level      SystemLogLevel    @default(INFO)
+  category   SystemLogCategory @default(API)
+  event      String
+  userId     String?
+  user       User?             @relation(fields: [userId], references: [id], onDelete: SetNull)
+  subject    String?
+  ipAddress  String?
+  userAgent  String?
+  method     String?
+  path       String?
+  statusCode Int?
+  durationMs Int?
+  metadata   Json?
+  createdAt  DateTime          @default(now())
+
+  @@index([createdAt])
+  @@index([level, createdAt])
+  @@index([category, createdAt])
+  @@index([userId, createdAt])
 }
 
 model StatusComponent {
