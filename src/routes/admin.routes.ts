@@ -11,6 +11,7 @@ import {
   addIncidentUpdate, createMaintenance, createStatusComponent, createStatusIncident,
   deleteMaintenance, deleteStatusComponent, deleteStatusIncident, getAdminStatus,
   updateMaintenance, updateStatusComponent, updateStatusIncident,
+  updateStatusPageSettings,
 } from '../controllers/status.controller.js';
 
 const router = Router();
@@ -43,6 +44,7 @@ router.patch('/models/:id', updateAiModel);
 router.delete('/models/:id', deleteAiModel);
 
 router.get('/status', getAdminStatus);
+router.patch('/status/settings', updateStatusPageSettings);
 router.post('/status/components', createStatusComponent);
 router.patch('/status/components/:id', updateStatusComponent);
 router.delete('/status/components/:id', deleteStatusComponent);
