@@ -12,14 +12,19 @@ import cliAuthRoutes from './routes/cliAuth.routes.js';
 import llmProxyRoutes from './routes/llmProxy.routes.js';
 import oidcProvider from './services/oidc.service.js';
 import { ensureDefaultFreeTariff } from './services/defaultTariff.service.js';
-import transparencyRoutes from './routes/transparency.routes.js';
+import statusRoutes from './routes/status.routes.js';
 import { ensureDefaultAiModels } from './services/defaultModels.service.js';
+import { ensureDefaultStatusComponents } from './services/defaultStatusComponents.service.js';
+import { systemLogMiddleware } from './middleware/systemLog.middleware.js';
+import { pruneSystemLogs, writeSystemLog } from './services/systemLog.service.js';
 
 process.on('unhandledRejection', (reason, promise) => {
   console.error('[process] Unhandled Rejection:', reason);
+  void writeSystemLog({ level: 'ERROR', category: 'SYSTEM', event: 'Необработанное отклонение Promise', metadata: { message: reason instanceof Error ? reason.message : String(reason) } });
 });
 process.on('uncaughtException', (err) => {
   console.error('[process] Uncaught Exception:', err);
+  void writeSystemLog({ level: 'ERROR', category: 'SYSTEM', event: 'Необработанное исключение процесса', metadata: { message: err.message } });
 });
 
 const __filename = fileURLToPath(import.meta.url);
@@ -32,6 +37,7 @@ app.set('trust proxy', 1);
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
+app.use(systemLogMiddleware);
 
 // API routes
 app.use('/interaction', interactionRoutes);
@@ -41,13 +47,13 @@ app.use('/api/admin', adminRoutes);
 app.use('/api/v1', arlistApiRoutes);
 app.use('/api/cli/auth', cliAuthRoutes);
 app.use('/api/v1', llmProxyRoutes);
-app.use('/api/transparency', transparencyRoutes);
+app.use('/api/status', statusRoutes);
 app.get('/api/health', (req, res) => {
   res.json({ status: 'ok' });
 });
 
 // React SPA routes
-app.get(['/', '/products', '/forEdu', '/contacts', '/docs', '/landings', '/legal', '/legal/geotekt-policies', '/promo', '/promo/manifest', '/vspyshka', '/grusnub', '/login', '/register', '/verify', '/profile', '/admin', '/privacy-policy', '/forgot-password', '/reset-password', '/cli/auth', '/transparency', '/transparancy'], (req, res) => {
+app.get(['/', '/products', '/forEdu', '/contacts', '/docs', '/landings', '/legal', '/legal/geotekt-policies', '/promo', '/promo/manifest', '/vspyshka', '/grusnub', '/login', '/register', '/verify', '/profile', '/admin', '/privacy-policy', '/forgot-password', '/reset-password', '/cli/auth', '/status', '/transparency', '/transparancy'], (req, res) => {
   res.sendFile(path.join(__dirname, '../dist-client/index.html'));
 });
 
@@ -70,6 +76,11 @@ app.get(/.*/, (req, res, next) => {
 app.use(oidcProvider.callback());
 
 const startServer = async () => {
+  const prunedLogs = await pruneSystemLogs();
+
+  const createdComponents = await ensureDefaultStatusComponents();
+  if (createdComponents > 0) console.log(`[status] Created ${createdComponents} default component(s)`);
+
   const createdModels = await ensureDefaultAiModels();
   if (createdModels > 0) console.log(`[models] Created ${createdModels} default model(s)`);
 
@@ -79,6 +90,11 @@ const startServer = async () => {
   app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
     console.log(`OIDC Issuer: ${process.env.ISSUER_URL || 'http://localhost:8086'}`);
+    void writeSystemLog({
+      category: 'SYSTEM',
+      event: 'Сервер запущен',
+      metadata: { port: Number(PORT), prunedLogs },
+    });
   });
 };
 

@@ -82,7 +82,7 @@ const Home = () => {
         <div className="grid grid-cols-2 gap-8 text-sm sm:grid-cols-3">
           <div className="flex flex-col gap-3"><span className="font-mono text-[10px] uppercase tracking-[0.16em] text-[#171817]/38">Сервисы</span><a href="https://leetcot.ru" className="hover:opacity-50">ЛитКот</a></div>
           <div className="flex flex-col gap-3"><span className="font-mono text-[10px] uppercase tracking-[0.16em] text-[#171817]/38">Компания</span><Link to="/forEdu" className="hover:opacity-50">Для людей</Link><Link to="/contacts" className="hover:opacity-50">Контакты</Link><Link to="/docs" className="hover:opacity-50">API</Link></div>
-          <div className="flex flex-col gap-3"><span className="font-mono text-[10px] uppercase tracking-[0.16em] text-[#171817]/38">Право</span><Link to="/legal" className="hover:opacity-50">Документы</Link><Link to="/privacy-policy" className="hover:opacity-50">Приватность</Link><Link to="/transparency" className="hover:opacity-50">Прозрачность</Link></div>
+          <div className="flex flex-col gap-3"><span className="font-mono text-[10px] uppercase tracking-[0.16em] text-[#171817]/38">Право</span><Link to="/legal" className="hover:opacity-50">Документы</Link><Link to="/privacy-policy" className="hover:opacity-50">Приватность</Link><Link to="/status" className="hover:opacity-50">Статус</Link></div>
         </div>
         <p className="text-xs text-[#171817]/40 lg:col-span-2">© 2026 АРЛИСТ ТЕХ. Все права защищены.</p>
       </footer>

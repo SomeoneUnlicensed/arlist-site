@@ -5,6 +5,7 @@ import { getSettings, saveSettings } from '../services/settings.service.js';
 import { sendCustomEmail } from '../services/mail.service.js';
 import { invalidateModelRegistry } from '../services/modelRegistry.service.js';
 import { invalidateModelAuth } from '../services/modelAuth.service.js';
+import type { Prisma } from '@prisma/client';
 
 // ── Stats ─────────────────────────────────────────────────
 
@@ -251,6 +252,47 @@ export const getKnownModels = async (req: Request, res: Response) => {
     res.json({ models: models.map((model) => model.key) });
   } catch {
     res.status(500).json({ error: 'Internal server error' });
+  }
+};
+
+// ── System logs ───────────────────────────────────────────
+
+const LOG_LEVELS = ['INFO', 'WARN', 'ERROR'];
+const LOG_CATEGORIES = ['SYSTEM', 'AUTH', 'SECURITY', 'ADMIN', 'API', 'STATUS', 'MAIL', 'OIDC'];
+
+export const getSystemLogs = async (req: Request, res: Response) => {
+  try {
+    const level = typeof req.query.level === 'string' ? req.query.level.toUpperCase() : '';
+    const category = typeof req.query.category === 'string' ? req.query.category.toUpperCase() : '';
+    const query = typeof req.query.query === 'string' ? req.query.query.trim().slice(0, 200) : '';
+    const requestedLimit = Number(req.query.limit ?? 100);
+    const limit = Number.isSafeInteger(requestedLimit) ? Math.min(200, Math.max(1, requestedLimit)) : 100;
+    if (level && !LOG_LEVELS.includes(level)) return res.status(400).json({ error: 'Invalid log level' });
+    if (category && !LOG_CATEGORIES.includes(category)) return res.status(400).json({ error: 'Invalid log category' });
+
+    const where: Prisma.SystemLogWhereInput = {
+      ...(level ? { level: level as any } : {}),
+      ...(category ? { category: category as any } : {}),
+      ...(query ? { OR: [
+        { event: { contains: query, mode: 'insensitive' } },
+        { subject: { contains: query, mode: 'insensitive' } },
+        { ipAddress: { contains: query, mode: 'insensitive' } },
+        { path: { contains: query, mode: 'insensitive' } },
+        { user: { is: { email: { contains: query, mode: 'insensitive' } } } },
+      ] } : {}),
+    };
+    const [logs, total] = await Promise.all([
+      prisma.systemLog.findMany({
+        where,
+        include: { user: { select: { id: true, email: true, name: true, role: true } } },
+        orderBy: [{ createdAt: 'desc' }, { id: 'desc' }],
+        take: limit,
+      }),
+      prisma.systemLog.count({ where }),
+    ]);
+    res.json({ logs, total, limit });
+  } catch {
+    res.status(500).json({ error: 'Не удалось загрузить системные логи' });
   }
 };
 
