@@ -68,7 +68,7 @@ async function callYandexGpt(row: AiModel, apiKey: string, body: Record<string, 
   }), { status: 200, headers: { 'Content-Type': 'application/json' } });
 }
 
-async function callUpstream(row: AiModel, body: Record<string, unknown>) {
+export async function callUpstream(row: AiModel, body: Record<string, unknown>) {
   const token = await resolveToken(row);
   if (row.wireProtocol === 'YANDEXGPT') return callYandexGpt(row, token, body);
   return callOpenAiCompatible(row, token, body);
