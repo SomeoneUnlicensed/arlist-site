@@ -299,7 +299,7 @@ export const getSystemLogs = async (req: Request, res: Response) => {
 
 // ── AI model registry ─────────────────────────────────────
 
-const WIRE_PROTOCOLS = ['OPENAI_COMPATIBLE', 'YANDEXGPT'] as const;
+const WIRE_PROTOCOLS = ['OPENAI_COMPATIBLE', 'YANDEXGPT', 'ANTHROPIC'] as const;
 const AUTH_METHODS = ['BEARER_ENV', 'OAUTH2_CLIENT_CREDENTIALS', 'API_KEY_HEADER'] as const;
 const ENV_NAME_PATTERN = /^[A-Z_][A-Z0-9_]*$/;
 const MODEL_KEY_PATTERN = /^[a-z0-9][a-z0-9._/-]*$/;
@@ -366,7 +366,7 @@ function modelReadiness(model: any) {
     .filter(Boolean) as string[];
   const missingEnvVars = names.filter((name) => !process.env[name]);
   const hasRequiredConfig = Boolean(apiKeySecret || model.apiKeyEnvVar)
-    && (model.authMethod !== 'API_KEY_HEADER' || model.wireProtocol === 'YANDEXGPT' || Boolean(model.headerName))
+    && (model.authMethod !== 'API_KEY_HEADER' || model.wireProtocol !== 'OPENAI_COMPATIBLE' || Boolean(model.headerName))
     && (model.authMethod !== 'OAUTH2_CLIENT_CREDENTIALS' || Boolean(model.oauthTokenUrl))
     && (model.wireProtocol !== 'YANDEXGPT' || Boolean(model.extraHeaderName && model.extraHeaderEnvVar));
   return {

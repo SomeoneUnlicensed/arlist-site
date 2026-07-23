@@ -53,6 +53,7 @@ enum MaintenanceState {
 enum ModelWireProtocol {
   OPENAI_COMPATIBLE
   YANDEXGPT
+  ANTHROPIC
 }
 
 enum ModelAuthMethod {

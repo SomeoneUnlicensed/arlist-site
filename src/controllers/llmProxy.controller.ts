@@ -72,9 +72,65 @@ async function callYandexGpt(row: AiModel, apiKey: string, body: Record<string, 
   }), { status: 200, headers: { 'Content-Type': 'application/json' } });
 }
 
+// Anthropic's Messages API: system prompt is a top-level field, not a "system"-role message, and
+// max_tokens is mandatory. Response is normalized to OpenAI's chat-completion shape (choices/usage)
+// so nothing downstream (billing, the Вспышка client) needs protocol-specific handling - same
+// approach as callYandexGpt below.
+async function callAnthropic(row: AiModel, apiKey: string, body: Record<string, unknown>) {
+  const messages = (body.messages as Array<{ role: string; content: string }> | undefined) ?? [];
+  const system = messages
+    .filter((message) => message.role === 'system')
+    .map((message) => message.content)
+    .join('\n\n');
+  const conversation = messages
+    .filter((message) => message.role !== 'system')
+    .map((message) => ({ role: message.role === 'assistant' ? 'assistant' : 'user', content: message.content }));
+  const maxTokens = (body.max_tokens as number | undefined) ?? 4096;
+  const temperature = body.temperature as number | undefined;
+
+  const response = await fetch(row.baseUrl, {
+    method: 'POST',
+    headers: {
+      'x-api-key': apiKey,
+      'anthropic-version': '2023-06-01',
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      model: row.upstreamModel,
+      max_tokens: maxTokens,
+      ...(system ? { system } : {}),
+      ...(temperature !== undefined ? { temperature } : {}),
+      messages: conversation,
+    }),
+    signal: AbortSignal.timeout(120_000),
+  });
+
+  if (!response.ok) return response;
+  const data: any = await response.json();
+  const text = (data.content ?? [])
+    .filter((block: any) => block.type === 'text')
+    .map((block: any) => block.text)
+    .join('');
+  const inputTokens = Number(data.usage?.input_tokens ?? 0);
+  const outputTokens = Number(data.usage?.output_tokens ?? 0);
+  return new Response(JSON.stringify({
+    choices: [{
+      message: { role: 'assistant', content: text },
+      finish_reason: data.stop_reason === 'end_turn' ? 'stop' : (data.stop_reason ?? 'stop'),
+      index: 0,
+    }],
+    usage: {
+      prompt_tokens: inputTokens,
+      completion_tokens: outputTokens,
+      total_tokens: inputTokens + outputTokens,
+    },
+  }), { status: 200, headers: { 'Content-Type': 'application/json' } });
+}
+
 export async function callUpstream(row: AiModel, body: Record<string, unknown>) {
   const token = await resolveToken(row);
   if (row.wireProtocol === 'YANDEXGPT') return callYandexGpt(row, token, body);
+  if (row.wireProtocol === 'ANTHROPIC') return callAnthropic(row, token, body);
   return callOpenAiCompatible(row, token, body);
 }
 

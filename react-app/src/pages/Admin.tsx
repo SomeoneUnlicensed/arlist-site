@@ -1171,7 +1171,30 @@ const TariffsTab = () => {
                 <div><p className="text-xs text-muted-foreground mb-1">Кредиты / 5ч</p>{t.creditsPer5h.toLocaleString('ru-RU')}</div>
                 <div><p className="text-xs text-muted-foreground mb-1">Кредиты / неделя</p>{t.creditsPerWeek.toLocaleString('ru-RU')}</div>
                 <div><p className="text-xs text-muted-foreground mb-1">Оверран</p>{t.overrunEnabled ? 'Включён' : 'Выключен'}</div>
-                <div><p className="text-xs text-muted-foreground mb-1">Модели</p>{t.models.join(', ') || '—'}</div>
+                <div className="col-span-2">
+                  <p className="text-xs text-muted-foreground mb-1">Модели</p>
+                  {t.models.length === 0 ? '—' : (
+                    <div className="flex flex-wrap gap-1.5">
+                      {t.models.map((m: string) => {
+                        const missing = !knownModels.includes(m)
+                        return (
+                          <span
+                            key={m}
+                            title={missing ? 'Этой модели больше нет в реестре — недоступна на прокси, пока не добавите заново' : undefined}
+                            className={cn(
+                              'font-mono text-xs px-2 py-0.5 rounded-full border',
+                              missing
+                                ? 'border-red-500/30 bg-red-500/10 text-red-400 line-through decoration-red-400/60'
+                                : 'border-border/40 text-muted-foreground'
+                            )}
+                          >
+                            {m}
+                          </span>
+                        )
+                      })}
+                    </div>
+                  )}
+                </div>
               </div>
             ) : (
               <div className="space-y-4">
@@ -1298,7 +1321,7 @@ const ModelsTab = () => {
         <div className="space-y-2"><Label>Название в интерфейсе</Label><Input value={form.label} onChange={e => setForm({ ...form, label: e.target.value })} placeholder="Gemini 2.5 Flash" /></div>
         <div className="space-y-2"><Label>API endpoint</Label><Input value={form.baseUrl} onChange={e => setForm({ ...form, baseUrl: e.target.value })} placeholder="https://provider.example/v1/chat/completions" /></div>
         <div className="space-y-2"><Label>Модель у провайдера</Label><Input value={form.upstreamModel} onChange={e => setForm({ ...form, upstreamModel: e.target.value })} placeholder="provider-model-id" /></div>
-        <div className="space-y-2"><Label>Протокол</Label><select value={form.wireProtocol} onChange={e => setForm({ ...form, wireProtocol: e.target.value })} className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm"><option value="OPENAI_COMPATIBLE">OpenAI-compatible</option><option value="YANDEXGPT">YandexGPT</option></select></div>
+        <div className="space-y-2"><Label>Протокол</Label><select value={form.wireProtocol} onChange={e => setForm({ ...form, wireProtocol: e.target.value })} className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm"><option value="OPENAI_COMPATIBLE">OpenAI-compatible</option><option value="YANDEXGPT">YandexGPT</option><option value="ANTHROPIC">Anthropic (Claude)</option></select></div>
         <div className="space-y-2"><Label>Авторизация</Label><select value={form.authMethod} onChange={e => setForm({ ...form, authMethod: e.target.value })} className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm"><option value="BEARER_ENV">Bearer token из env</option><option value="API_KEY_HEADER">API key в заголовке</option><option value="OAUTH2_CLIENT_CREDENTIALS">OAuth2 client credentials</option></select></div>
         <div className="space-y-2"><Label>Имя env-переменной с секретом</Label><Input value={form.apiKeyEnvVar} onChange={e => setForm({ ...form, apiKeyEnvVar: e.target.value.toUpperCase() })} placeholder="PROVIDER_API_KEY" /><p className="text-xs text-muted-foreground">Сам секрет в базу не записывается.</p></div>
         {form.authMethod === 'API_KEY_HEADER' && form.wireProtocol === 'OPENAI_COMPATIBLE' && <div className="space-y-2"><Label>Название заголовка</Label><Input value={form.headerName} onChange={e => setForm({ ...form, headerName: e.target.value })} placeholder="x-api-key" /></div>}
