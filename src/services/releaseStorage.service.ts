@@ -7,11 +7,15 @@ const BUCKET = process.env.RELEASES_S3_BUCKET || '';
 const PREFIX = 'releases/vspyshka';
 
 function client(): S3Client {
-  const accessKeyId = process.env.RELEASES_S3_ACCESS_KEY;
+  const keyId = process.env.RELEASES_S3_ACCESS_KEY;
   const secretAccessKey = process.env.RELEASES_S3_SECRET_KEY;
-  if (!accessKeyId || !secretAccessKey || !BUCKET) {
+  const tenantId = process.env.RELEASES_S3_TENANT_ID;
+  if (!keyId || !secretAccessKey || !BUCKET) {
     throw new Error('RELEASES_S3_ACCESS_KEY/RELEASES_S3_SECRET_KEY/RELEASES_S3_BUCKET not configured');
   }
+  // Cloud.ru's S3E requires the access key id to be prefixed with the tenant id
+  // (`<tenant_id>:<key_id>`), unlike plain access keys used elsewhere (e.g. the backup script).
+  const accessKeyId = tenantId ? `${tenantId}:${keyId}` : keyId;
   return new S3Client({
     endpoint: process.env.RELEASES_S3_ENDPOINT || 'https://s3.cloud.ru',
     region: process.env.RELEASES_S3_REGION || 'ru-central-1',
