@@ -53,6 +53,15 @@ export const getVersionInfo = async (_req: Request, res: Response) => {
 
 // Admin-authenticated (reuses the existing admin JWT middleware, mounted in admin.routes.ts) -
 // this is ongoing content management, not a one-shot CI credential.
+export const getAnnouncementsAdmin = async (_req: Request, res: Response) => {
+  try {
+    res.json(await getAnnouncements());
+  } catch (error: any) {
+    console.error('Vspyshka announcements fetch error:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+};
+
 export const updateAnnouncements = async (req: Request, res: Response) => {
   try {
     const body = req.body?.announcements;

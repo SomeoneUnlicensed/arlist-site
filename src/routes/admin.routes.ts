@@ -6,7 +6,7 @@ import {
   getTariffs, updateTariff, getKnownModels,
   getAiModels, createAiModel, updateAiModel, deleteAiModel,
 } from '../controllers/admin.controller.js';
-import { updateAnnouncements } from '../controllers/vspyshkaReleases.controller.js';
+import { getAnnouncementsAdmin, updateAnnouncements } from '../controllers/vspyshkaReleases.controller.js';
 import { authenticate, authorize } from '../middleware/auth.middleware.js';
 import {
   addIncidentUpdate, createMaintenance, createStatusComponent, createStatusIncident,
@@ -44,6 +44,7 @@ router.post('/models', createAiModel);
 router.patch('/models/:id', updateAiModel);
 router.delete('/models/:id', deleteAiModel);
 
+router.get('/vspyshka-announcements', getAnnouncementsAdmin);
 router.patch('/vspyshka-announcements', updateAnnouncements);
 
 router.get('/status', getAdminStatus);

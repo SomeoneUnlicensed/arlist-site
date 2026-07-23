@@ -1319,6 +1319,127 @@ const ModelsTab = () => {
   </div>
 }
 
+// ── Vspyshka announcements tab ───────────────────────────────
+
+const EMPTY_ANNOUNCEMENT = { message: '', minVersion: '', maxVersion: '' }
+
+const AnnouncementsTab = () => {
+  const [announcements, setAnnouncements] = useState<any[]>([])
+  const [loading, setLoading] = useState(true)
+  const [saving, setSaving] = useState(false)
+  const [err, setErr] = useState('')
+  const [draft, setDraft] = useState(EMPTY_ANNOUNCEMENT)
+
+  const load = async () => {
+    setLoading(true)
+    try {
+      const { data } = await axios.get('/api/admin/vspyshka-announcements')
+      setAnnouncements(data)
+    } catch { setErr('Не удалось загрузить объявления') }
+    finally { setLoading(false) }
+  }
+
+  useEffect(() => { load() }, [])
+
+  const persist = async (next: any[]) => {
+    setSaving(true); setErr('')
+    try {
+      await axios.patch('/api/admin/vspyshka-announcements', { announcements: next })
+      setAnnouncements(next)
+    } catch (e: any) { setErr(e.response?.data?.error || 'Не удалось сохранить объявления') }
+    finally { setSaving(false) }
+  }
+
+  const add = () => {
+    if (!draft.message.trim()) return
+    const entry: any = { message: draft.message.trim() }
+    if (draft.minVersion.trim()) entry.minVersion = draft.minVersion.trim()
+    if (draft.maxVersion.trim()) entry.maxVersion = draft.maxVersion.trim()
+    persist([...announcements, entry])
+    setDraft(EMPTY_ANNOUNCEMENT)
+  }
+
+  const remove = (idx: number) => {
+    persist(announcements.filter((_, i) => i !== idx))
+  }
+
+  if (loading) return (
+    <div className="flex items-center justify-center py-20 text-muted-foreground gap-2 text-sm">
+      <Loader2 size={18} className="animate-spin text-lime-700" /> Загрузка объявлений...
+    </div>
+  )
+
+  return (
+    <div className="p-5 space-y-5">
+      {err && <Alert variant="destructive"><AlertDescription>{err}</AlertDescription></Alert>}
+      <p className="text-xs text-muted-foreground max-w-2xl">
+        Сообщения показываются в клиенте Вспышки при запуске. Без версий — всем; с минимальной и/или
+        максимальной версией — только тем клиентам, чья версия попадает в диапазон. Нет отдельного
+        механизма «скрыть навсегда» — сообщение видно, пока вы его не удалите здесь.
+      </p>
+
+      {announcements.length === 0 ? (
+        <div className="text-center py-10 text-muted-foreground text-sm border border-dashed border-border rounded-xl">
+          Активных объявлений нет
+        </div>
+      ) : (
+        <div className="space-y-3">
+          {announcements.map((a, idx) => (
+            <Card key={idx}>
+              <CardContent className="p-4 flex items-start justify-between gap-4">
+                <div className="min-w-0 space-y-1.5">
+                  <p className="text-sm break-words">{a.message}</p>
+                  {(a.minVersion || a.maxVersion) && (
+                    <p className="text-[11px] font-mono text-muted-foreground">
+                      {a.minVersion ? `от ${a.minVersion}` : ''}{a.minVersion && a.maxVersion ? ' · ' : ''}{a.maxVersion ? `до ${a.maxVersion}` : ''}
+                    </p>
+                  )}
+                </div>
+                <Button size="sm" variant="ghost" disabled={saving} onClick={() => remove(idx)} className="shrink-0 text-red-400 hover:bg-red-500/10 hover:text-red-300">
+                  <Trash2 size={13} />
+                </Button>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      )}
+
+      <Card className="max-w-lg">
+        <CardHeader className="py-4 px-5 border-b border-border/40">
+          <p className="text-sm font-medium">Новое объявление</p>
+        </CardHeader>
+        <CardContent className="p-5 space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="announcement-message">Текст сообщения</Label>
+            <textarea
+              id="announcement-message"
+              rows={3}
+              value={draft.message}
+              onChange={e => setDraft({ ...draft, message: e.target.value })}
+              placeholder="Плановые работы на сервере сегодня в 23:00 по МСК"
+              className="w-full rounded-md border border-input bg-background px-3 py-2 text-xs ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            />
+          </div>
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="announcement-min">Мин. версия (необязательно)</Label>
+              <Input id="announcement-min" value={draft.minVersion} onChange={e => setDraft({ ...draft, minVersion: e.target.value })} placeholder="0.2.0" />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="announcement-max">Макс. версия (необязательно)</Label>
+              <Input id="announcement-max" value={draft.maxVersion} onChange={e => setDraft({ ...draft, maxVersion: e.target.value })} placeholder="0.3.0" />
+            </div>
+          </div>
+          <Button onClick={add} disabled={saving || !draft.message.trim()} className="w-full">
+            {saving ? <Loader2 size={14} className="animate-spin" /> : <Plus size={14} />}
+            Добавить объявление
+          </Button>
+        </CardContent>
+      </Card>
+    </div>
+  )
+}
+
 // ── Main ──────────────────────────────────────────────────
 
 const Admin = () => {
@@ -1355,6 +1476,7 @@ const Admin = () => {
               <TabsTrigger value="status">Статус</TabsTrigger>
               <TabsTrigger value="tariffs">Тарифы Вспышки</TabsTrigger>
               <TabsTrigger value="models">Модели ИИ</TabsTrigger>
+              <TabsTrigger value="announcements">Объявления Вспышки</TabsTrigger>
               <TabsTrigger value="settings">Режимы регистрации</TabsTrigger>
               <TabsTrigger value="logs">Логи системы</TabsTrigger>
             </TabsList>
@@ -1364,6 +1486,7 @@ const Admin = () => {
             <TabsContent value="status"><StatusAdminTab /></TabsContent>
             <TabsContent value="tariffs"><TariffsTab /></TabsContent>
             <TabsContent value="models"><ModelsTab /></TabsContent>
+            <TabsContent value="announcements"><AnnouncementsTab /></TabsContent>
             <TabsContent value="settings"><SettingsTab /></TabsContent>
             <TabsContent value="logs"><LogsTab /></TabsContent>
           </Card>
