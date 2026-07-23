@@ -8,7 +8,6 @@ import { Label } from '@/components/ui/label'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { Alert, AlertDescription } from '@/components/ui/alert'
-import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs'
 import { cn } from '@/lib/utils'
 import { StatusAdminTab } from '@/components/StatusAdminTab'
 
@@ -1251,9 +1250,9 @@ const TariffsTab = () => {
 
 const EMPTY_MODEL = {
   key: '', label: '', wireProtocol: 'OPENAI_COMPATIBLE', authMethod: 'BEARER_ENV',
-  baseUrl: '', upstreamModel: '', apiKeyEnvVar: '', headerName: '',
+  baseUrl: '', upstreamModel: '', apiKey: '', apiKeyEnvVar: '', headerName: '',
   extraHeaderName: '', extraHeaderEnvVar: '', oauthTokenUrl: '', oauthScopeEnvVar: '',
-  isEnabled: false,
+  isEnabled: false, hasApiKeySecret: false,
 }
 
 const ModelsTab = () => {
@@ -1277,23 +1276,29 @@ const ModelsTab = () => {
     setErr('')
     setForm({
       key: model.key, label: model.label, wireProtocol: model.wireProtocol, authMethod: model.authMethod,
-      baseUrl: model.baseUrl, upstreamModel: model.upstreamModel,
+      baseUrl: model.baseUrl, upstreamModel: model.upstreamModel, apiKey: '',
       apiKeyEnvVar: model.apiKeyEnvVar ?? '', headerName: model.headerName ?? '',
       extraHeaderName: model.extraHeaderName ?? '', extraHeaderEnvVar: model.extraHeaderEnvVar ?? '',
       oauthTokenUrl: model.oauthTokenUrl ?? '', oauthScopeEnvVar: model.oauthScopeEnvVar ?? '',
-      isEnabled: model.isEnabled,
+      isEnabled: model.isEnabled, hasApiKeySecret: Boolean(model.hasApiKeySecret),
     })
   }
 
-  const payload = () => ({
-    ...form,
-    apiKeyEnvVar: form.apiKeyEnvVar || null,
-    headerName: form.headerName || null,
-    extraHeaderName: form.extraHeaderName || null,
-    extraHeaderEnvVar: form.extraHeaderEnvVar || null,
-    oauthTokenUrl: form.oauthTokenUrl || null,
-    oauthScopeEnvVar: form.oauthScopeEnvVar || null,
-  })
+  const payload = () => {
+    // apiKey is write-only: an empty field must NOT be sent while editing, or the backend would
+    // interpret it as "clear the secret" (apiKey !== undefined) even though the admin never touched it.
+    const { apiKey, hasApiKeySecret: _hasApiKeySecret, ...rest } = form
+    return {
+      ...rest,
+      apiKeyEnvVar: form.apiKeyEnvVar || null,
+      headerName: form.headerName || null,
+      extraHeaderName: form.extraHeaderName || null,
+      extraHeaderEnvVar: form.extraHeaderEnvVar || null,
+      oauthTokenUrl: form.oauthTokenUrl || null,
+      oauthScopeEnvVar: form.oauthScopeEnvVar || null,
+      ...(apiKey.trim() ? { apiKey: apiKey.trim() } : {}),
+    }
+  }
 
   const save = async () => {
     setSaving(true); setErr('')
@@ -1323,7 +1328,17 @@ const ModelsTab = () => {
         <div className="space-y-2"><Label>Модель у провайдера</Label><Input value={form.upstreamModel} onChange={e => setForm({ ...form, upstreamModel: e.target.value })} placeholder="provider-model-id" /></div>
         <div className="space-y-2"><Label>Протокол</Label><select value={form.wireProtocol} onChange={e => setForm({ ...form, wireProtocol: e.target.value })} className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm"><option value="OPENAI_COMPATIBLE">OpenAI-compatible</option><option value="YANDEXGPT">YandexGPT</option><option value="ANTHROPIC">Anthropic (Claude)</option></select></div>
         <div className="space-y-2"><Label>Авторизация</Label><select value={form.authMethod} onChange={e => setForm({ ...form, authMethod: e.target.value })} className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm"><option value="BEARER_ENV">Bearer token из env</option><option value="API_KEY_HEADER">API key в заголовке</option><option value="OAUTH2_CLIENT_CREDENTIALS">OAuth2 client credentials</option></select></div>
-        <div className="space-y-2"><Label>Имя env-переменной с секретом</Label><Input value={form.apiKeyEnvVar} onChange={e => setForm({ ...form, apiKeyEnvVar: e.target.value.toUpperCase() })} placeholder="PROVIDER_API_KEY" /><p className="text-xs text-muted-foreground">Сам секрет в базу не записывается.</p></div>
+        <div className="space-y-2">
+          <Label>API-ключ / токен авторизации</Label>
+          <Input
+            type="password"
+            value={form.apiKey}
+            onChange={e => setForm({ ...form, apiKey: e.target.value })}
+            placeholder={form.hasApiKeySecret ? 'Уже настроен — оставьте пустым, чтобы не менять' : 'Вставьте ключ провайдера'}
+          />
+          <p className="text-xs text-muted-foreground">Шифруется (AES-256-GCM) и хранится в базе, обратно не показывается. Для OAuth2 — сюда вставляется Authorization key (Basic).</p>
+        </div>
+        <div className="space-y-2"><Label>Имя env-переменной с секретом (альтернатива полю выше)</Label><Input value={form.apiKeyEnvVar} onChange={e => setForm({ ...form, apiKeyEnvVar: e.target.value.toUpperCase() })} placeholder="PROVIDER_API_KEY" /><p className="text-xs text-muted-foreground">Если задано вместо ключа выше — секрет берётся из окружения сервера, а не из базы.</p></div>
         {form.authMethod === 'API_KEY_HEADER' && form.wireProtocol === 'OPENAI_COMPATIBLE' && <div className="space-y-2"><Label>Название заголовка</Label><Input value={form.headerName} onChange={e => setForm({ ...form, headerName: e.target.value })} placeholder="x-api-key" /></div>}
         {form.authMethod === 'OAUTH2_CLIENT_CREDENTIALS' && <><div className="space-y-2"><Label>OAuth token URL</Label><Input value={form.oauthTokenUrl} onChange={e => setForm({ ...form, oauthTokenUrl: e.target.value })} placeholder="https://provider.example/oauth" /></div><div className="space-y-2"><Label>Env-переменная scope</Label><Input value={form.oauthScopeEnvVar} onChange={e => setForm({ ...form, oauthScopeEnvVar: e.target.value.toUpperCase() })} placeholder="PROVIDER_SCOPE" /></div></>}
         {form.wireProtocol === 'YANDEXGPT' && <><div className="space-y-2"><Label>Дополнительный заголовок</Label><Input value={form.extraHeaderName} onChange={e => setForm({ ...form, extraHeaderName: e.target.value })} placeholder="x-folder-id" /></div><div className="space-y-2"><Label>Env со значением заголовка</Label><Input value={form.extraHeaderEnvVar} onChange={e => setForm({ ...form, extraHeaderEnvVar: e.target.value.toUpperCase() })} placeholder="YANDEX_FOLDER_ID" /></div></>}
@@ -1465,56 +1480,85 @@ const AnnouncementsTab = () => {
 
 // ── Main ──────────────────────────────────────────────────
 
+const NAV_SECTIONS = [
+  { value: 'users', label: 'Пользователи', icon: Users },
+  { value: 'clients', label: 'OIDC-клиенты', icon: AppWindow },
+  { value: 'broadcast', label: 'Рассылка писем', icon: Mail },
+  { value: 'status', label: 'Статус', icon: Activity },
+  { value: 'tariffs', label: 'Тарифы Вспышки', icon: Coins },
+  { value: 'models', label: 'Модели ИИ', icon: Globe },
+  { value: 'announcements', label: 'Объявления Вспышки', icon: AlertTriangle },
+  { value: 'settings', label: 'Режимы регистрации', icon: Settings },
+  { value: 'logs', label: 'Логи системы', icon: FileText },
+] as const
+
+type AdminSection = typeof NAV_SECTIONS[number]['value']
+
+const SECTION_CONTENT: Record<AdminSection, React.ReactNode> = {
+  users: <UsersTab />,
+  clients: <ClientsTab />,
+  broadcast: <BroadcastTab />,
+  status: <StatusAdminTab />,
+  tariffs: <TariffsTab />,
+  models: <ModelsTab />,
+  announcements: <AnnouncementsTab />,
+  settings: <SettingsTab />,
+  logs: <LogsTab />,
+}
+
 const Admin = () => {
   const navigate = useNavigate()
+  const [active, setActive] = useState<AdminSection>('users')
+  const activeSection = NAV_SECTIONS.find(s => s.value === active)!
 
   return (
-    <div className="min-h-screen flex flex-col">
-      <header className="h-14 sticky top-0 z-50 border-b border-border/60 bg-background/80 backdrop-blur-xl flex items-center justify-between px-6">
-        <a href="/" className="font-display text-base tracking-tight hover:opacity-75 transition-opacity">арлист id</a>
-        <Button variant="outline" size="sm" onClick={() => navigate('/profile')}>
-          <ArrowLeft size={14} />Профиль
-        </Button>
-      </header>
-
-      <main className="flex-1 max-w-5xl w-full mx-auto px-4 py-10 animate-fade-up">
-        <div className="mb-6 flex items-center gap-3">
-          <div className="p-2 rounded-lg bg-lime-700/10 border border-lime-700/20">
-            <ShieldCheck size={18} className="text-lime-700" />
-          </div>
-          <div>
-            <h1 className="text-lg font-semibold tracking-tight">Панель управления</h1>
-            <p className="text-sm text-muted-foreground">арлист id</p>
-          </div>
+    <div className="h-screen flex overflow-hidden bg-background">
+      <aside className="w-64 shrink-0 border-r border-border/60 bg-card/20 flex flex-col">
+        <div className="h-14 shrink-0 flex items-center px-5 border-b border-border/60">
+          <a href="/" className="font-display text-base tracking-tight hover:opacity-75 transition-opacity">арлист id</a>
         </div>
+        <nav className="flex-1 overflow-y-auto py-3 px-2 space-y-0.5">
+          {NAV_SECTIONS.map(({ value, label, icon: Icon }) => (
+            <button
+              key={value}
+              type="button"
+              onClick={() => setActive(value)}
+              className={cn(
+                'w-full flex items-center gap-2.5 rounded-lg border px-3 py-2 text-left text-sm font-medium transition-colors',
+                active === value
+                  ? 'border-lime-700/20 bg-lime-700/10 text-lime-700'
+                  : 'border-transparent text-muted-foreground hover:bg-accent/50 hover:text-foreground'
+              )}
+            >
+              <Icon size={15} className="shrink-0" />
+              <span className="truncate">{label}</span>
+            </button>
+          ))}
+        </nav>
+        <div className="shrink-0 border-t border-border/60 p-3">
+          <Button variant="outline" size="sm" className="w-full" onClick={() => navigate('/profile')}>
+            <ArrowLeft size={14} />Профиль
+          </Button>
+        </div>
+      </aside>
 
-        <StatsBar />
+      <div className="flex min-w-0 flex-1 flex-col overflow-hidden">
+        <header className="h-14 shrink-0 flex items-center gap-3 border-b border-border/60 bg-background/80 px-6 backdrop-blur-xl">
+          <div className="rounded-lg border border-lime-700/20 bg-lime-700/10 p-1.5">
+            <ShieldCheck size={16} className="text-lime-700" />
+          </div>
+          <h1 className="text-sm font-semibold tracking-tight">{activeSection.label}</h1>
+        </header>
 
-        <Tabs defaultValue="users">
-          <Card className="overflow-hidden">
-            <TabsList className="scrollbar-none overflow-x-auto rounded-none border-b border-border/60 bg-transparent px-2 gap-0">
-              <TabsTrigger value="users">Пользователи</TabsTrigger>
-              <TabsTrigger value="clients">OIDC-клиенты</TabsTrigger>
-              <TabsTrigger value="broadcast">Рассылка писем</TabsTrigger>
-              <TabsTrigger value="status">Статус</TabsTrigger>
-              <TabsTrigger value="tariffs">Тарифы Вспышки</TabsTrigger>
-              <TabsTrigger value="models">Модели ИИ</TabsTrigger>
-              <TabsTrigger value="announcements">Объявления Вспышки</TabsTrigger>
-              <TabsTrigger value="settings">Режимы регистрации</TabsTrigger>
-              <TabsTrigger value="logs">Логи системы</TabsTrigger>
-            </TabsList>
-            <TabsContent value="users"><UsersTab /></TabsContent>
-            <TabsContent value="clients"><ClientsTab /></TabsContent>
-            <TabsContent value="broadcast"><BroadcastTab /></TabsContent>
-            <TabsContent value="status"><StatusAdminTab /></TabsContent>
-            <TabsContent value="tariffs"><TariffsTab /></TabsContent>
-            <TabsContent value="models"><ModelsTab /></TabsContent>
-            <TabsContent value="announcements"><AnnouncementsTab /></TabsContent>
-            <TabsContent value="settings"><SettingsTab /></TabsContent>
-            <TabsContent value="logs"><LogsTab /></TabsContent>
-          </Card>
-        </Tabs>
-      </main>
+        <main className="flex-1 overflow-y-auto">
+          {active === 'users' && <div className="p-6 pb-0"><StatsBar /></div>}
+          <div className="p-6">
+            <Card className="overflow-hidden">
+              {SECTION_CONTENT[active]}
+            </Card>
+          </div>
+        </main>
+      </div>
     </div>
   )
 }
