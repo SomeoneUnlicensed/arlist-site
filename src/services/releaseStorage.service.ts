@@ -51,6 +51,32 @@ export async function getLatestVersion(): Promise<string | null> {
   }
 }
 
+export interface Announcement {
+  message: string;
+  minVersion?: string;
+  maxVersion?: string;
+}
+
+export async function getAnnouncements(): Promise<Announcement[]> {
+  try {
+    const response = await client().send(new GetObjectCommand({ Bucket: BUCKET, Key: `${PREFIX}/announcements.json` }));
+    const body = await streamToString(response);
+    const parsed = JSON.parse(body) as { announcements?: Announcement[] };
+    return parsed.announcements ?? [];
+  } catch {
+    return [];
+  }
+}
+
+export async function setAnnouncements(announcements: Announcement[]): Promise<void> {
+  await client().send(new PutObjectCommand({
+    Bucket: BUCKET,
+    Key: `${PREFIX}/announcements.json`,
+    Body: Buffer.from(JSON.stringify({ announcements })),
+    ContentType: 'application/json',
+  }));
+}
+
 export async function getReleaseAsset(version: string, filename: string): Promise<GetObjectCommandOutput | null> {
   try {
     return await client().send(new GetObjectCommand({ Bucket: BUCKET, Key: objectKey(version, filename) }));

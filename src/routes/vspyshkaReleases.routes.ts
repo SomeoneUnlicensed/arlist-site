@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import express from 'express';
-import { uploadRelease, markLatestRelease, downloadRelease } from '../controllers/vspyshkaReleases.controller.js';
+import { uploadRelease, markLatestRelease, downloadRelease, getVersionInfo } from '../controllers/vspyshkaReleases.controller.js';
 import { authenticateReleaseUpload } from '../middleware/releaseUploadAuth.middleware.js';
 
 // Internal, CI-only upload API. Not mounted under /api/v1 (the customer-facing LLM proxy) since
@@ -14,4 +14,5 @@ vspyshkaReleaseUploadRoutes.post('/latest', markLatestRelease);
 
 // Public download surface, e.g. https://arlist.ru/dl/vspyshka/latest/vspyshka-win32-x64.zip
 export const vspyshkaReleaseDownloadRoutes = Router();
+vspyshkaReleaseDownloadRoutes.get('/version.json', getVersionInfo);
 vspyshkaReleaseDownloadRoutes.get('/:version/:filename', downloadRelease);
