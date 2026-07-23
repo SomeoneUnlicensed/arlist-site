@@ -10,6 +10,7 @@ import interactionRoutes from './routes/interaction.routes.js';
 import arlistApiRoutes from './routes/arlistApi.routes.js';
 import cliAuthRoutes from './routes/cliAuth.routes.js';
 import llmProxyRoutes from './routes/llmProxy.routes.js';
+import { vspyshkaReleaseUploadRoutes, vspyshkaReleaseDownloadRoutes } from './routes/vspyshkaReleases.routes.js';
 import oidcProvider from './services/oidc.service.js';
 import { ensureDefaultFreeTariff } from './services/defaultTariff.service.js';
 import statusRoutes from './routes/status.routes.js';
@@ -47,6 +48,8 @@ app.use('/api/admin', adminRoutes);
 app.use('/api/v1', arlistApiRoutes);
 app.use('/api/cli/auth', cliAuthRoutes);
 app.use('/api/v1', llmProxyRoutes);
+app.use('/api/internal/vspyshka-releases', vspyshkaReleaseUploadRoutes);
+app.use('/dl/vspyshka', vspyshkaReleaseDownloadRoutes);
 app.use('/api/status', statusRoutes);
 app.get('/api/health', (req, res) => {
   res.json({ status: 'ok' });

@@ -24,6 +24,7 @@
   },
   "homepage": "https://github.com/SomeoneUnlicensed/arlist-site#readme",
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.1093.0",
     "@prisma/client": "^5.15.0",
     "altcha-lib": "^2.2.0",
     "bcryptjs": "^3.0.3",
