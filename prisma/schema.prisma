@@ -214,22 +214,37 @@ model DeviceCode {
 }
 
 model AiModel {
-  id                String            @id @default(cuid())
-  key               String            @unique
-  label             String
-  wireProtocol      ModelWireProtocol
-  authMethod        ModelAuthMethod
-  baseUrl           String
-  upstreamModel     String
-  apiKeyEnvVar      String?
-  headerName        String?
-  extraHeaderName   String?
-  extraHeaderEnvVar String?
-  oauthTokenUrl     String?
-  oauthScopeEnvVar  String?
-  isEnabled         Boolean           @default(true)
-  createdAt         DateTime          @default(now())
-  updatedAt         DateTime          @updatedAt
+  id                      String            @id @default(cuid())
+  key                     String            @unique
+  label                   String
+  wireProtocol            ModelWireProtocol
+  authMethod              ModelAuthMethod
+  baseUrl                 String
+  upstreamModel           String
+  apiKeyEnvVar            String?
+  headerName              String?
+  extraHeaderName         String?
+  extraHeaderEnvVar       String?
+  oauthTokenUrl           String?
+  oauthScopeEnvVar        String?
+  isEnabled               Boolean           @default(true)
+  /// Short user-facing description of the model, shown in model pickers.
+  description             String?
+  /// Published context window size in tokens, if known.
+  contextWindow           Int?
+  /// Published max output token limit, if known.
+  maxOutputTokens         Int?
+  /// Whether the upstream model exposes an explicit reasoning/thinking mode.
+  supportsReasoning       Boolean           @default(false)
+  /// Whether the upstream model supports function/tool calling.
+  supportsFunctionCalling Boolean           @default(false)
+  /// Fixed vendor-specific request fields always merged into outgoing requests
+  /// for this model (e.g. DeepSeek's `{"thinking":{"type":"enabled"}}`).
+  extraRequestParams      Json?
+  /// Lower sorts first in model pickers.
+  priority                Int               @default(0)
+  createdAt               DateTime          @default(now())
+  updatedAt               DateTime          @updatedAt
 }
 
 model SystemSetting {

@@ -3,6 +3,7 @@ import type { AiModel } from '@prisma/client';
 import { recordUsage, isModelAllowed } from '../services/limits.service.js';
 import { getOAuthClientCredentialsToken } from '../services/modelAuth.service.js';
 import { getEnabledModels } from '../services/modelRegistry.service.js';
+import { buildModelInfo } from '../services/modelInfoBuilder.service.js';
 
 async function resolveToken(row: AiModel): Promise<string> {
   if (!row.apiKeyEnvVar) throw new Error(`${row.key}: apiKeyEnvVar not set`);
@@ -20,11 +21,16 @@ async function resolveToken(row: AiModel): Promise<string> {
 async function callOpenAiCompatible(row: AiModel, token: string, body: Record<string, unknown>) {
   const authHeader = row.authMethod === 'API_KEY_HEADER' ? (row.headerName || 'x-api-key') : 'Authorization';
   const authValue = row.authMethod === 'API_KEY_HEADER' ? token : `Bearer ${token}`;
+  // extraRequestParams holds fixed vendor-specific fields for this model (e.g. DeepSeek's
+  // `{"thinking":{"type":"enabled"}}` toggle for the "reasoner" product tier). These are applied
+  // after the caller's body and are not caller-overridable, since they define what the product key
+  // structurally means.
+  const extraRequestParams = (row.extraRequestParams as Record<string, unknown> | null) ?? {};
 
   return fetch(row.baseUrl, {
     method: 'POST',
     headers: { [authHeader]: authValue, 'Content-Type': 'application/json' },
-    body: JSON.stringify({ ...body, model: row.upstreamModel, stream: false }),
+    body: JSON.stringify({ ...body, ...extraRequestParams, model: row.upstreamModel, stream: false }),
     signal: AbortSignal.timeout(120_000),
   });
 }
@@ -112,13 +118,23 @@ export const chatCompletions = async (req: any, res: ExpressResponse) => {
   }
 };
 
+// Вспышка's built-in ModelsEndpointClient (models-manager/models_endpoint.rs) calls
+// GET {base_url}/models?client_version=X expecting a full ModelsResponse { models: ModelInfo[] } -
+// the exact JSON shape of the bundled models.json, not a lightweight summary. buildModelInfo fills
+// in the Codex-protocol plumbing fields (base_instructions, truncation_policy, etc.) that this
+// backend has no real per-model data for, and layers the real per-row fields on top.
 export const listModels = async (req: any, res: ExpressResponse) => {
   try {
     const enabled = await getEnabledModels();
     const tariffModels: string[] = req.user.tariff?.models ?? [];
-    const models = tariffModels.includes('*')
+    const allowedKeys = tariffModels.includes('*')
       ? [...enabled.keys()]
       : tariffModels.filter((key) => enabled.has(key));
+    const models = allowedKeys
+      .map((key) => enabled.get(key))
+      .filter((row): row is NonNullable<typeof row> => row != null)
+      .sort((a, b) => a.priority - b.priority)
+      .map(buildModelInfo);
     res.json({ models });
   } catch {
     res.status(500).json({ error: 'Internal server error' });
