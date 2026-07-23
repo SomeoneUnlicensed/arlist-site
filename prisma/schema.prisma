@@ -222,6 +222,10 @@ model AiModel {
   baseUrl                 String
   upstreamModel           String
   apiKeyEnvVar            String?
+  /// AES-256-GCM ciphertext (see secretCrypto.service.ts) of the actual API key/auth key value,
+  /// entered directly through the admin panel. Preferred over apiKeyEnvVar when present, so a
+  /// model can be fully configured from the admin UI without a server env var / restart.
+  apiKeySecret            String?
   headerName              String?
   extraHeaderName         String?
   extraHeaderEnvVar       String?

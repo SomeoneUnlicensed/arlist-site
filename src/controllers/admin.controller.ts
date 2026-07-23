@@ -5,6 +5,7 @@ import { getSettings, saveSettings } from '../services/settings.service.js';
 import { sendCustomEmail } from '../services/mail.service.js';
 import { invalidateModelRegistry } from '../services/modelRegistry.service.js';
 import { invalidateModelAuth } from '../services/modelAuth.service.js';
+import { encryptSecret } from '../services/secretCrypto.service.js';
 import type { Prisma } from '@prisma/client';
 
 // ── Stats ─────────────────────────────────────────────────
@@ -344,7 +345,9 @@ function validateModelInput(body: any, partial = false): string | null {
     if (value && !ENV_NAME_PATTERN.test(value)) return `${field} must be an environment variable name`;
   }
   if (!partial) {
-    if (!optionalText(body.apiKeyEnvVar)) return 'apiKeyEnvVar is required';
+    if (!optionalText(body.apiKeyEnvVar) && !optionalText(body.apiKey) && !body.hasApiKeySecret) {
+      return 'apiKey (entered directly) or apiKeyEnvVar is required';
+    }
     if (body.authMethod === 'API_KEY_HEADER' && body.wireProtocol === 'OPENAI_COMPATIBLE' && !optionalText(body.headerName)) {
       return 'headerName is required for API_KEY_HEADER';
     }
@@ -356,15 +359,22 @@ function validateModelInput(body: any, partial = false): string | null {
   return null;
 }
 
+/** Strips the apiKeySecret ciphertext and reports only whether one is set. */
 function modelReadiness(model: any) {
-  const names = [model.apiKeyEnvVar, model.extraHeaderEnvVar]
+  const { apiKeySecret, ...rest } = model;
+  const names = [!apiKeySecret ? model.apiKeyEnvVar : null, model.extraHeaderEnvVar]
     .filter(Boolean) as string[];
   const missingEnvVars = names.filter((name) => !process.env[name]);
-  const hasRequiredConfig = Boolean(model.apiKeyEnvVar)
+  const hasRequiredConfig = Boolean(apiKeySecret || model.apiKeyEnvVar)
     && (model.authMethod !== 'API_KEY_HEADER' || model.wireProtocol === 'YANDEXGPT' || Boolean(model.headerName))
     && (model.authMethod !== 'OAUTH2_CLIENT_CREDENTIALS' || Boolean(model.oauthTokenUrl))
     && (model.wireProtocol !== 'YANDEXGPT' || Boolean(model.extraHeaderName && model.extraHeaderEnvVar));
-  return { ...model, isConfigured: hasRequiredConfig && missingEnvVars.length === 0, missingEnvVars };
+  return {
+    ...rest,
+    hasApiKeySecret: Boolean(apiKeySecret),
+    isConfigured: hasRequiredConfig && missingEnvVars.length === 0,
+    missingEnvVars,
+  };
 }
 
 export const getAiModels = async (_req: Request, res: Response) => {
@@ -380,6 +390,7 @@ export const createAiModel = async (req: Request, res: Response) => {
   try {
     const error = validateModelInput(req.body);
     if (error) return res.status(400).json({ error });
+    const apiKey = optionalText(req.body.apiKey);
     const model = await prisma.aiModel.create({ data: {
       key: String(req.body.key).trim(),
       label: String(req.body.label).trim(),
@@ -388,6 +399,7 @@ export const createAiModel = async (req: Request, res: Response) => {
       baseUrl: String(req.body.baseUrl).trim(),
       upstreamModel: String(req.body.upstreamModel).trim(),
       apiKeyEnvVar: optionalText(req.body.apiKeyEnvVar),
+      apiKeySecret: apiKey ? encryptSecret(apiKey) : null,
       headerName: optionalText(req.body.headerName),
       extraHeaderName: optionalText(req.body.extraHeaderName),
       extraHeaderEnvVar: optionalText(req.body.extraHeaderEnvVar),
@@ -408,13 +420,19 @@ export const updateAiModel = async (req: Request, res: Response) => {
     const { id } = req.params as { id: string };
     const existing = await prisma.aiModel.findUnique({ where: { id } });
     if (!existing) return res.status(404).json({ error: 'Model not found' });
-    const error = validateModelInput({ ...existing, ...req.body });
+    const error = validateModelInput({ ...existing, ...req.body, hasApiKeySecret: Boolean(existing.apiKeySecret) });
     if (error) return res.status(400).json({ error });
     const textFields = ['key', 'label', 'baseUrl', 'upstreamModel'] as const;
     const optionalFields = ['apiKeyEnvVar', 'headerName', 'extraHeaderName', 'extraHeaderEnvVar', 'oauthTokenUrl', 'oauthScopeEnvVar'] as const;
     const data: Record<string, unknown> = {};
     for (const field of textFields) if (req.body[field] !== undefined) data[field] = String(req.body[field]).trim();
     for (const field of optionalFields) if (req.body[field] !== undefined) data[field] = optionalText(req.body[field]);
+    // apiKey is write-only: omitted -> leave the stored secret untouched; a non-empty string ->
+    // re-encrypt and replace it; null/'' -> explicitly clear it back to using apiKeyEnvVar.
+    if (req.body.apiKey !== undefined) {
+      const apiKey = optionalText(req.body.apiKey);
+      data.apiKeySecret = apiKey ? encryptSecret(apiKey) : null;
+    }
     if (req.body.wireProtocol !== undefined) data.wireProtocol = req.body.wireProtocol;
     if (req.body.authMethod !== undefined) data.authMethod = req.body.authMethod;
     if (req.body.isEnabled !== undefined) data.isEnabled = req.body.isEnabled;

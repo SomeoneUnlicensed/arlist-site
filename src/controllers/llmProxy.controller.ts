@@ -1,21 +1,19 @@
 import type { Response as ExpressResponse } from 'express';
 import type { AiModel } from '@prisma/client';
 import { recordUsage, isModelAllowed } from '../services/limits.service.js';
-import { getOAuthClientCredentialsToken } from '../services/modelAuth.service.js';
+import { getOAuthClientCredentialsToken, resolveModelApiKey } from '../services/modelAuth.service.js';
 import { getEnabledModels } from '../services/modelRegistry.service.js';
 import { buildModelInfo } from '../services/modelInfoBuilder.service.js';
 
 async function resolveToken(row: AiModel): Promise<string> {
-  if (!row.apiKeyEnvVar) throw new Error(`${row.key}: apiKeyEnvVar not set`);
+  const apiKey = resolveModelApiKey(row);
 
   if (row.authMethod === 'OAUTH2_CLIENT_CREDENTIALS') {
     if (!row.oauthTokenUrl) throw new Error(`${row.key}: oauthTokenUrl not set`);
-    return getOAuthClientCredentialsToken(row.id, row.oauthTokenUrl, row.apiKeyEnvVar, row.oauthScopeEnvVar);
+    return getOAuthClientCredentialsToken(row.id, row.oauthTokenUrl, apiKey, row.oauthScopeEnvVar);
   }
 
-  const token = process.env[row.apiKeyEnvVar];
-  if (!token) throw new Error(`${row.apiKeyEnvVar} not configured`);
-  return token;
+  return apiKey;
 }
 
 async function callOpenAiCompatible(row: AiModel, token: string, body: Record<string, unknown>) {

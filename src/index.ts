@@ -13,7 +13,6 @@ import llmProxyRoutes from './routes/llmProxy.routes.js';
 import oidcProvider from './services/oidc.service.js';
 import { ensureDefaultFreeTariff } from './services/defaultTariff.service.js';
 import statusRoutes from './routes/status.routes.js';
-import { ensureDefaultAiModels } from './services/defaultModels.service.js';
 import { ensureDefaultStatusComponents } from './services/defaultStatusComponents.service.js';
 import { systemLogMiddleware } from './middleware/systemLog.middleware.js';
 import { pruneSystemLogs, writeSystemLog } from './services/systemLog.service.js';
@@ -82,9 +81,6 @@ const startServer = async () => {
   const createdComponents = await ensureDefaultStatusComponents();
   if (createdComponents > 0) console.log(`[status] Created ${createdComponents} default component(s)`);
   await ensureStatusPageSettings();
-
-  const createdModels = await ensureDefaultAiModels();
-  if (createdModels > 0) console.log(`[models] Created ${createdModels} default model(s)`);
 
   const { assignedUsers } = await ensureDefaultFreeTariff();
   if (assignedUsers > 0) console.log(`[tariffs] FREE assigned to ${assignedUsers} user(s)`);
