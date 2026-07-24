@@ -411,6 +411,7 @@ export const createAiModel = async (req: Request, res: Response) => {
     res.status(201).json(modelReadiness(model));
   } catch (error: any) {
     if (error?.code === 'P2002') return res.status(409).json({ error: 'Model key already exists' });
+    console.error('Create AI model error:', error);
     res.status(500).json({ error: 'Internal server error' });
   }
 };
@@ -456,6 +457,7 @@ export const updateAiModel = async (req: Request, res: Response) => {
   } catch (error: any) {
     if (error?.code === 'P2025') return res.status(404).json({ error: 'Model not found' });
     if (error?.code === 'P2002') return res.status(409).json({ error: 'Model key already exists' });
+    console.error('Update AI model error:', error);
     res.status(500).json({ error: 'Internal server error' });
   }
 };
