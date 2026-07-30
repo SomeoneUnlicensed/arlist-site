@@ -1,5 +1,5 @@
 # Build React
-FROM node:20-bookworm-slim AS build-client
+FROM node:22-bookworm-slim AS build-client
 WORKDIR /app/react-app
 COPY react-app/package*.json ./
 RUN npm install
@@ -7,7 +7,7 @@ COPY react-app/ ./
 RUN npm run build
 
 # Build Backend
-FROM node:20-bookworm-slim AS build-server
+FROM node:22-bookworm-slim AS build-server
 WORKDIR /app
 COPY package*.json ./
 RUN npm install
@@ -17,7 +17,7 @@ COPY . .
 RUN npm run build
 
 # Final Stage
-FROM node:20-bookworm-slim
+FROM node:22-bookworm-slim
 RUN apt-get update -y && apt-get install -y openssl && rm -rf /var/lib/apt/lists/*
 WORKDIR /app
 COPY --from=build-server /app/dist ./dist
