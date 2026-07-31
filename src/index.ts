@@ -16,6 +16,7 @@ import { ensureDefaultFreeTariff } from './services/defaultTariff.service.js';
 import statusRoutes from './routes/status.routes.js';
 import { ensureDefaultStatusComponents } from './services/defaultStatusComponents.service.js';
 import { systemLogMiddleware } from './middleware/systemLog.middleware.js';
+import { agentWarningMiddleware } from './middleware/agentWarning.middleware.js';
 import { pruneSystemLogs, writeSystemLog } from './services/systemLog.service.js';
 import { ensureStatusPageSettings } from './services/statusPageSettings.service.js';
 
@@ -35,6 +36,7 @@ const app = express();
 const PORT = process.env.PORT || 8086;
 
 app.set('trust proxy', 1);
+app.use(agentWarningMiddleware);
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
