@@ -17,6 +17,7 @@ import statusRoutes from './routes/status.routes.js';
 import { ensureDefaultStatusComponents } from './services/defaultStatusComponents.service.js';
 import { systemLogMiddleware } from './middleware/systemLog.middleware.js';
 import { agentWarningMiddleware } from './middleware/agentWarning.middleware.js';
+import { aiAgentGuard, honeypotTrap } from './middleware/aiAgentGuard.middleware.js';
 import { pruneSystemLogs, writeSystemLog } from './services/systemLog.service.js';
 import { ensureStatusPageSettings } from './services/statusPageSettings.service.js';
 
@@ -34,6 +35,7 @@ const __dirname = path.dirname(__filename);
 
 const app = express();
 const PORT = process.env.PORT || 8086;
+const oidcPaths = ['/auth', '/token', '/me', '/jwks', '/session'];
 
 app.set('trust proxy', 1);
 app.use(agentWarningMiddleware);
@@ -41,6 +43,15 @@ app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(systemLogMiddleware);
+
+// Hidden trap: never linked for humans, only a bot/agent that crawls or
+// probes every path would ever hit it. Any hit bans the IP for an hour.
+app.all('/api/__trap', honeypotTrap);
+
+// Known AI-agent/crawler UAs are blocked on auth-sensitive routes. Deliberately
+// excludes /api/v1 (LLM proxy) and /api/cli/auth: those are the legitimate
+// programmatic API this product sells, not something to gate on user-agent.
+app.use(['/interaction', '/api/auth', '/api/admin', ...oidcPaths], aiAgentGuard);
 
 // API routes
 app.use('/interaction', interactionRoutes);
@@ -67,7 +78,6 @@ app.use(express.static(path.join(__dirname, '../dist-client'), { index: false })
 
 // React SPA fallback must run before oidc-provider: the provider responds with
 // its own 404 for unknown paths instead of delegating them to React Router.
-const oidcPaths = ['/auth', '/token', '/me', '/jwks', '/session'];
 app.get(/.*/, (req, res, next) => {
   const isBackendPath = req.path.startsWith('/api')
     || req.path.startsWith('/interaction')
