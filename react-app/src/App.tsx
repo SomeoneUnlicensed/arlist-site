@@ -11,6 +11,7 @@ import ResetPassword from './pages/ResetPassword';
 import CliAuth from './pages/CliAuth';
 import Status from './pages/Status';
 import Home from './pages/Home';
+import { KnotCalculatorPage } from './pages/KnotCalculator';
 import { LegalPage } from './pages/LegalPage';
 import { LegalDocumentPage } from './pages/LegalDocumentPage';
 import { ContactsPage, DocsPage, EducationPage, GrusnubPage, LandingsPage, ManifestPage, PrivacyPage, ProductsPage, PromoPage, VspyshkaPage } from './pages/PublicPages';
@@ -47,6 +48,7 @@ function App() {
           <Route path="/promo/manifest" element={<ManifestPage />} />
           <Route path="/vspyshka" element={<VspyshkaPage />} />
           <Route path="/grusnub" element={<GrusnubPage />} />
+          <Route path="/knots" element={<KnotCalculatorPage />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="/verify" element={<Verify />} />

@@ -56,7 +56,7 @@ app.get('/api/health', (req, res) => {
 });
 
 // React SPA routes
-app.get(['/', '/products', '/forEdu', '/contacts', '/docs', '/landings', '/legal', '/legal/geotekt-policies', '/promo', '/promo/manifest', '/vspyshka', '/grusnub', '/login', '/register', '/verify', '/profile', '/admin', '/privacy-policy', '/forgot-password', '/reset-password', '/cli/auth', '/status', '/transparency', '/transparancy'], (req, res) => {
+app.get(['/', '/products', '/forEdu', '/contacts', '/docs', '/landings', '/legal', '/legal/geotekt-policies', '/promo', '/promo/manifest', '/vspyshka', '/grusnub', '/knots', '/login', '/register', '/verify', '/profile', '/admin', '/privacy-policy', '/forgot-password', '/reset-password', '/cli/auth', '/status', '/transparency', '/transparancy'], (req, res) => {
   res.sendFile(path.join(__dirname, '../dist-client/index.html'));
 });
 
